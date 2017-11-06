@@ -1,0 +1,54 @@
+{
+  "mem_fuzz_train": {
+    "sut": "../bin/sut/mem_thrashing_test",
+    "template_data": "../templates/mem_thrashing/parameters.json",
+    "template_file": "../templates/mem_thrashing/template_mem_thrashing.c",
+    "cores": 3,
+    "method":"fuzz",
+    "kappa": 0,
+    "log_file": "mem_fuzz_log.txt",
+    "max_file": "mem_fuzz_max.txt",
+    "training_time": 240,
+    "max_temperature": 70,
+    "cooldown_time": 10
+  },
+  "mem_baysian_train1": {
+    "sut": "../bin/sut/mem_thrashing_test",
+    "template_data": "../templates/mem_thrashing/parameters.json",
+    "template_file": "../templates/mem_thrashing/template_mem_thrashing.c",
+    "cores": 3,
+    "method":"baysian",
+    "kappa": 2,
+    "log_file": "mem_baysian_log_kappa2.txt",
+    "max_file": "mem_baysian_max_kappa2.txt",
+    "training_time": 240,
+    "max_temperature": 70,
+    "cooldown_time": 10
+  },
+  "mem_baysian_train2": {
+    "sut": "../bin/sut/mem_thrashing_test",
+    "template_data": "../templates/mem_thrashing/parameters.json",
+    "template_file": "../templates/mem_thrashing/template_mem_thrashing.c",
+    "cores": 3,
+    "method":"baysian",
+    "kappa": 6,
+    "log_file": "mem_baysian_log_kappa6.txt",
+    "max_file": "mem_baysian_max_kappa6.txt",
+    "training_time": 240,
+    "max_temperature": 70,
+    "cooldown_time": 10
+  },
+  "mem_baysian_train3": {
+    "sut": "../bin/sut/mem_thrashing_test",
+    "template_data": "../templates/mem_thrashing/parameters.json",
+    "template_file": "../templates/mem_thrashing/template_mem_thrashing.c",
+    "cores": 3,
+    "method":"baysian",
+    "kappa": 10,
+    "log_file": "mem_baysian_log_kappa10.txt",
+    "max_file": "mem_baysian_max_kappa10.txt",
+    "training_time": 240,
+    "max_temperature": 70,
+    "cooldown_time": 10
+  }
+}

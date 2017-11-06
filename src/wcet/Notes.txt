@@ -1,0 +1,5 @@
+bsort100 didn't work out of the box and I changed one value to make it work.
+Check the source file. This might have made the array trivial to sort. 
+Results from this app should be approached cautiously
+
+Some of the other apps didn't work and I couldn't get them to easily. Check the not_working directory. 

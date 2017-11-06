@@ -1,0 +1,24 @@
+{
+  "DEFINES": {
+    "INSTR1": {
+      "range" :[1,6],
+      "type": "int"
+    },
+    "INSTR2": {
+      "range" :[1,6],
+      "type": "int"
+    },
+    "INSTR3": {
+      "range" :[1,6],
+      "type": "int"
+    },
+    "INSTR4": {
+      "range" :[1,6],
+      "type": "int"
+    },
+    "INSTR5": {
+      "range" :[1,6],
+      "type": "int"
+    }
+  }
+}

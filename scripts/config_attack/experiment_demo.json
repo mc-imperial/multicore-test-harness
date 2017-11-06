@@ -1,0 +1,18 @@
+{
+  "mem_thrashing_test": {
+    "sut": "../bin/sut/mem_thrashing_test",
+    "stress": ["../bin/mem_thrashing_stress/mem_thrashing_stress","../bin/pipeline_stress/full_pipeline_stress"],
+    "cores": [1,2,3],
+    "iterations": 5,
+    "max_temperature": 70,
+    "cooldown_time": 10
+  },
+  "core_mark": {
+    "sut": "../bin/sut/coremark.exe",
+    "stress": ["../bin/mem_thrashing_stress/mem_thrashing_stress","../bin/pipeline_stress/full_pipeline_stress"],
+    "cores": [1,2,3],
+    "iterations": 5,
+    "max_temperature": 70,
+    "cooldown_time": 10
+  }
+}

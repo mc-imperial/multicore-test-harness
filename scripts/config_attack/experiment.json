@@ -1,0 +1,19 @@
+{
+  "cache_evaluation": {
+    "sut": "../bin/sut/crc_wcet",
+    "stress": "../bin/cache_stress/L3_unified_stress",
+    "cores": [1,2],
+    "iterations": 5,
+    "max_temperature": 70, 
+    "cooldown_time": 10
+  },
+    "RAM_evaluation": {
+    "sut": "../bin/sut/mem_thrashing_test",
+    "stress": ["../bin/cache_stress/L3_unified_stress", "../bin/mem_thrashing_stress/mem_thrashing_stress"],
+    "cores": [1,2],
+    "iterations": 5,
+    "max_temperature": 70,
+    "cooldown_time": 10
+  }
+}
+

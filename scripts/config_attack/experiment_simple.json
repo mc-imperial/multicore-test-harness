@@ -1,0 +1,10 @@
+{
+  "cache_evaluation": {
+    "sut": ["../bin/sut/coremark.exe", "../bin/sut/mem_thrashing_test", "../bin/sut/run_cyclictest.sh"],
+    "stress": "../bin/cache_stress/L3_unified_stress",
+    "cores": [1,2],
+    "iterations": 5,
+    "max_temperature": 70,
+    "cooldown_time": 10
+  }
+}

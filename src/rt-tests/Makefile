@@ -1,0 +1,222 @@
+VERSION_STRING = 0.92
+
+HAVE_NPTL ?= yes
+
+ifeq ($(HAVE_NPTL),yes)
+sources = cyclictest.c pi_stress.c pip_stress.c pmqtest.c rt-migrate-test.c
+endif
+
+sources += signaltest.c ptsematest.c sigwaittest.c svsematest.c sendme.c \
+	  hackbench.c
+
+TARGETS = $(sources:.c=)
+
+LIBS	= -lrt -lpthread
+RTTESTLIB = -lrttest -L.
+EXTRA_LIBS ?= -ldl	# for get_cpu
+DESTDIR	?=
+prefix  ?= /usr/local
+bindir  ?= $(prefix)/bin
+mandir	?= $(prefix)/share/man
+srcdir	?= $(prefix)/src
+
+machinetype = $(shell $(CC) -dumpmachine | \
+    sed -e 's/-.*//' -e 's/i.86/i386/' -e 's/mips.*/mips/' -e 's/ppc.*/powerpc/')
+
+CFLAGS ?= -Wall -Wno-nonnull
+CPPFLAGS += -D_GNU_SOURCE -Isrc/include
+LDFLAGS ?=
+
+ifneq ($(filter x86_64 i386 ia64 mips powerpc,$(machinetype)),)
+NUMA 	:= 1
+ifdef HAVE_PARSE_CPUSTRING_ALL
+	CFLAGS += -DHAVE_PARSE_CPUSTRING_ALL
+endif
+endif
+
+PYLIB  := $(shell python -c 'import distutils.sysconfig;  print distutils.sysconfig.get_python_lib()')
+
+ifndef DEBUG
+	CFLAGS	+= -O2
+else
+	CFLAGS	+= -O0 -g
+endif
+
+ifeq ($(NUMA),1)
+	CFLAGS += -DNUMA
+	NUMA_LIBS = -lnuma
+endif
+
+VPATH	= src/cyclictest:
+VPATH	+= src/signaltest:
+VPATH	+= src/pi_tests:
+VPATH	+= src/rt-migrate-test:
+VPATH	+= src/ptsematest:
+VPATH	+= src/sigwaittest:
+VPATH	+= src/svsematest:
+VPATH	+= src/pmqtest:
+VPATH	+= src/backfire:
+VPATH	+= src/lib
+VPATH	+= src/hackbench
+
+%.o: %.c
+	$(CC) -D VERSION_STRING=$(VERSION_STRING) -c $< $(CFLAGS) $(CPPFLAGS)
+
+# Pattern rule to generate dependency files from .c files
+%.d: %.c
+	@$(CC) -MM $(CFLAGS) $(CPPFLAGS) $< | sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' > $@ || rm -f $@
+
+.PHONY: all
+all: $(TARGETS) hwlatdetect
+
+# Include dependency files, automatically generate them if needed.
+-include $(sources:.c=.d)
+
+cyclictest: cyclictest.o librttest.a
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $< $(LIBS) $(RTTESTLIB) $(NUMA_LIBS)
+	cp cyclictest ../../bin/sut/cyclictest 
+	cp run_cyclictest.sh ../../bin/sut/run_cyclictest.sh
+
+signaltest: signaltest.o librttest.a
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $< $(LIBS) $(RTTESTLIB)
+
+pi_stress: pi_stress.o librttest.a
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $< $(LIBS) $(RTTESTLIB)
+
+hwlatdetect:  src/hwlatdetect/hwlatdetect.py
+	chmod +x src/hwlatdetect/hwlatdetect.py
+	ln -s src/hwlatdetect/hwlatdetect.py hwlatdetect
+
+rt-migrate-test: rt-migrate-test.o
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $< $(LIBS)
+
+ptsematest: ptsematest.o librttest.a
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $< $(LIBS) $(RTTESTLIB) $(EXTRA_LIBS)
+
+sigwaittest: sigwaittest.o librttest.a
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $< $(LIBS) $(RTTESTLIB) $(EXTRA_LIBS)
+
+svsematest: svsematest.o librttest.a
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $< $(LIBS) $(RTTESTLIB) $(EXTRA_LIBS)
+
+pmqtest: pmqtest.o librttest.a
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $< $(LIBS) $(RTTESTLIB) $(EXTRA_LIBS)
+
+sendme: sendme.o librttest.a
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $< $(LIBS) $(RTTESTLIB) $(EXTRA_LIBS)
+
+pip_stress: pip_stress.o librttest.a
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $< $(LIBS) $(RTTESTLIB)
+
+hackbench: hackbench.o
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $< $(LIBS)
+
+librttest.a: rt-utils.o error.o rt-get_cpu.o rt-sched.o
+	$(AR) rcs librttest.a $^
+
+CLEANUP  = $(TARGETS) *.o .depend *.*~ *.orig *.rej rt-tests.spec *.d *.a
+CLEANUP += $(if $(wildcard .git), ChangeLog)
+
+.PHONY: clean
+clean:
+	for F in $(CLEANUP); do find -type f -name $$F | xargs rm -f; done
+	rm -f hwlatdetect
+	rm -f tags
+	rm -f ../../bin/sut/cyclictest 
+	rm -f ../../bin/sut/run_cyclictest.sh
+
+
+RPMDIRS = BUILD BUILDROOT RPMS SRPMS SPECS
+.PHONY: distclean
+distclean: clean
+	rm -rf $(RPMDIRS) releases *.tar.gz rt-tests.spec tmp
+
+.PHONY: changelog
+changelog:
+	git log >ChangeLog
+
+.PHONY: install
+install: all
+	mkdir -p "$(DESTDIR)$(bindir)" "$(DESTDIR)$(mandir)/man4"
+	mkdir -p "$(DESTDIR)$(srcdir)" "$(DESTDIR)$(mandir)/man8"
+	cp $(TARGETS) "$(DESTDIR)$(bindir)"
+	if test -n "$(PYLIB)" ; then \
+		install -D -m 755 src/hwlatdetect/hwlatdetect.py $(DESTDIR)$(PYLIB)/hwlatdetect.py ; \
+		rm -f "$(DESTDIR)$(bindir)/hwlatdetect" ; \
+		ln -s $(PYLIB)/hwlatdetect.py "$(DESTDIR)$(bindir)/hwlatdetect" ; \
+	fi
+	install -D -m 644 src/backfire/backfire.c "$(DESTDIR)$(srcdir)/backfire/backfire.c"
+	install -m 644 src/backfire/Makefile "$(DESTDIR)$(srcdir)/backfire/Makefile"
+	gzip src/backfire/backfire.4 -c >"$(DESTDIR)$(mandir)/man4/backfire.4.gz"
+	gzip src/cyclictest/cyclictest.8 -c >"$(DESTDIR)$(mandir)/man8/cyclictest.8.gz"
+	gzip src/pi_tests/pi_stress.8 -c >"$(DESTDIR)$(mandir)/man8/pi_stress.8.gz"
+	gzip src/hwlatdetect/hwlatdetect.8 -c >"$(DESTDIR)$(mandir)/man8/hwlatdetect.8.gz"
+	gzip src/ptsematest/ptsematest.8 -c >"$(DESTDIR)$(mandir)/man8/ptsematest.8.gz"
+	gzip src/sigwaittest/sigwaittest.8 -c >"$(DESTDIR)$(mandir)/man8/sigwaittest.8.gz"
+	gzip src/svsematest/svsematest.8 -c >"$(DESTDIR)$(mandir)/man8/svsematest.8.gz"
+	gzip src/pmqtest/pmqtest.8 -c >"$(DESTDIR)$(mandir)/man8/pmqtest.8.gz"
+	gzip src/backfire/sendme.8 -c >"$(DESTDIR)$(mandir)/man8/sendme.8.gz"
+	gzip src/hackbench/hackbench.8 -c >"$(DESTDIR)$(mandir)/man8/hackbench.8.gz"
+
+.PHONY: release
+release: distclean changelog
+	mkdir -p releases
+	mkdir -p tmp/rt-tests
+	cp -r Makefile COPYING ChangeLog MAINTAINERS doc README.markdown src tmp/rt-tests
+	rm -f rt-tests-$(VERSION_STRING).tar rt-tests-$(VERSION_STRING).tar.asc
+	tar -C tmp -cf rt-tests-$(VERSION_STRING).tar rt-tests
+	gpg2 --default-key clrkwllms@kernel.org --detach-sign --armor rt-tests-$(VERSION_STRING).tar
+	gzip rt-tests-$(VERSION_STRING).tar
+	rm -f ChangeLog
+	cp rt-tests-$(VERSION_STRING).tar.gz rt-tests-$(VERSION_STRING).tar.asc releases
+
+.PHONY: push
+push:	release
+	scripts/do-git-push $(VERSION_STRING)
+
+.PHONY: pushtest
+pushtest: release
+	scripts/do-git-push --test $(VERSION_STRING)
+
+rt-tests.spec: Makefile rt-tests.spec-in
+	sed s/__VERSION__/$(VERSION_STRING)/ <$@-in >$@
+ifeq ($(NUMA),1)
+	sed -i -e 's/__MAKE_NUMA__/NUMA=1/' $@
+	sed -i -e 's/__BUILDREQUIRES_NUMA__/numactl-devel/' $@
+else
+	sed -i -e 's/__MAKE_NUMA__//' $@
+	sed -i -e 's/__BUILDREQUIRES_NUMA__//' $@
+endif
+
+
+HERE	:=	$(shell pwd)
+RPMARGS	:=	--define "_topdir $(HERE)" 	\
+		--define "_sourcedir $(HERE)/releases" 	\
+		--define "_builddir $(HERE)/BUILD" 	\
+
+.PHONY: rpm
+rpm:	rpmdirs release rt-tests.spec
+	rpmbuild -ba $(RPMARGS) rt-tests.spec
+
+.PHONY: rpmdirs
+rpmdirs:
+	@[ -d BUILD ]  || mkdir BUILD
+	@[ -d RPMS ]   || mkdir RPMS
+	@[ -d SRPMS ]  || mkdir SRPMS
+
+.PHONY: help
+help:
+	@echo ""
+	@echo " rt-tests useful Makefile targets:"
+	@echo ""
+	@echo "    all       :  build all tests (default"
+	@echo "    install   :  install tests to local filesystem"
+	@echo "    release   :  build source tarfile"
+	@echo "    rpm       :  build RPM package"
+	@echo "    clean     :  remove object files"
+	@echo "    distclean :  remove all generated files"
+	@echo "    help      :  print this message"
+
+.PHONY: tags
+tags:
+	ctags -R --extra=+f --c-kinds=+p --exclude=tmp --exclude=BUILD *
