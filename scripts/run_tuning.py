@@ -21,7 +21,7 @@
 ################################################################################
 
 """@package python_scripts
-A python for trainning based on fuzzing and baysian optimisation
+A python for tuning based on fuzzing and baysian optimisation
 """
 
 import json
@@ -37,12 +37,12 @@ from common import cooldown
 
 
 class Training(object):
-    """Run trainning based on fuzzing or baysian optimisation
+    """Run tuning based on fuzzing or baysian optimisation
     Reads and runs the trainnings described in the JSON file.
     """
     def __init__(self):
         """
-        Create a trainning object
+        Create a tuning object
         """
         self._sut = None
         self._template_data_file = None
