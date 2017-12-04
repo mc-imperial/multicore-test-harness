@@ -1,4 +1,4 @@
-CACHE_FILE = dan-laptop_cache.json
+CACHE_FILE = raspberry_cache.json
 COREMARK_PORT_DIR = linux64
 
 
