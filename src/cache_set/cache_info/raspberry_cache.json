@@ -1,26 +1,26 @@
 {
-	"L1_instr_cache": {
+	"L1_instr": {
 		"type": "instr",
 		"shared": false,
 		"level": 1,
 		"size": 16,
-        "cache_line": 64,
+		"cache_line": 64,
 		"associativity": 2
 	},
-	"L1_data_cache": {
+	"L1_data": {
 		"type": "data",
 		"shared": false,
 		"level": 2,
 		"size": 16,
-        "cache_line": 64,
+		"cache_line": 64,
 		"associativity": 4
-  },
-	"L2_unified_cache": {
+	},
+	"L2_unified": {
 		"type": "unified",
 		"shared": true,
 		"level": 2,
 		"size": 512,
-        "cache_line": 64,
+		"cache_line": 64,
 		"associativity": 16
-  }
+	}
 }
