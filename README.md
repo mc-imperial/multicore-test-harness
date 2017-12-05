@@ -61,7 +61,10 @@ The enemy processes are written in C and the experiments are driven by scripts w
 For Bayesian optimization:
 ```
   sudo apt install python-pip
-  pip install bayesian-optimization
+  sudo pip install --upgrade pip
+  sudo apt-get install python-numpy python-scipy
+  sudo pip install setuptools
+  sudo pip install bayesian-optimization
 ```
 For RT-tests:
 ```
