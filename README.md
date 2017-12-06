@@ -56,6 +56,8 @@ The enemy processes are written in C and the experiments are driven by scripts w
 
 ## Building
 
+The system has been tested on Ubuntu 16.04 and on an Raspberry Pi 3 running Raspbian Jessie. We make the assumption that the system has a gcc compiler for that architecture on which the harness will be run.
+
 1\. Dependencies to install:
 
 For Bayesian optimization:
@@ -181,6 +183,8 @@ Doxygen is used to generate documentation from annotated source files. It will g
 ## Raspberry Pi 3 Results
 
 In this section, we provide the results of the the multicore test harness on the Raspberry Pi 3 with a Real-Time Kernel.
+
+The Raspberry Pi, was configured by flasshing an SD cared with [Raspbian Jessie](http://downloads.raspberrypi.org/raspbian/images/raspbian-2017-07-05/) and replacing the kernel with a RT as instructed [here](http://www.frank-durr.de/?p=203).
 
 ### Tuning
 
