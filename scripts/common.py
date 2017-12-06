@@ -60,7 +60,12 @@ def get_temp():
     """
     c = ProcessManagement()
     cmd = "cat /sys/class/thermal/thermal_zone*/temp"
-    temp = float(c.system_call(cmd, True)[0]) / 1000
+    command_output = c.system_call(cmd, True)[0]
+    try:
+        temp = float(command_output) / 1000
+    except ValueError:
+        print "\n\tWARNING: Unable to find temperature for this system. Using default temperature of 30C\n"
+        temp = 30
     return temp
 
 def cooldown(temp_threshold):
