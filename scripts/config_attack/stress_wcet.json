@@ -1,0 +1,11 @@
+{
+  "coremark_stress": {
+    "sut": ["../bin/sut/adpcm_wcet", "../bin/sut/bs_wcet", "../bin/sut/bsort100_wcet", "../bin/sut/cnt_wcet", "../bin/sut/compress_wcet", "../bin/sut/duff_wcet", "../bin/sut/edn_wcet", "../bin/sut/expint_wcet", "../bin/sut/fac_wcet", "../bin/sut/fdct_wcet", "../bin/sut/fft1_wcet", "../bin/sut/fibcall_wcet", "../bin/sut/fir_wcet", "../bin/sut/insertsort_wcet", "../bin/sut/janne_complex_wcet", "../bin/sut/jfdctint_wcet", "../bin/sut/lcdnum_wcet", "../bin/sut/lms_wcet", "../bin/sut/ludcmp_wcet", "../bin/sut/matmult_wcet", "../bin/sut/minver_wcet", "../bin/sut/ndes_wcet", "../bin/sut/ns_wcet", "../bin/sut/nsichneu_wcet", "../bin/sut/prime_wcet", "../bin/sut/qsort_exam_wcet", "../bin/sut/qurt_wcet",  "../bin/sut/select_wcet", "../bin/sut/statemate_wcet", "../bin/sut/ud_wcet"
+    ],
+    "stress": "../bin/cache_stress/L1_data_stress",
+    "cores": [1],
+    "iterations": 1,
+    "max_temperature": 70,
+    "cooldown_time": 10
+  }
+}
