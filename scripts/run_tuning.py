@@ -236,7 +236,7 @@ class Training(object):
                 + str(max_value) + "\t\t" + str(cur_value) +"\t\t" + self._pp_d(conf) + "\n"
             data_file.write(d)
 
-    def baysian_train(self):
+    def bayesian_train(self):
         """
         Training using Baysian Optimisation
         :return:
@@ -320,9 +320,9 @@ class Training(object):
             if self._method == "fuzz":
                 print "Training by fuzzing"
                 self.fuzz_train()
-            elif self._method == "baysian":
+            elif self._method == "bayesian":
                 print "Training by Baysian Optimisation"
-                self.baysian_train()
+                self.bayesian_train()
             else:
                 print "I do not know how to train that way"
                 sys.exit(0)
