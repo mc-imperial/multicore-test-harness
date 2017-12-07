@@ -120,6 +120,15 @@ There are two possibilities to train an enemy process to cause as much interfere
 
 3\. A file describing all the iterations **log_file** and a file describing the parameters for the maximum interference **max_file** will be created. This parameters can be used as defines to compile the template file.
 
+#### Demo scripts
+
+* **config_tune/tune_cache.json** : This script will try to find the optimal parameters for the cache stress. It will try to this by fuzzing and by Bayesian Optimisation.
+* **config_tune/tune_mem.json** : This script will try to find the optimal parameters for the memory stress. It will try to this by fuzzing and by Bayesian Optimisation.
+* **config_tune/tune_system.json** : This script will try to find the optimal parameters for the system stress. It will try to this by fuzzing and by Bayesian Optimisation.
+
+*Note:* All scripts will run for 8 hours and will record the detected parameters in .txt files.
+
+
 ## Running the SUT in the precedence of enemy processes
 
 1\. Create a JSON file that defines the experiment that needs to be run with the following parameters:
@@ -163,6 +172,20 @@ This will run experiments with the cross product of all the applications in the 
     python plot.py <output>.json
 ```
 
+#### Demo scripts
+
+* **config_attack/stress_cache.json** : This script will stress the cache intensive applications with the untrained enemy processes.
+* **config_attack/stress_coremark.json** : This script will stress the coremark benchmark with the untrained enemy processes.
+* **config_attack/stress_memory.json** : This script will stress the memory intensive application by running all alongside the untrained enemy processes.
+* **config_attack/stress_RT.json** : This script will stress the real-time capabilities of the system by running with the untrained enemy processes. The benchmark will ask for sudo permission.
+* **config_attack/stress_system_calls.json** : This script will stress a system calls intensive application with the untrained enemy processes.
+* **config_attack/stress_wcet.json** : This script will stress the Malardalen WCET benchmarks with the untrained enemy processes.
+
+*Note 1:* All the demo scripts are configured to run with enemy processes on 1, 2 and 3 cores. Each configuration will run a number of 50 times and will only start if the temperature is below 70C.
+
+*Note 2:* Compile and add the tuned enemy processes to the **stress** list in for your specific platform.
+
+
 ## Doxygen (Doxygen)
 
 Doxygen is used to generate documentation from annotated source files. It will generate HTML and Latex documentation in the /doc folder.
@@ -184,7 +207,7 @@ Doxygen is used to generate documentation from annotated source files. It will g
 
 In this section, we provide the results of the the multicore test harness on the Raspberry Pi 3 with a Real-Time Kernel.
 
-The Raspberry Pi, was configured by flasshing an SD cared with [Raspbian Jessie](http://downloads.raspberrypi.org/raspbian/images/raspbian-2017-07-05/) and replacing the kernel with a RT as instructed [here](http://www.frank-durr.de/?p=203).
+The Raspberry Pi, was configured by flashing an SD cared with [Raspbian Jessie](http://downloads.raspberrypi.org/raspbian/images/raspbian-2017-07-05/) and replacing the kernel with a RT as instructed [here](http://www.frank-durr.de/?p=203).
 
 ### Tuning
 

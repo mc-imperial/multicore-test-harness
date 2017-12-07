@@ -12,41 +12,15 @@
     "max_temperature": 70,
     "cooldown_time": 10
   },
-  "cache_baysian_train1": {
+  "cache_bayesian_train": {
     "sut": "../bin/sut/L2_unified_test",
     "template_data": "../templates/cache/parameters.json",
     "template_file": "../templates/cache/template_cache_stress.c",
     "cores": 3,
-    "method":"baysian",
-    "kappa": 2,
-    "log_file": "cache_baysian_log_kappa2.txt",
-    "max_file": "cache_baysian_max_kappa2.txt",
-    "training_time": 240,
-    "max_temperature": 70,
-    "cooldown_time": 10
-  },
-  "cache_baysian_train2": {
-    "sut": "../bin/sut/L2_unified_test",
-    "template_data": "../templates/cache/parameters.json",
-    "template_file": "../templates/cache/template_cache_stress.c",
-    "cores": 3,
-    "method":"baysian",
-    "kappa": 6,
-    "log_file": "cache_baysian_log_kappa6.txt",
-    "max_file": "cache_baysian_max_kappa6.txt",
-    "training_time": 240,
-    "max_temperature": 70,
-    "cooldown_time": 10
-  },
-  "cache_baysian_train3": {
-    "sut": "../bin/sut/L2_unified_test",
-    "template_data": "../templates/cache/parameters.json",
-    "template_file": "../templates/cache/template_cache_stress.c",
-    "cores": 3,
-    "method":"baysian",
-    "kappa": 10,
-    "log_file": "cache_baysian_log_kappa10.txt",
-    "max_file": "cache_baysian_max_kappa10.txt",
+    "method":"bayesian",
+    "kappa": 5,
+    "log_file": "cache_bayesian_log.txt",
+    "max_file": "cache_bayesian_max.txt",
     "training_time": 240,
     "max_temperature": 70,
     "cooldown_time": 10
