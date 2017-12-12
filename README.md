@@ -42,6 +42,8 @@ An industry-standard benchmark for embedded systems that can be found [here](htt
 
 A benchmark suite to test the latency of real-time threads. It is based on lunching high-priority threads that should preempt any process running on the processor and measuring the actual time that is required to do so. It can be found [here](https://github.com/jlelli/rt-tests)
 
+*Note*: If you plan to use one of the external SUTs, it is your responsibility to check the license associated with that SUT
+
 
 ## Structure
 The enemy processes are written in C and the experiments are driven by scripts written in python 2.
