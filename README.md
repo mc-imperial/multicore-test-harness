@@ -253,7 +253,7 @@ F - tuned using Fuzzing
 
 B - Tuned using Bayesian optimization
 
-|                  | Cache litmus | Memory litmus | System litmus | Pipeline litmus| Coremark |
+|  *Enemy process* | *Cache litmus time(us)*  | *Memory litmus time(us)* | *System litmus time(us)* | *Pipeline litmus time(us)* | *Coremark time(us)* |
 | ---------------- |:------------:|:-------------:|:-------------:|:--------------:|:--------:|
 | baseline         | 605113       | 800807        | 1608829       | 3543630        | 12490000 |
 | U cache          | 3345717      | 1079123       | 1945448       | 3594554        | 12720000 |
