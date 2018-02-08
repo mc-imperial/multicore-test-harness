@@ -215,7 +215,7 @@ The Raspberry Pi, was configured by flashing an SD cared with [Raspbian Jessie](
 
 **Cache enemy**
 
-|               | Fuzzing       | Bayesian optimization  |
+| *Parameters*  | *Values detected by <br /> fuzzing* | *Values detected by <br />  bayesian optimization*|
 | ------------- |:-------------:|:----------------------:|
 | ASSOCIATIVITY | 154           | 113                    |
 | INSTR1        | 1             | 1                      |
@@ -228,14 +228,14 @@ The Raspberry Pi, was configured by flashing an SD cared with [Raspbian Jessie](
 
 **Memory enemy**
 
-|                  | Fuzzing       | Bayesian optimization  |
+| *Parameters*  | *Values detected by <br /> fuzzing* | *Values detected by <br />  bayesian optimization*|
 | ---------------- |:-------------:|:----------------------:|
 | SIZE_MB          | 29            | 95                     |
 | PAGE_SIZE_BYTES  | 9853          | 8907                   |
 
 **System enemy**
 
-|               | Fuzzing       | Bayesian optimization  |
+| *Parameters*  | *Values detected by <br /> fuzzing* | *Values detected by <br />  bayesian optimization*|
 | ------------- |:-------------:|:----------------------:|
 | INSTR1        | 2             | 2                      |
 | INSTR2        | 3             | 4                      |
