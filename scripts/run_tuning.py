@@ -1,27 +1,27 @@
 ################################################################################
- # Copyright (c) 2017 Dan Iorga, Tyler Sorenson, Alastair Donaldson
+# Copyright (c) 2017 Dan Iorga, Tyler Sorenson, Alastair Donaldson
 
- # Permission is hereby granted, free of charge, to any person obtaining a copy
- # of this software and associated documentation files (the "Software"), to deal
- # in the Software without restriction, including without limitation the rights
- # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- # copies of the Software, and to permit persons to whom the Software is
- # furnished to do so, subject to the following conditions:
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
 
- # The above copyright notice and this permission notice shall be included in all
- #copies or substantial portions of the Software.
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
 
- # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- # SOFTWARE.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 ################################################################################
 
 """@package python_scripts
-A python for tuning based on fuzzing and baysian optimisation
+A python for tuning based on fuzzing and Bayesian Optimisation
 """
 
 import json
@@ -30,22 +30,170 @@ import os
 
 from bayes_opt import BayesianOptimization
 from time import time
-from random import randrange, uniform
+from random import randrange, uniform, choice
 
 from run_sut_stress import SutStress
 from common import cooldown
 
 
-class Training(object):
+class ConfigurableEnemy(object):
+    """
+    Object that hold all information about a template
+    """
+
+    def __init__(self):
+        """
+        Initialise a template object with template file and template data
+        """
+        self._t_file = None
+        self._d_file = None
+        self._define_range = None
+
+        self._defines = None
+
+    def set_template(self, template_file, data_file):
+        """
+        Set the template C file and the JSON with the data ranges
+        :param template_file: Template C file
+        :param data_file: JSON file with data range
+        :return:
+        """
+
+        self._t_file = template_file
+        self._d_file = data_file
+
+        self._read_range_data()
+
+    def _read_range_data(self):
+        """
+        Read the template JSON data from the d_file and store in in defines
+        :return:
+        """
+
+        # Read the configuration in the JSON file
+        with open(self._d_file) as data_file:
+            template_object = json.load(data_file)
+
+        try:
+            self._define_range = template_object["DEFINES"]
+        except KeyError:
+            print "Unable to find DEFINES in JSON"
+
+    def set_defines(self, defines):
+        """
+        :param defines: Dictionary of instantiated defines
+        :return:
+        """
+        # Make sure that the parameters are of the correct type
+        # Workaround to force BO to generate init_points
+        for key in defines:
+            if self._define_range[key]["type"] == "int":
+                self._defines[key] = int(defines[key])
+            elif self._define_range[key]["type"] == "float":
+                self._defines[key] = float(defines[key])
+            else:
+                print("Unknown data type for param " + str(key))
+                sys.exit(1)
+
+    def random_instantiate_defines(self):
+        """
+        Instantiate the template with random values
+        :return A dict with random defines
+        """
+        self._defines = {}
+        for param in self._define_range:
+            min_val = self._define_range[param]["range"][0]
+            max_val = self._define_range[param]["range"][1]
+            if self._define_range[param]["type"] == "int":
+                self._defines[param] = randrange(min_val, max_val)
+            elif self._define_range[param]["type"] == "float":
+                self._defines[param] = uniform(min_val, max_val)
+            else:
+                print("Unknown data type for param " + str(param))
+                sys.exit(1)
+
+    def create_bin(self, output_file):
+        """
+        :param output_file: The name of the file that will be outputted
+        :return:
+        """
+
+        defines = ["-D" + d + "=" + str(self._defines[d]) for d in inst]
+        cmd = "gcc -std=gnu11 -Wall " + " ".join(defines) + " " + self._t_file + " -lm" + " -o " + output_file
+        print "Compiling:", cmd
+        os.system(cmd)
+
+
+class EnemyConfiguration(object):
+    """Hold the configuration on how an attack should look like"""
+    def_files = {"../templates/cache/template_cache_stress.c":
+                 "../templates/cache/parameters.json",
+                 "../templates/mem_thrashing/template_mem_thrashing.c":
+                 "../templates/mem_thrashing/parameters.json",
+                 "../templates/pipeline_stress/template_pipeline_stress.c":
+                 "../templates/pipeline_stress/parameters.json",
+                 "../templates/system_calls/template_system_calls.c":
+                 "../templates/system_calls/parameters.json"}
+
+    def __init__(self, enemy_cores):
+        """
+        If no template file and data file is provided we use all of them since every configuration is possible
+        :param enemy_cores: The total number of enemy processes
+        """
+        self._enemy_cores = enemy_cores
+        self._enemies = [ConfigurableEnemy] * enemy_cores
+        self._enemy_files = []
+
+    def set_all_defines(self, list_dict):
+        """
+        :param list_dict: List where each element is a dict with defines for each template
+        :return:
+        """
+
+        assert len(list_dict) == len(self._enemies), "List of defs does not match list of enemies"
+
+        for i in range(len(list_dict)):
+            self._enemies[i].set_defines(list_dict[i])
+
+    def random_set_enemy_type(self):
+        """
+        Randomly set what type of enemy process you have
+        :return:
+        """
+        for i in range(self._enemy_cores):
+            template_file, json_file = choice(list(EnemyConfiguration.def_files.items()))
+            self._enemies.set_template(template_file, json_file)
+
+    def random_instantiate_all_defines(self):
+        """
+        Randomly instantiate the parameters of the enemy
+        :return:
+        """
+        for i in range(self._enemy_cores):
+            self._enemies.random_instantiate_defines()
+
+
+    def get_executables(self):
+        """
+        :return: A list of generated enemy files
+        """
+        self._enemy_files.= []
+
+        for i in range(self._enemy_cores):
+            filename = str(i) + "_enemy.out"
+            self._enemy_files.append(self._enemies.create_bin(filename))
+
+
+class Tuning(object):
     """Run tuning based on fuzzing or baysian optimisation
     Reads and runs the trainnings described in the JSON file.
     """
+
     def __init__(self):
         """
         Create a tuning object
         """
         self._sut = None
-        self._template_data_file = None
         self._cores = None
         self._method = None
         self._kappa = None
@@ -53,8 +201,7 @@ class Training(object):
         self._max_temperature = None
         self._cooldown_time = None
 
-        self._t_file = None
-        self._defines = None
+        self._enemy_config = None
 
         self._log_file = None
         self._max_file = None
@@ -70,18 +217,6 @@ class Training(object):
             self._sut = str(json_object["sut"])
         except KeyError:
             print "Unable to find sut in JSON"
-            sys.exit(1)
-
-        try:
-            self._template_data_file = str(json_object["template_data"])
-        except KeyError:
-            print "Unable to find template_data in JSON"
-            sys.exit(1)
-
-        try:
-            self._t_file = str(json_object["template_file"])
-        except KeyError:
-            print "Unable to find T_FILE in JSON"
             sys.exit(1)
 
         try:
@@ -136,68 +271,19 @@ class Training(object):
             print "Unable to find cooldown_time in JSON"
             sys.exit(1)
 
-    def process_templete_data(self):
-        """
-        :param json_file: The JSON file containing the templete data
-        :return:
-        """
-
-        # Read the configuration in the JSON file
-        with open(self._template_data_file) as data_file:
-            template_object = json.load(data_file)
-
         try:
-            self._defines = template_object["DEFINES"]
+            template_data_file = str(json_object["template_data"])
+            t_file = str(json_object["template_file"])
+            self._enemy_config = EnemyConfiguration(t_file, template_data_file)
         except KeyError:
-            print "Unable to find DEFINES in JSON"
-
-    def create_bin(self, inst):
-        """
-        :param inst: A dictionary of defines
-        :return:
-        """
-        defines = ["-D" + d + "=" + str(inst[d]) for d in inst]
-        cmd = "gcc -std=gnu11 -Wall " + " ".join(defines) + " " + self._t_file + " -lm"
-        print "Compiling:"
-        print cmd
-        os.system(cmd)
-
-    def random_instantiate_defines(self):
-        """
-        :return
-        """
-        ret = {}
-        for param in self._defines:
-            min_val = self._defines[param]["range"][0]
-            max_val = self._defines[param]["range"][1]
-            if self._defines[param]["type"] == "int":
-                ret[param] = randrange(min_val, max_val)
-            elif self._defines[param]["type"] == "float":
-                ret[param] = uniform(min_val, max_val)
-            else:
-                print("Unknown data type for param " + str(param) )
-                sys.exit(1)
-
-        return ret
+            print "No template file specified, will tune with every known template"
+            self._enemy_config = EnemyConfiguration()
 
     def run_experiment(self, **kwargs):
         """
         :param **kwargs: keyworded, variable-length argument list
         :return: Execution time (latency)
         """
-        def_param = dict()
-
-        # Make sure that the parameters are of the correct type
-        # Workaround to force BO to generate init_points
-        for key in kwargs:
-            if self._defines[key]["type"] == "int":
-                def_param[key] = int(kwargs[key])
-            elif self._defines[key]["type"] == "float":
-                def_param[key] = float(kwargs[key])
-            else:
-                print("Unknown data type for param " + str(key) )
-                sys.exit(1)
-
         cooldown(self._max_temperature)
 
         self.create_bin(def_param)
@@ -206,7 +292,8 @@ class Training(object):
 
         return ex_time
 
-    def _pp_d(self, d):
+    @staticmethod
+    def _pp_d(d):
         ret = []
         for x in d:
             ret.append(x + ": " + str(d[x]))
@@ -233,7 +320,7 @@ class Training(object):
         """
         with open(self._log_file, 'a') as data_file:
             d = str(iterations) + "\t\t" + str(time) + "\t\t" \
-                + str(max_value) + "\t\t" + str(cur_value) +"\t\t" + self._pp_d(conf) + "\n"
+                + str(max_value) + "\t\t" + str(cur_value) + "\t\t" + self._pp_d(conf) + "\n"
             data_file.write(d)
 
     def bayesian_train(self):
@@ -247,21 +334,20 @@ class Training(object):
             data_range[str(d)] = (self._defines[d]["range"][0], self._defines[d]["range"][1])
         bo = BayesianOptimization(self.run_experiment, data_range)
 
-
         t_start = time()
         t_end = time() + 60 * self._training_time
 
-        bo.init(init_points = init_pts)
-        iteration = init_pts # I consider the init_points also as iterations, BO does not
+        bo.init(init_points=init_pts)
+        iteration = init_pts  # I consider the init_points also as iterations, BO does not
         while time() < t_end:
-            bo.maximize(n_iter = 1, kappa = self._kappa)
+            bo.maximize(n_iter=1, kappa=self._kappa)
             print bo.res['max']
             print bo.res['all']['values']
             self._log_data(iteration,
-                          int(time() - t_start),
-                          bo.res['max']['max_val'],
-                          bo.res['all']['values'][iteration - init_pts],
-                          bo.res['all']['params'][iteration - init_pts])
+                           int(time() - t_start),
+                           bo.res['max']['max_val'],
+                           bo.res['all']['values'][iteration - init_pts],
+                           bo.res['all']['params'][iteration - init_pts])
             iteration = iteration + 1
 
         f = open(self._max_file, 'w')
@@ -310,8 +396,6 @@ class Training(object):
         with open(input_file) as data_file:
             training_object = json.load(data_file)
 
-
-
         for training_sesion in training_object:
             self.read_json_object(training_object[training_sesion])
             self.process_templete_data()
@@ -327,11 +411,12 @@ class Training(object):
                 print "I do not know how to train that way"
                 sys.exit(0)
 
+
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print "usage: " + sys.argv[0] + " <experments_file>.json\n"
         exit(1)
 
-    tr = Training()
+    tr = Tuning()
 
     tr.run(sys.argv[1])

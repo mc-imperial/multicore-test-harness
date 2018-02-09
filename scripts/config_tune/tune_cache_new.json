@@ -1,0 +1,15 @@
+{
+  "cache_fuzz_train": {
+    "sut": "../bin/sut/L2_unified_test",
+    "template_data": "anything",
+    "template_file": "anything",
+    "cores": 3,
+    "method":"fuzz",
+    "kappa": 0,
+    "log_file": "cache_fuzz_log.txt",
+    "max_file": "cache_fuzz_max.txt",
+    "training_time": 240,
+    "max_temperature": 70,
+    "cooldown_time": 10
+  },
+}
