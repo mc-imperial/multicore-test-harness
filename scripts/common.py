@@ -68,18 +68,19 @@ def get_temp():
         temp = 30
     return temp
 
-def cooldown(temp_threshold):
+
+def cool_down(temp_threshold):
     """
     If the temperature is above a certain threshold, this function will delay
     the next experiment until the chip has cooled down.
+    :param temp_threshold: The maximum temperature allowed
     """
     temp = get_temp()
-    while (temp > temp_threshold):
+    while temp > temp_threshold:
         print "Temperature " + str(temp) + " is too high! Cooling down"
         time.sleep(5)
         temp = get_temp()
     print "Temperature " + str(temp) + " is ok. Running experiment"
-
 
 
 class ProcessManagement:
@@ -107,14 +108,15 @@ class ProcessManagement:
         self.kill_stress()
         sys.exit(0)
 
-    def system_call(self, command, silent = False):
+    @staticmethod
+    def system_call(self, command, silent=False):
         """
         Call a background system command and wait for it to terminate
         :param coomand: Shell command to run
         :param silent: Surpress verbose
         :return: Call output and error
         """
-        if (silent  == False):
+        if not silent:
             print "executing command: " + command
 
         p = subprocess.Popen([command], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
