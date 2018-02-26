@@ -8,20 +8,7 @@
     "kappa": 0,
     "log_file": "cache_fuzz_log.txt",
     "max_file": "cache_fuzz_max.txt",
-    "training_time": 240,
-    "max_temperature": 70,
-    "cooldown_time": 10
-  },
-  "cache_bayesian_train": {
-    "sut": "../bin/sut/L2_unified_test",
-    "template_data": "../templates/cache/parameters.json",
-    "template_file": "../templates/cache/template_cache_stress.c",
-    "cores": 3,
-    "method":"bayesian",
-    "kappa": 5,
-    "log_file": "cache_bayesian_log.txt",
-    "max_file": "cache_bayesian_max.txt",
-    "training_time": 240,
+    "training_time": 10,
     "max_temperature": 70,
     "cooldown_time": 10
   }

@@ -109,10 +109,10 @@ class ProcessManagement:
         sys.exit(0)
 
     @staticmethod
-    def system_call(self, command, silent=False):
+    def system_call(command, silent=False):
         """
         Call a background system command and wait for it to terminate
-        :param coomand: Shell command to run
+        :param command: Shell command to run
         :param silent: Surpress verbose
         :return: Call output and error
         """
