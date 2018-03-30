@@ -31,8 +31,8 @@ import time
 import os
 from copy import deepcopy
 
-import common
-from run_sut_stress import SutStress
+from .common import cool_down
+from .run_sut_stress import SutStress
 
 
 class Experiment(object):
@@ -67,25 +67,25 @@ class Experiment(object):
         # You can have a list for sut, stress and cores or a single object
         try:
             data = json_object['sut']
-            if isinstance(data, unicode):
+            if isinstance(data, str):
                 self._sut.append(json_object["sut"])
             elif isinstance(data, list):
                 self._sut.extend(json_object["sut"])
             else:
                 raise KeyError
         except KeyError:
-            print "Error processing sut filed in JSON"
+            print("Error processing sut filed in JSON")
 
         try:
             data = json_object['stress']
-            if isinstance(data, unicode):
+            if isinstance(data, str):
                 self._stress.append(json_object["stress"])
             elif isinstance(data, list):
                 self._stress.extend(json_object["stress"])
             else:
                 raise KeyError
         except KeyError:
-            print "Error processing stress in JSON"
+            print("Error processing stress in JSON")
 
         try:
             data = json_object['cores']
@@ -96,23 +96,23 @@ class Experiment(object):
             else:
                 raise KeyError
         except KeyError:
-            print "Error processing cores in JSON"
+            print("Error processing cores in JSON")
 
         # You can not have a list for iterations, temperature, cooldown_time
         try:
             self._iterations = int(json_object["iterations"])
         except KeyError:
-            print "Unable to find iterations in JSON"
+            print("Unable to find iterations in JSON")
 
         try:
             self._max_temperature = int(json_object["max_temperature"])
         except KeyError:
-            print "Unable to find max_temperature in JSON"
+            print("Unable to find max_temperature in JSON")
 
         try:
             self._cooldown_time = int(json_object["cooldown_time"])
         except KeyError:
-            print "Unable to find cooldown_time in JSON"
+            print("Unable to find cooldown_time in JSON")
 
     def run_config(self, experiment, config, sut, stress, cores):
         """
@@ -128,14 +128,14 @@ class Experiment(object):
         temp_list = []
 
         for it in range(self._iterations):
-            common.cooldown(self._max_temperature)
+            cool_down(self._max_temperature)
             s = SutStress()
-            print "\nStarting " + str(experiment) +", " + \
+            print("\nStarting " + str(experiment) +", " + \
                   str(config) +                           \
-                  ", iteration " + str(it) + " with:"
-            print "SUT:\t\t" + sut + "\n" + \
+                  ", iteration " + str(it) + " with:")
+            print("SUT:\t\t" + sut + "\n" + \
                   "Stress:\t\t" + stress + "\n" + \
-                  "Cores:\t\t" + str(cores) + "\n"
+                  "Cores:\t\t" + str(cores) + "\n")
             ex_time, ex_temp = s.run_sut_stress(sut, stress, cores, 0)
 
             time_list.append(ex_time)
@@ -192,7 +192,6 @@ class Experiment(object):
         :param sut: System under stress
         :param stress: Enemy process
         :param cores: Number of enemy cores
-        :param iterations: Total number of iterations
         :param time_list: A list with all the execution times
         :param temp_list: A list with all the temperatures
         :param suffix: Suffix tha cna be added to all keys
@@ -289,7 +288,7 @@ class Experiment(object):
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print "usage: " + sys.argv[0] + " <experments_file>.json  <results>.json \n"
+        print("usage: " + sys.argv[0] + " <experments_file>.json  <results>.json \n")
         exit(1)
 
     exp = Experiment()

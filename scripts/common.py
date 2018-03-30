@@ -64,7 +64,7 @@ def get_temp():
     try:
         temp = float(command_output) / 1000
     except ValueError:
-        print "\n\tWARNING: Unable to find temperature for this system. Using default temperature of 30C\n"
+        print("\n\tWARNING: Unable to find temperature for this system. Using default temperature of 30C\n")
         temp = 30
     return temp
 
@@ -77,10 +77,10 @@ def cool_down(temp_threshold):
     """
     temp = get_temp()
     while temp > temp_threshold:
-        print "Temperature " + str(temp) + " is too high! Cooling down"
+        print("Temperature " + str(temp) + " is too high! Cooling down")
         time.sleep(5)
         temp = get_temp()
-    print "Temperature " + str(temp) + " is ok. Running experiment"
+    print("Temperature " + str(temp) + " is ok. Running experiment")
 
 
 class ProcessManagement:
@@ -117,7 +117,7 @@ class ProcessManagement:
         :return: Call output and error
         """
         if not silent:
-            print "executing command: " + command
+            print("executing command: " + command)
 
         p = subprocess.Popen([command], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         return p.stdout.read(),p.stderr.read()
@@ -127,7 +127,7 @@ class ProcessManagement:
         Call a background system command and leave it in the background
         :param command: Shell command to run
         """
-        print "executing command: " + command + " in the background"
+        print("executing command: " + command + " in the background")
         self._background_procs.append(subprocess.Popen(command, shell = True, preexec_fn=os.setsid))
         time.sleep(self._sleep_startup)
 
@@ -135,7 +135,7 @@ class ProcessManagement:
         """
         Kill all the background stress commands
         """
-        print "killing stress"
+        print("killing stress")
         for b in self._background_procs:
             os.killpg(os.getpgid(b.pid), signal.SIGTERM)
             time.sleep(self._sleep_shutdown)

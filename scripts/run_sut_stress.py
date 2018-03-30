@@ -25,8 +25,8 @@ Runs individual tests.
 """
 
 import sys
-from common import ProcessManagement
-from common import get_event, get_temp
+from .common import ProcessManagement
+from .common import get_event, get_temp
 
 
 class SutStress:
@@ -80,7 +80,7 @@ class SutStress:
         """
 
         if s_err:
-            print s_err
+            print(s_err)
             sys.exit(1)
 
     def run_mapping(self, sut,  mapping, style = 0):
@@ -152,9 +152,9 @@ class SutStress:
 
 if __name__ == "__main__":
     if len(sys.argv) != 5:
-        print "usage: sut_exe stress_exe num_stress_cores output_style(0 or 1)"
+        print("usage: sut_exe stress_exe num_stress_cores output_style(0 or 1)")
         exit(1)
     s = SutStress()
     ex_time, ex_temp = s.run_sut_stress(sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4]))
-    print "Execution time " + str(ex_time)
-    print "Execution temperature " + str(ex_temp)
+    print("Execution time " + str(ex_time))
+    print("Execution temperature " + str(ex_temp))
