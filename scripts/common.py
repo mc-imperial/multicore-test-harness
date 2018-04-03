@@ -64,23 +64,27 @@ def get_temp():
     try:
         temp = float(command_output) / 1000
     except ValueError:
-        print("\n\tWARNING: Unable to find temperature for this system. Using default temperature of 30C\n")
-        temp = 30
+        print("\n\tWARNING: Unable to find temperature for this system\n")
+        return None
     return temp
 
 
-def cool_down(temp_threshold):
+def cool_down(temp_threshold=70):
     """
     If the temperature is above a certain threshold, this function will delay
     the next experiment until the chip has cooled down.
     :param temp_threshold: The maximum temperature allowed
     """
     temp = get_temp()
-    while temp > temp_threshold:
-        print("Temperature " + str(temp) + " is too high! Cooling down")
-        time.sleep(5)
-        temp = get_temp()
-    print("Temperature " + str(temp) + " is ok. Running experiment")
+    if temp:
+        while temp > temp_threshold:
+            print("Temperature " + str(temp) + " is too high! Cooling down")
+            time.sleep(5)
+            temp = get_temp()
+        print("Temperature " + str(temp) + " is ok. Running experiment")
+    else:
+        print("\n\tWARNING: Using default cooldown time of 30 s\n")
+        time.sleep(30)
 
 
 class ProcessManagement:

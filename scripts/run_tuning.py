@@ -27,10 +27,12 @@ A python for tuning based on fuzzing and Bayesian Optimisation
 import json
 import sys
 import os
+import math
 
 from bayes_opt import BayesianOptimization
 from time import time
-from random import randrange, uniform, choice
+from random import randrange, uniform, choice, randint
+
 
 from .run_sut_stress import SutStress
 from .common import cool_down
@@ -100,7 +102,7 @@ class ConfigurableEnemy(object):
         except KeyError:
             print("Unable to find DEFINES in JSON")
 
-    def set_define(self, defines):
+    def set_defines(self, defines):
         """
         Sets the defines of the enemy process
         :param defines: A dictionary of defines
@@ -155,11 +157,14 @@ class EnemyConfiguration(object):
                  "../templates/system_calls/template_system_calls.c":
                  "../templates/system_calls/parameters.json"}
 
-    def __init__(self, enemy_cores):
+    def __init__(self, enemy_cores, sut, max_temperature):
         """
         If no template file and data file is provided we use all of them since every configuration is possible
         :param enemy_cores: The total number of enemy processes
         """
+        self._sut = sut
+        self._max_temperature = max_temperature
+
         self._enemy_cores = enemy_cores
         self._enemies = []
         self._enemy_files = []
@@ -167,6 +172,9 @@ class EnemyConfiguration(object):
         for i in range(self._enemy_cores):
             enemy = ConfigurableEnemy()
             self._enemies.append(enemy)
+
+        self.best_mapping = None
+        self.best_score = None
 
         # If this variable is true, the templates can not be changed
         self._fixed_template = False
@@ -178,15 +186,6 @@ class EnemyConfiguration(object):
 
     def set_same_defines(self, same_defines):
         self._same_defines = same_defines
-
-    def set_defines_core(self, core, defines):
-        """
-        :param core: The core on which to set the defines
-        :param defines: The defines for that specific core
-        :return:
-        """
-
-        self._enemies[core].set_define(defines)
 
     def get_define_core(self, core):
         """
@@ -203,6 +202,21 @@ class EnemyConfiguration(object):
         """
         return self._enemies[core].get_defines_range
 
+    def neighbour_template(self):
+        """
+        :return: A template configuration that differs by just one
+        """
+        core = randint(0, self._enemy_cores)
+        template = self._enemies[core].get_template()
+
+        keys = self.def_files.keys()
+        values = self.def_files.values()
+
+        for k, v in self.def_files.iteritems():
+            if k == template:
+                ind = self.def_files.keys().index(k)
+                keys[ind + 1], values[ind + 1]
+
     def set_all_templates(self, t_file, t_data_file):
         """
         Sets the templates to all enemies and sets the flag to not modify them
@@ -215,19 +229,21 @@ class EnemyConfiguration(object):
 
         self._fixed_template = True
 
-    def random_set_all_enemy_types(self):
+    def random_set_all_templates(self):
         """
         Randomly set what type of enemy process you have
-        :return:
+        :return: A dict of assigned templates
         """
         for i in range(self._enemy_cores):
             template_file, json_file = choice(list(EnemyConfiguration.def_files.items()))
             self._enemies[i].set_template(template_file, json_file)
 
-    def random_instantiate_all_defines(self):
+        return self.get_all_templates()
+
+    def random_set_all_defines(self):
         """
         Randomly instantiate the parameters of the enemy
-        :return:
+        :return: A dict of assigned defines
         """
         if self._same_defines:
             self._enemies[0].random_instantiate_defines()
@@ -238,11 +254,13 @@ class EnemyConfiguration(object):
             for i in range(self._enemy_cores):
                 self._enemies[i].random_instantiate_defines()
 
+        return self.get_all_defines()
+
     def random_set_all(self):
         """
         If the template type is not specified, set the template and defines
         If the template is set, just set the defines
-        :return:
+        :return: A tuple of the set templates and defines
         """
         if self._fixed_template:
             self.random_instantiate_all_defines()
@@ -250,7 +268,29 @@ class EnemyConfiguration(object):
             self.random_set_all_enemy_types()
             self.random_instantiate_all_defines()
 
-    def get_mapping(self):
+        return self.get_all_templates, self.get_all_defines
+
+    def get_all_templates(self):
+        """
+        :return: A dict that contains core and its corresponding template
+        """
+        templates = {}
+        for i in range(self._enemy_cores):
+            templates[i] = self._enemies[i].get_template()
+
+        return templates
+
+    def get_all_defines(self):
+        """
+        :return: A dict that contains core and its corresponding defines
+        """
+        defines = {}
+        for i in range(self._enemy_cores):
+            defines[i] = self._enemies[i].get_defines()
+
+        return defines
+
+    def get_file_mapping(self):
         """
         Generated enemy files
         :return: A dict representing a mapping of enemy files to cores
@@ -262,9 +302,33 @@ class EnemyConfiguration(object):
             filename = str(self._enemies[i].get_core()) + "_enemy.out"
             self._enemies[i].create_bin(filename)
             self._enemy_files.append(filename)
-            enemy_mapping[i] = filename
+            # Start mapping the enemies from core 1
+            enemy_mapping[i+1] = filename
 
         return enemy_mapping
+
+    def evaluate(self, templates=None, defines=None):
+        """
+        :param templates: A dictionary of templates for each core
+        :param defines: A dictionary of defines for each core
+        :return: Execution time (latency)
+        """
+        cool_down(self._max_temperature)
+
+        if templates and defines:
+            for core, template_file, data_file in self._enemy_cores, templates.items():
+                self._enemies[core].set_template(template_file, data_file)
+                self._enemies[core].set_defines(defines[core])
+
+        mapping = self.get_file_mapping()
+        s = SutStress()
+        ex_time, ex_temp = s.run_mapping(self._sut, mapping)
+
+        if self.best_score is None or ex_time > self.best_score:
+            self.best_score = ex_time
+            self.best_mapping = self.get_all_templates, self.get_all_defines
+
+        return ex_time
 
     def __del__(self):
         """
@@ -278,6 +342,55 @@ class EnemyConfiguration(object):
             os.system(cmd)
 
 
+class SimulatedAnnealing(object):
+
+    def __init__(self, enemy_config, outer_temp=10, outer_alpha=0.9, inner_temp=10, inner_alpha=0.9):
+        """
+        Create an Annealing object
+        """
+        self._enemy_config = enemy_config
+
+        self._outer_temp = outer_temp
+        self._outer_alpha = outer_alpha
+        self._inner_temp = inner_temp
+        self._inner_alpha = inner_alpha
+
+    @staticmethod
+    def kirkpatrick_cooling(start_temp, alpha):
+        temp = start_temp
+        while temp > 1:
+            yield temp
+            temp = alpha * temp
+
+    @staticmethod
+    def P(prev_score, next_score, temperature):
+        if next_score > prev_score:
+            return 1.0
+        else:
+            return math.exp(-abs(next_score - prev_score) / temperature)
+
+    def anneal(self):
+
+        # Initialise SA
+        current = self._enemy_config.random_set_all()
+        ex_time = self._enemy_config.evaluate()
+        num_evaluations = 1
+
+        outer_cooling_schedule = self.kirkpatrick_cooling(self._outer_temp, self._outer_alpha)
+
+        for temperature in outer_cooling_schedule:
+            done = False
+
+
+
+
+
+
+
+
+
+
+
 class Tuning(object):
     """Run tuning based on fuzzing or Bayesian Optimisation
     Reads and runs the tuning described in the JSON file.
@@ -287,13 +400,11 @@ class Tuning(object):
         """
         Create a tuning object
         """
-        self._sut = None
+
         self._cores = None
         self._method = None
         self._kappa = None
         self._training_time = None
-        self._max_temperature = None
-        self._cooldown_time = None
 
         # Store the enemy config
         self._enemy_config = None
@@ -309,14 +420,13 @@ class Tuning(object):
         """
 
         try:
-            self._sut = str(json_object["sut"])
+            sut = str(json_object["sut"])
         except KeyError:
             print("Unable to find sut in JSON")
             sys.exit(1)
 
         try:
             self._cores = int(json_object["cores"])
-            self._enemy_config = EnemyConfiguration(self._cores)
         except KeyError:
             print("Unable to find cores in JSON")
             sys.exit(1)
@@ -356,16 +466,12 @@ class Tuning(object):
             sys.exit(1)
 
         try:
-            self._max_temperature = int(json_object["max_temperature"])
+            max_temperature = int(json_object["max_temperature"])
         except KeyError:
             print("Unable to find max_temperature in JSON")
             sys.exit(1)
 
-        try:
-            self._cooldown_time = int(json_object["cooldown_time"])
-        except KeyError:
-            print("Unable to find cooldown_time in JSON")
-            sys.exit(1)
+        self._enemy_config = EnemyConfiguration(self._cores, sut, max_temperature)
 
         try:
             template_data_file = str(json_object["template_data"])
@@ -373,20 +479,6 @@ class Tuning(object):
             self._enemy_config.set_all_templates(t_file, template_data_file)
         except KeyError:
             print("No template file specified, will tune with every known template")
-
-    def run_experiment(self, **kwargs):
-        """
-        :param kwargs: keyworded, variable-length argument list
-        :return: Execution time (latency)
-        """
-        cool_down(self._max_temperature)
-
-        # self._enemy_config.set_all_defines(kwargs)
-        mapping = self._enemy_config.get_mapping()
-        s = SutStress()
-        ex_time, ex_temp = s.run_mapping(self._sut, mapping)
-
-        return ex_time
 
     def _write_log_header(self):
         """
@@ -397,26 +489,26 @@ class Tuning(object):
             d = "Iterations\tTraining Time\tMax value found\t\tCurrent value\t\tParams\n"
             data_file.write(d)
 
-    def _log_data(self, iterations, time, max_value, cur_value, conf):
+    def _log_data(self, iterations, tuning_time, max_value, cur_value, conf):
         """
         Log the maximum time found after time to determine "convergence" speed
         :param iterations: Total number of iterations so far
-        :param time: The time the record was made
+        :param tuning_time: The time the record was made
         :param max_value: The maximum value detected so far
         :param cur_value: The value found with the current config
         """
         with open(self._log_file, 'a') as data_file:
-            d = str(iterations) + "\t\t" + str(time) + "\t\t" \
+            d = str(iterations) + "\t\t" + str(tuning_time) + "\t\t" \
                 + str(max_value) + "\t\t" + str(cur_value) + "\t\t" + conf + "\n"
             data_file.write(d)
 
     def fuzz_tune(self):
         """
-        Training by fuzzing
+        Tuning by fuzzing
         :return:
         """
 
-        iteration = 0
+        num_evaluations = 0
         max_time = 0
 
         t_start = time()
@@ -431,8 +523,8 @@ class Tuning(object):
             print("found time of " + str(ex_time))
             if ex_time > max_time:
                 max_time = ex_time
-            iteration = iteration + 1
-            self._log_data(iteration,
+            num_evaluations = num_evaluations + 1
+            self._log_data(num_evaluations,
                            int(time() - t_start),
                            max_time,
                            ex_time,
@@ -442,44 +534,59 @@ class Tuning(object):
         f.write("Max time " + str(max_time) + "\n" + json.dumps(self._enemy_config.get_all_defines()))
         f.close()
 
-    def bayesian_tune(self):
+    def sa_tune(self):
         """
-        Training using Baysian Optimisation
+        Tuning by simulated annealing
         :return:
         """
-        self._enemy_config.set_fixed_template(True)
-        self._enemy_config.set_same_defines(True)
 
-        init_pts = 5
-        data_range = {}
+        # Initialise SA
+        self._enemy_config.random_set_all()
+        ex_time = self._enemy_config.evaluate_config()
+        num_evaluations = 1
 
-        self._enemy_config.get_defines_range_core(0)
 
-        for d in self._defines:
-            for i in range(len(self._cores)):
-                data_range[str(i) + "." + str(d)] = (self._defines[d]["range"][0], self._defines[d]["range"][1])
 
-        bo = BayesianOptimization(self.run_experiment, data_range)
 
-        t_start = time()
-        t_end = time() + 60 * self._training_time
 
-        bo.init(init_points=init_pts)
-        iteration = init_pts  # I consider the init_points also as iterations, BO does not
-        while time() < t_end:
-            bo.maximize(n_iter=1, kappa=self._kappa)
-            print(bo.res['max'])
-            print(bo.res['all']['values'])
-            self._log_data(iteration,
-                           int(time() - t_start),
-                           bo.res['max']['max_val'],
-                           bo.res['all']['values'][iteration - init_pts],
-                           bo.res['all']['params'][iteration - init_pts])
-            iteration = iteration + 1
-
-        f = open(self._max_file, 'w')
-        f.write(str(bo.res['max']))
-        f.close()
+    # def bayesian_tune(self):
+    #     """
+    #     Tuning using Bayesian Optimisation
+    #     :return:
+    #     """
+    #     self._enemy_config.set_fixed_template(True)
+    #     self._enemy_config.set_same_defines(True)
+    #
+    #     init_pts = 5
+    #     data_range = {}
+    #
+    #     self._enemy_config.get_defines_range_core(0)
+    #
+    #     for d in self._defines:
+    #         for i in range(len(self._cores)):
+    #             data_range[str(i) + "." + str(d)] = (self._defines[d]["range"][0], self._defines[d]["range"][1])
+    #
+    #     bo = BayesianOptimization(self.run_experiment, data_range)
+    #
+    #     t_start = time()
+    #     t_end = time() + 60 * self._training_time
+    #
+    #     bo.init(init_points=init_pts)
+    #     iteration = init_pts  # I consider the init_points also as iterations, BO does not
+    #     while time() < t_end:
+    #         bo.maximize(n_iter=1, kappa=self._kappa)
+    #         print(bo.res['max'])
+    #         print(bo.res['all']['values'])
+    #         self._log_data(iteration,
+    #                        int(time() - t_start),
+    #                        bo.res['max']['max_val'],
+    #                        bo.res['all']['values'][iteration - init_pts],
+    #                        bo.res['all']['params'][iteration - init_pts])
+    #         iteration = iteration + 1
+    #
+    #     f = open(self._max_file, 'w')
+    #     f.write(str(bo.res['max']))
+    #     f.close()
 
     def run(self, input_file):
         """

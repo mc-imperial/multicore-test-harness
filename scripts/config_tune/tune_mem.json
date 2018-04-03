@@ -9,8 +9,7 @@
     "log_file": "mem_fuzz_log.txt",
     "max_file": "mem_fuzz_max.txt",
     "training_time": 240,
-    "max_temperature": 70,
-    "cooldown_time": 10
+    "max_temperature": 70
   },
   "mem_baysian_train": {
     "sut": "../bin/sut/mem_thrashing_test",
@@ -22,7 +21,6 @@
     "log_file": "mem_bayesian_log.txt",
     "max_file": "mem_bayesian_max.txt",
     "training_time": 240,
-    "max_temperature": 70,
-    "cooldown_time": 10
+    "max_temperature": 70
   }
 }

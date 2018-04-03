@@ -9,7 +9,6 @@
     "log_file": "cache_fuzz_log.txt",
     "max_file": "cache_fuzz_max.txt",
     "training_time": 10,
-    "max_temperature": 70,
-    "cooldown_time": 10
+    "max_temperature": 70
   }
 }

@@ -10,8 +10,10 @@ def P(prev_score,next_score,temperature):
 
 
 class ObjectiveFunction:
-    '''class to wrap an objective function and
-    keep track of the best solution evaluated'''
+    """
+    class to wrap an objective function and
+    keep track of the best solution evaluated
+    """
     def __init__(self, objective_function):
         self.objective_function = objective_function
         self.best = None
@@ -22,7 +24,6 @@ class ObjectiveFunction:
         if self.best is None or score > self.best_score:
             self.best_score = score
             self.best = solution
-            logging.info('new best score: %f', self.best_score)
         return score
 
 
@@ -44,22 +45,20 @@ def anneal(init_function, move_operator, objective_function, max_evaluations, st
 
     cooling_schedule = kirkpatrick_cooling(start_temp, alpha)
 
-    logging.info('anneal started: score=%f',current_score)
-
     for temperature in cooling_schedule:
         done = False
         # examine moves around our current position
         for next in move_operator(current):
             if num_evaluations >= max_evaluations:
-                done=True
+                done = True
                 break
 
-            next_score=objective_function(next)
+            next_score = objective_function(next)
             num_evaluations += 1
 
-            # probablistically accept this solution
+            # probabilistically accept this solution
             # always accepting better solutions
-            p=P(current_score,next_score,temperature)
+            p = P(current_score, next_score, temperature)
             if random.random() < p:
                 current=next
                 current_score=next_score
@@ -71,4 +70,4 @@ def anneal(init_function, move_operator, objective_function, max_evaluations, st
     best=objective_function.best
     logging.info('final temperature: %f',temperature)
     logging.info('anneal finished: num_evaluations=%d, best_score=%f',num_evaluations,best_score)
-    return (num_evaluations,best_score,best)
+    return (num_evaluations, best_score,best)

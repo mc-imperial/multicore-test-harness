@@ -9,8 +9,7 @@
     "log_file": "system_fuzz_log.txt",
     "max_file": "system_fuzz_max.txt",
     "training_time": 240,
-    "max_temperature": 70,
-    "cooldown_time": 10
+    "max_temperature": 70
   },
   "system_baysian_train": {
     "sut": "../bin/sut/system_calls_test",
@@ -22,7 +21,6 @@
     "log_file": "system_baysian_log.txt",
     "max_file": "system_baysian_max.txt",
     "training_time": 240,
-    "max_temperature": 70,
-    "cooldown_time": 10
+    "max_temperature": 70
   }
 }

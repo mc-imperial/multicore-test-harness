@@ -5,8 +5,7 @@
     ],
     "cores": [1,2,3],
     "iterations": 50,
-    "max_temperature": 70,
-    "cooldown_time": 10
+    "max_temperature": 70
   },
   "L1_instr_stress_test": {
     "sut": "../bin/sut/L1_instr_test",
@@ -14,8 +13,7 @@
     ],
     "cores": [1,2,3],
     "iterations": 50,
-    "max_temperature": 70,
-    "cooldown_time": 10
+    "max_temperature": 70
   },
   "L2_unified_stress_test": {
     "sut": "../bin/sut/L2_unified_test" ,
@@ -23,7 +21,6 @@
     ],
     "cores": [1,2,3],
     "iterations": 50,
-    "max_temperature": 70,
-    "cooldown_time": 10
+    "max_temperature": 70
   }
 }
