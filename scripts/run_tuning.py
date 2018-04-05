@@ -33,6 +33,7 @@ import math
 # from time import time
 from random import randrange, uniform, choice, random
 from collections import OrderedDict
+from copy import deepcopy
 
 
 from run_sut_stress import SutStress
@@ -257,9 +258,11 @@ class EnemyConfiguration:
             template = self._enemies[i].get_template()
             for v in self.def_files.keys():
                 if v != template:
-                    self._enemies[i].set_template(v, self.def_files[v])
-                    self._enemies[i].random_instantiate_defines()
-                    yield self
+                    self_copy = deepcopy(self)
+                    self_copy._enemies[i].set_template(v, self.def_files[v])
+                    self_copy._enemies[i].random_instantiate_defines()
+                    yield self_copy
+
 
     def neighbour_define(self):
         """
@@ -414,7 +417,7 @@ class SimulatedAnnealing:
     Class to performance annealing
     """
 
-    def __init__(self, outer_temp=20, outer_alpha=0.9, inner_temp=10, inner_alpha=0.9):
+    def __init__(self, outer_temp=20, outer_alpha=0.6, inner_temp=10, inner_alpha=0.9):
         """
         Create an Annealing object
         """
@@ -444,31 +447,35 @@ class SimulatedAnnealing:
         objective_function = ObjectiveFunction(sut, max_temperature)
 
         # Initialise SA
-        current = enemy_config.random_set_all()
-        current_score = objective_function(enemy_config)
+        current_outer_config = enemy_config.random_set_all()
+        current_outer_score = objective_function(enemy_config)
         num_evaluations = 1
 
-        print(current)
 
         outer_cooling_schedule = self.kirkpatrick_cooling(self._outer_temp, self._outer_alpha)
 
-        for temperature in outer_cooling_schedule:
+        for outer_temperature in outer_cooling_schedule:
             done = False
-            for next_config in current.neighbour_template():
+            # print(current_outer_config)
+            #
+            # for config in current_outer_config.neighbour_template():
+            #     print(config)
+
+            for next_outer_config in current_outer_config.neighbour_template():
                 if num_evaluations >= max_evaluations:
                     done = True
                     break
 
-                print("Annealing temperature is ", temperature, " and we are evaluating number", num_evaluations)
-                next_score = objective_function(next_config)
+                print("Annealing temperature is ", outer_temperature, " and we are evaluating number", num_evaluations)
+                next_outer_score = objective_function(next_outer_config)
                 num_evaluations += 1
 
                 # probabilistically accept this solution
                 # always accepting better solutions
-                p = self.p(current_score, next_score, temperature)
+                p = self.p(current_outer_score, next_outer_score, outer_temperature)
                 if random() < p:
-                    current = next_config
-                    current_score = next_score
+                    current_outer_config = next_outer_config
+                    current_outer_score = next_outer_score
                     break
             # see if completely finished
             if done:
