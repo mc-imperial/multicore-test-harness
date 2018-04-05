@@ -25,8 +25,8 @@ Runs individual tests.
 """
 
 import sys
-from .common import ProcessManagement
-from .common import get_event, get_temp
+from common import ProcessManagement, get_event, get_temp
+
 
 
 class SutStress:
@@ -100,6 +100,7 @@ class SutStress:
 
         if len(mapping) > 0:
             self._processes.kill_stress()
+
 
         if get_event(s_out, "total time(us): "):
             ex_time = get_event(s_out, "total time(us): ")

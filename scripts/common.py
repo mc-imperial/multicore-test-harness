@@ -38,6 +38,8 @@ def get_event(data,field):
     # First try to find a float
     value = None
 
+    data = str(data)
+
     data = re.sub(' +',' ',data)
     try:
         line = re.findall(re.escape(field) + "\d+\.\d+", data)[0]
@@ -92,7 +94,7 @@ class ProcessManagement:
     This class is designed to manage background classes and foreground processes
     and to be able to kill them efficiantly when necessary.
     """
-    def __init__(self, sleep_startup = 3, sleep_shutdown = 1):
+    def __init__(self, sleep_startup=0.1, sleep_shutdown=0.1):
         """
         :param sleep_startup:  Delay between starting tasks
         :param sleep_shutdown: Delay between killing tasks
@@ -124,7 +126,9 @@ class ProcessManagement:
             print("executing command: " + command)
 
         p = subprocess.Popen([command], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        return p.stdout.read(),p.stderr.read()
+
+        # return p.stdout.read(),p.stderr.read()
+        return p.communicate()
 
     def system_call_background(self, command):
         """

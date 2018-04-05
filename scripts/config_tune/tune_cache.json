@@ -4,7 +4,7 @@
     "template_data": "../templates/cache/parameters.json",
     "template_file": "../templates/cache/template_cache_stress.c",
     "cores": 3,
-    "method":"bayesian",
+    "method":"sa",
     "kappa": 5,
     "log_file": "cache_fuzz_log.txt",
     "max_file": "cache_fuzz_max.txt",

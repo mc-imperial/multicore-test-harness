@@ -29,13 +29,14 @@ import sys
 import os
 import math
 
-from bayes_opt import BayesianOptimization
-from time import time
-from random import randrange, uniform, choice, randint
+# from bayes_opt import BayesianOptimization
+# from time import time
+from random import randrange, uniform, choice, random
+from collections import OrderedDict
 
 
-from .run_sut_stress import SutStress
-from .common import cool_down
+from run_sut_stress import SutStress
+from common import cool_down
 
 
 class ConfigurableEnemy(object):
@@ -56,6 +57,15 @@ class ConfigurableEnemy(object):
 
         self._define_range = None
         self._defines = dict()
+
+    def __str__(self):
+        """
+        :return: Template name and defines
+        """
+        string = "Template: " + str(self._t_file) + "\n"
+        for key in self._defines:
+            string += "\t" + str(key) + " " + str(self._defines[key]) + "\n"
+        return string
 
     def set_template(self, template_file, data_file):
         """
@@ -133,6 +143,23 @@ class ConfigurableEnemy(object):
                 print("Unknown data type for param " + str(param))
                 sys.exit(1)
 
+    def neighbour(self):
+        """
+        A generator for the neighbour defines
+        """
+        for key in self._defines:
+            value = self._defines[key]
+            min_val = self._define_range[key]["range"][0]
+            max_val = self._define_range[key]["range"][1]
+
+            for i in range(max_val):
+                if value-i > min_val:
+                    yield self
+                    self._defines[key] = value - i
+                if value+i < max_val:
+                    yield self
+                    self._defines[key] = value + i
+
     def create_bin(self, output_file):
         """
         :param output_file: The name of the file that will be outputted
@@ -146,45 +173,65 @@ class ConfigurableEnemy(object):
         os.system(cmd)
 
 
-class EnemyConfiguration(object):
-    """Hold the configuration on how an attack should look like"""
-    def_files = {"../templates/cache/template_cache_stress.c":
-                 "../templates/cache/parameters.json",
-                 "../templates/mem_thrashing/template_mem_thrashing.c":
-                 "../templates/mem_thrashing/parameters.json",
-                 "../templates/pipeline_stress/template_pipeline_stress.c":
-                 "../templates/pipeline_stress/parameters.json",
-                 "../templates/system_calls/template_system_calls.c":
-                 "../templates/system_calls/parameters.json"}
+class EnemyConfiguration:
+    """
+    Hold the configuration on how an attack should look like
+    """
 
-    def __init__(self, enemy_cores, sut, max_temperature):
+    def_files = OrderedDict([
+                            ("../templates/cache/template_cache_stress.c",
+                             "../templates/cache/parameters.json"),
+                            ("../templates/mem_thrashing/template_mem_thrashing.c",
+                             "../templates/mem_thrashing/parameters.json"),
+                            ("../templates/pipeline_stress/template_pipeline_stress.c",
+                             "../templates/pipeline_stress/parameters.json"),
+                            ("../templates/system_calls/template_system_calls.c",
+                             "../templates/system_calls/parameters.json")
+                            ])
+
+    def __init__(self, enemy_cores):
         """
         If no template file and data file is provided we use all of them since every configuration is possible
         :param enemy_cores: The total number of enemy processes
         """
-        self._sut = sut
-        self._max_temperature = max_temperature
 
         self._enemy_cores = enemy_cores
         self._enemies = []
-        self._enemy_files = []
 
         for i in range(self._enemy_cores):
             enemy = ConfigurableEnemy()
             self._enemies.append(enemy)
 
-        self.best_mapping = None
-        self.best_score = None
-
-        # If this variable is true, the templates can not be changed
+        # If this variable is true, the template across all enemies
         self._fixed_template = False
         # If this variable is true, all templates have the same parameters
         self._same_defines = False
 
+    def __str__(self):
+        """
+        :return: The template and defines for each core
+        """
+        string = ""
+        for enemy in self._enemies:
+            string += str(enemy)
+
+        string += "\n"
+        return string
+
     def set_fixed_template(self, fix_template):
+        """
+        Set weather it is the same template across all enemies
+        :param fix_template: Boolean variable
+        :return:
+        """
         self._fixed_template = fix_template
 
     def set_same_defines(self, same_defines):
+        """
+        Set weather all enemies have the same defines
+        :param same_defines: Boolean variable
+        :return:
+        """
         self._same_defines = same_defines
 
     def get_define_core(self, core):
@@ -204,18 +251,25 @@ class EnemyConfiguration(object):
 
     def neighbour_template(self):
         """
-        :return: A template configuration that differs by just one
+        A generator for the configs with different templates
         """
-        core = randint(0, self._enemy_cores)
-        template = self._enemies[core].get_template()
+        for i in range(self._enemy_cores):
+            template = self._enemies[i].get_template()
+            for v in self.def_files.keys():
+                if v != template:
+                    self._enemies[i].set_template(v, self.def_files[v])
+                    self._enemies[i].random_instantiate_defines()
+                    yield self
 
-        keys = self.def_files.keys()
-        values = self.def_files.values()
-
-        for k, v in self.def_files.iteritems():
-            if k == template:
-                ind = self.def_files.keys().index(k)
-                keys[ind + 1], values[ind + 1]
+    def neighbour_define(self):
+        """
+        A generator for configs with different defines
+        """
+        while True:
+            enemy = randrange(self._enemy_cores)
+            for j in self.enemies[enemy].neighbour():
+                yield self
+                self.enemies[enemy] = j
 
     def set_all_templates(self, t_file, t_data_file):
         """
@@ -263,12 +317,12 @@ class EnemyConfiguration(object):
         :return: A tuple of the set templates and defines
         """
         if self._fixed_template:
-            self.random_instantiate_all_defines()
+            self.random_set_all_defines()
         else:
-            self.random_set_all_enemy_types()
-            self.random_instantiate_all_defines()
+            self.random_set_all_templates()
+            self.random_set_all_defines()
 
-        return self.get_all_templates, self.get_all_defines
+        return self
 
     def get_all_templates(self):
         """
@@ -296,37 +350,50 @@ class EnemyConfiguration(object):
         :return: A dict representing a mapping of enemy files to cores
         """
         enemy_mapping = dict()
-        self._enemy_files = []
 
         for i in range(self._enemy_cores):
-            filename = str(self._enemies[i].get_core()) + "_enemy.out"
+            filename = str(i+1) + "_enemy.out"
             self._enemies[i].create_bin(filename)
-            self._enemy_files.append(filename)
             # Start mapping the enemies from core 1
-            enemy_mapping[i+1] = filename
+            enemy_mapping[i + 1] = filename
 
         return enemy_mapping
 
-    def evaluate(self, templates=None, defines=None):
+
+class ObjectiveFunction:
+    """
+    Class to evaluate an enemy config
+    """
+
+    def __init__(self, sut, max_temperature):
         """
-        :param templates: A dictionary of templates for each core
-        :param defines: A dictionary of defines for each core
+        :param sut: The system under test
+        :param max_temperature: The maximum temperature before starting an evaluation
+        """
+        self._sut = sut
+        self._max_temperature = max_temperature
+
+        # Keep the created files for cleanup
+        self._enemy_files = None
+
+        # Keep track of the best evaluation
+        self.best_mapping = None
+        self.best_score = None
+
+    def __call__(self, enemy_config):
+        """
+        :param enemy_config: An EnemyConfiguration object
         :return: Execution time (latency)
         """
         cool_down(self._max_temperature)
 
-        if templates and defines:
-            for core, template_file, data_file in self._enemy_cores, templates.items():
-                self._enemies[core].set_template(template_file, data_file)
-                self._enemies[core].set_defines(defines[core])
-
-        mapping = self.get_file_mapping()
+        self._enemy_files = enemy_config.get_file_mapping()
         s = SutStress()
-        ex_time, ex_temp = s.run_mapping(self._sut, mapping)
+        ex_time, ex_temp = s.run_mapping(self._sut, self._enemy_files)
 
         if self.best_score is None or ex_time > self.best_score:
             self.best_score = ex_time
-            self.best_mapping = self.get_all_templates, self.get_all_defines
+            self.best_mapping = enemy_config
 
         return ex_time
 
@@ -336,19 +403,21 @@ class EnemyConfiguration(object):
         :return:
         """
 
-        for enemy_file in self._enemy_files:
-            cmd = "rm " + enemy_file
+        for key in self._enemy_files:
+            cmd = "rm " + self._enemy_files[key]
             print("Deleting:", cmd)
             os.system(cmd)
 
 
-class SimulatedAnnealing(object):
+class SimulatedAnnealing:
+    """
+    Class to performance annealing
+    """
 
-    def __init__(self, enemy_config, outer_temp=10, outer_alpha=0.9, inner_temp=10, inner_alpha=0.9):
+    def __init__(self, outer_temp=20, outer_alpha=0.9, inner_temp=10, inner_alpha=0.9):
         """
         Create an Annealing object
         """
-        self._enemy_config = enemy_config
 
         self._outer_temp = outer_temp
         self._outer_alpha = outer_alpha
@@ -363,32 +432,55 @@ class SimulatedAnnealing(object):
             temp = alpha * temp
 
     @staticmethod
-    def P(prev_score, next_score, temperature):
+    def p(prev_score, next_score, temperature):
         if next_score > prev_score:
             return 1.0
         else:
             return math.exp(-abs(next_score - prev_score) / temperature)
 
-    def anneal(self):
+    def anneal(self, sut, enemy_config,  max_temperature=70, max_evaluations=1000):
+
+        # wrap the objective function (so we record the best)
+        objective_function = ObjectiveFunction(sut, max_temperature)
 
         # Initialise SA
-        current = self._enemy_config.random_set_all()
-        ex_time = self._enemy_config.evaluate()
+        current = enemy_config.random_set_all()
+        current_score = objective_function(enemy_config)
         num_evaluations = 1
+
+        print(current)
 
         outer_cooling_schedule = self.kirkpatrick_cooling(self._outer_temp, self._outer_alpha)
 
         for temperature in outer_cooling_schedule:
             done = False
+            for next_config in current.neighbour_template():
+                if num_evaluations >= max_evaluations:
+                    done = True
+                    break
 
+                print("Annealing temperature is ", temperature, " and we are evaluating number", num_evaluations)
+                next_score = objective_function(next_config)
+                num_evaluations += 1
 
+                # probabilistically accept this solution
+                # always accepting better solutions
+                p = self.p(current_score, next_score, temperature)
+                if random() < p:
+                    current = next_config
+                    current_score = next_score
+                    break
+            # see if completely finished
+            if done:
+                break
 
+        best_score = objective_function.best_score
+        best_mapping = objective_function.best_mapping
 
+        print(best_mapping)
+        print(best_score)
 
-
-
-
-
+        return num_evaluations, best_score, best_score
 
 
 class Tuning(object):
@@ -400,17 +492,18 @@ class Tuning(object):
         """
         Create a tuning object
         """
+        self._sut = None
 
         self._cores = None
         self._method = None
-        self._kappa = None
-        self._training_time = None
+        # self._kappa = None
+        # self._training_time = None
 
         # Store the enemy config
         self._enemy_config = None
 
-        self._log_file = None
-        self._max_file = None
+        # self._log_file = None
+        # self._max_file = None
 
     def read_json_object(self, json_object):
         """
@@ -420,7 +513,7 @@ class Tuning(object):
         """
 
         try:
-            sut = str(json_object["sut"])
+            self._sut = str(json_object["sut"])
         except KeyError:
             print("Unable to find sut in JSON")
             sys.exit(1)
@@ -437,102 +530,102 @@ class Tuning(object):
             print("Unable to find method in JSON")
             sys.exit(1)
 
-        try:
-            self._kappa = int(json_object["kappa"])
-        except KeyError:
-            print("Unable to find kappa in JSON")
-            sys.exit(1)
+        # try:
+        #     self._kappa = int(json_object["kappa"])
+        # except KeyError:
+        #     print("Unable to find kappa in JSON")
+        #     sys.exit(1)
 
-        try:
-            self._log_file = str(json_object["log_file"])
-            # Delete the file contents
-            open(self._log_file, 'w').close()
-        except KeyError:
-            print("Unable to find log_file in JSON")
-            sys.exit(1)
+        # try:
+        #     self._log_file = str(json_object["log_file"])
+        #     # Delete the file contents
+        #     open(self._log_file, 'w').close()
+        # except KeyError:
+        #     print("Unable to find log_file in JSON")
+        #     sys.exit(1)
 
-        try:
-            self._max_file = str(json_object["max_file"])
-            # Delete the file contents
-            open(self._max_file, 'w').close()
-        except KeyError:
-            print("Unable to find max_file in JSON")
-            sys.exit(1)
+        # try:
+        #     self._max_file = str(json_object["max_file"])
+        #     # Delete the file contents
+        #     open(self._max_file, 'w').close()
+        # except KeyError:
+        #     print("Unable to find max_file in JSON")
+        #     sys.exit(1)
 
-        try:
-            self._training_time = int(json_object["training_time"])
-        except KeyError:
-            print("Unable to find training_time in JSON")
-            sys.exit(1)
+        # try:
+        #     self._training_time = int(json_object["training_time"])
+        # except KeyError:
+        #     print("Unable to find training_time in JSON")
+        #     sys.exit(1)
 
-        try:
-            max_temperature = int(json_object["max_temperature"])
-        except KeyError:
-            print("Unable to find max_temperature in JSON")
-            sys.exit(1)
+        # try:
+        #     max_temperature = int(json_object["max_temperature"])
+        # except KeyError:
+        #     print("Unable to find max_temperature in JSON")
+        #     sys.exit(1)
 
-        self._enemy_config = EnemyConfiguration(self._cores, sut, max_temperature)
+        self._enemy_config = EnemyConfiguration(self._cores)
 
-        try:
-            template_data_file = str(json_object["template_data"])
-            t_file = str(json_object["template_file"])
-            self._enemy_config.set_all_templates(t_file, template_data_file)
-        except KeyError:
-            print("No template file specified, will tune with every known template")
+        # try:
+        #     template_data_file = str(json_object["template_data"])
+        #     t_file = str(json_object["template_file"])
+        #     self._enemy_config.set_all_templates(t_file, template_data_file)
+        # except KeyError:
+        #     print("No template file specified, will tune with every known template")
 
-    def _write_log_header(self):
-        """
-        Write the log file header
-        :return:
-        """
-        with open(self._log_file, 'w') as data_file:
-            d = "Iterations\tTraining Time\tMax value found\t\tCurrent value\t\tParams\n"
-            data_file.write(d)
+    # def _write_log_header(self):
+    #     """
+    #     Write the log file header
+    #     :return:
+    #     """
+    #     with open(self._log_file, 'w') as data_file:
+    #         d = "Iterations\tTraining Time\tMax value found\t\tCurrent value\t\tParams\n"
+    #         data_file.write(d)
+    #
+    # def _log_data(self, iterations, tuning_time, max_value, cur_value, conf):
+    #     """
+    #     Log the maximum time found after time to determine "convergence" speed
+    #     :param iterations: Total number of iterations so far
+    #     :param tuning_time: The time the record was made
+    #     :param max_value: The maximum value detected so far
+    #     :param cur_value: The value found with the current config
+    #     """
+    #     with open(self._log_file, 'a') as data_file:
+    #         d = str(iterations) + "\t\t" + str(tuning_time) + "\t\t" \
+    #             + str(max_value) + "\t\t" + str(cur_value) + "\t\t" + conf + "\n"
+    #         data_file.write(d)
 
-    def _log_data(self, iterations, tuning_time, max_value, cur_value, conf):
-        """
-        Log the maximum time found after time to determine "convergence" speed
-        :param iterations: Total number of iterations so far
-        :param tuning_time: The time the record was made
-        :param max_value: The maximum value detected so far
-        :param cur_value: The value found with the current config
-        """
-        with open(self._log_file, 'a') as data_file:
-            d = str(iterations) + "\t\t" + str(tuning_time) + "\t\t" \
-                + str(max_value) + "\t\t" + str(cur_value) + "\t\t" + conf + "\n"
-            data_file.write(d)
-
-    def fuzz_tune(self):
-        """
-        Tuning by fuzzing
-        :return:
-        """
-
-        num_evaluations = 0
-        max_time = 0
-
-        t_start = time()
-        t_end = time() + 60 * self._training_time
-
-        while time() < t_end:
-
-            # def_param = self.random_instantiate_defines()
-            self._enemy_config.random_set_all()
-            ex_time = self.run_experiment()
-
-            print("found time of " + str(ex_time))
-            if ex_time > max_time:
-                max_time = ex_time
-            num_evaluations = num_evaluations + 1
-            self._log_data(num_evaluations,
-                           int(time() - t_start),
-                           max_time,
-                           ex_time,
-                           json.dumps(self._enemy_config.get_all_defines()))
-
-        f = open(self._max_file, 'w')
-        f.write("Max time " + str(max_time) + "\n" + json.dumps(self._enemy_config.get_all_defines()))
-        f.close()
+    # def fuzz_tune(self):
+    #     """
+    #     Tuning by fuzzing
+    #     :return:
+    #     """
+    #
+    #     num_evaluations = 0
+    #     max_time = 0
+    #
+    #     t_start = time()
+    #     t_end = time() + 60 * self._training_time
+    #
+    #     while time() < t_end:
+    #
+    #         # def_param = self.random_instantiate_defines()
+    #         self._enemy_config.random_set_all()
+    #         ex_time = self.run_experiment()
+    #
+    #         print("found time of " + str(ex_time))
+    #         if ex_time > max_time:
+    #             max_time = ex_time
+    #         num_evaluations = num_evaluations + 1
+    #         self._log_data(num_evaluations,
+    #                        int(time() - t_start),
+    #                        max_time,
+    #                        ex_time,
+    #                        json.dumps(self._enemy_config.get_all_defines()))
+    #
+    #     f = open(self._max_file, 'w')
+    #     f.write("Max time " + str(max_time) + "\n" + json.dumps(self._enemy_config.get_all_defines()))
+    #     f.close()
 
     def sa_tune(self):
         """
@@ -540,10 +633,10 @@ class Tuning(object):
         :return:
         """
 
-        # Initialise SA
-        self._enemy_config.random_set_all()
-        ex_time = self._enemy_config.evaluate_config()
-        num_evaluations = 1
+        sa = SimulatedAnnealing()
+        sa.anneal(self._sut, self._enemy_config)
+
+
 
 
 
@@ -601,13 +694,13 @@ class Tuning(object):
         for tuning_session in tuning_object:
             self.read_json_object(tuning_object[tuning_session])
 
-            self._write_log_header()
+            # self._write_log_header()
             if self._method == "fuzz":
                 print("Tuning by fuzzing")
                 self.fuzz_tune()
             elif self._method == "sa":
                 print("Tuning by simulated anealing")
-                self._sa_tune()
+                self.sa_tune()
             elif self._method == "bayesian":
                 print("Tuning by Baysian Optimisation")
                 print("For the moment Bayesian optimisation only works with the same template and the same parameters "

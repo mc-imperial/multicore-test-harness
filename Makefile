@@ -31,7 +31,7 @@ cyclictest:
 
 .PHONY: clean
 clean:
-	(cd $(CACHE_DIR); python -c 'import gen; gen.clean()')
+	(cd $(CACHE_DIR); python3 -c 'import gen; gen.clean()')
 	(cd $(MEM_DIR); make clean)
 	(cd $(SYS_DIR); make clean)
 	(cd $(PIPE_DIR); make clean)

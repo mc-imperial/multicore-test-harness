@@ -59,19 +59,19 @@ def instantiate_tests(file):
         caches_object = json.load(data_file)
 
     for cache in caches_object:
-        print "Generating litmus, stress and stress sequance for " + cache
+        print("Generating litmus, stress and stress sequance for " + cache)
         inst={}
         inst.update(caches_object[cache])
 
         defines = ["-D" + d.upper()+ "=" + str(inst[d]) for d in inst]
 
         output = PATH + "sut/" + cache + "_test"
-        print "\t output file " + output
+        print("\t output file " + output)
         cmd = "gcc -std=gnu11 -Wall " + " ".join(defines) + " " + FILE + " -o " + output
         os.system(cmd)
 
         output = PATH + "cache_stress/" + cache + "_stress"
-        print "\t output file " + output
+        print("\t output file " + output)
         cmd = "gcc -std=gnu11 -Wall " + " ".join(defines) + " -DINFINITE"+ " " + FILE + " -o " + output
         os.system(cmd)
 
@@ -94,19 +94,19 @@ def clean():
     """
 
     cmd = "rm -f " + PATH + "sut/" + "*_litmus_test"
-    print cmd
+    print(cmd)
     os.system(cmd)
     cmd = "rm -f " + PATH + "cache_stress/" + "*_stress"
-    print cmd
+    print(cmd)
     os.system(cmd)
     cmd = "rm -f " + PATH + "cache_stress/" + "*_stress_sequence"
-    print cmd
+    print(cmd)
     os.system(cmd)
 
 
 if __name__ == "__main__":
   if len(sys.argv) != 2:
-    print "usage: " + sys.argv[0] + " cache_json_file\n"
+    print("usage: " + sys.argv[0] + " cache_json_file\n")
     exit(1)
 
   create_folders()
