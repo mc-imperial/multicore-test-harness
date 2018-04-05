@@ -148,18 +148,21 @@ class ConfigurableEnemy(object):
         """
         A generator for the neighbour defines
         """
-        for key in self._defines:
-            value = self._defines[key]
-            min_val = self._define_range[key]["range"][0]
-            max_val = self._define_range[key]["range"][1]
+        random_key = choice(list(self._defines))
 
-            for i in range(max_val):
-                if value-i > min_val:
-                    yield self
-                    self._defines[key] = value - i
-                if value+i < max_val:
-                    yield self
-                    self._defines[key] = value + i
+        value = self._defines[random_key]
+        min_val = self._define_range[random_key]["range"][0]
+        max_val = self._define_range[random_key]["range"][1]
+
+        for i in range(max_val):
+            if value-i > min_val:
+                self._defines[random_key] = value - i
+                yield self
+                self._defines[random_key] = value + i
+            if value+i < max_val:
+                self._defines[random_key] = value + i
+                yield self
+                self._defines[random_key] = value - i
 
     def create_bin(self, output_file):
         """
@@ -263,16 +266,15 @@ class EnemyConfiguration:
                     self_copy._enemies[i].random_instantiate_defines()
                     yield self_copy
 
-
     def neighbour_define(self):
         """
         A generator for configs with different defines
         """
         while True:
             enemy = randrange(self._enemy_cores)
-            for j in self.enemies[enemy].neighbour():
+            for j in self._enemies[enemy].neighbour():
+                self._enemies[enemy] = j
                 yield self
-                self.enemies[enemy] = j
 
     def set_all_templates(self, t_file, t_data_file):
         """
@@ -441,7 +443,46 @@ class SimulatedAnnealing:
         else:
             return math.exp(-abs(next_score - prev_score) / temperature)
 
-    def anneal(self, sut, enemy_config,  max_temperature=70, max_evaluations=1000):
+    def inner_anneal(self, sut, enemy_config, max_temperature=70, max_evaluations=30):
+
+        # wrap the objective function (so we record the best)
+        objective_function = ObjectiveFunction(sut, max_temperature)
+
+        # Initialise SA
+        current_inner_config = enemy_config
+        current_inner_score = objective_function(enemy_config)
+        num_evaluations = 1
+
+        inner_cooling_schedule = self.kirkpatrick_cooling(self._inner_temp, self._inner_alpha)
+
+        for inner_temperature in inner_cooling_schedule:
+            done = False
+
+            for next_inner_config in current_inner_config.neighbour_define():
+                if num_evaluations >= max_evaluations:
+                    done = True
+                    break
+
+                next_inner_score = objective_function(next_inner_config)
+                num_evaluations += 1
+
+                # probabilistically accept this solution
+                # always accepting better solutions
+                p = self.p(current_inner_score, next_inner_score, inner_temperature)
+                if random() < p:
+                    current_outer_config = next_inner_config
+                    current_outer_score = next_inner_score
+                    break
+            # see if completely finished
+            if done:
+                break
+
+        best_score = objective_function.best_score
+        best_mapping = objective_function.best_mapping
+
+        return best_score, best_mapping
+
+    def anneal(self, sut, enemy_config,  max_temperature=70, max_evaluations=40):
 
         # wrap the objective function (so we record the best)
         objective_function = ObjectiveFunction(sut, max_temperature)
@@ -466,8 +507,10 @@ class SimulatedAnnealing:
                     done = True
                     break
 
-                print("Annealing temperature is ", outer_temperature, " and we are evaluating number", num_evaluations)
-                next_outer_score = objective_function(next_outer_config)
+                # print("Annealing temperature is ", outer_temperature, " and we are evaluating number", num_evaluations)
+                next_outer_score, next_outer_config = self.inner_anneal(sut, next_outer_config)
+
+                # next_outer_score = objective_function(next_outer_config)
                 num_evaluations += 1
 
                 # probabilistically accept this solution
@@ -487,7 +530,7 @@ class SimulatedAnnealing:
         print(best_mapping)
         print(best_score)
 
-        return num_evaluations, best_score, best_score
+        return best_score, best_mapping
 
 
 class Tuning(object):

@@ -94,7 +94,7 @@ class ProcessManagement:
     This class is designed to manage background classes and foreground processes
     and to be able to kill them efficiantly when necessary.
     """
-    def __init__(self, sleep_startup=0.1, sleep_shutdown=0.1):
+    def __init__(self, sleep_startup=0.01, sleep_shutdown=0.01):
         """
         :param sleep_startup:  Delay between starting tasks
         :param sleep_shutdown: Delay between killing tasks
