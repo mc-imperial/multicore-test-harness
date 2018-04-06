@@ -149,20 +149,21 @@ class ConfigurableEnemy(object):
         A generator for the neighbour defines
         """
         random_key = choice(list(self._defines))
+        direction = choice(["up", "down"])
 
         value = self._defines[random_key]
         min_val = self._define_range[random_key]["range"][0]
         max_val = self._define_range[random_key]["range"][1]
 
-        for i in range(max_val):
-            if value-i > min_val:
-                self._defines[random_key] = value - i
-                yield self
-                self._defines[random_key] = value + i
-            if value+i < max_val:
-                self._defines[random_key] = value + i
-                yield self
-                self._defines[random_key] = value - i
+        for i in range(1, max_val):
+            if direction == "down" and value-i > min_val:
+                temp = deepcopy(self)
+                temp._defines[random_key] = value - i
+                yield temp
+            if direction == "up" and value+i < max_val:
+                temp = deepcopy(self)
+                temp._defines[random_key] = value + i
+                yield temp
 
     def create_bin(self, output_file):
         """
@@ -250,7 +251,7 @@ class EnemyConfiguration:
         """
         :param core: The core of which to return the defines
         :return: Return the defines of a specific core
-        """
+        """;
         return self._enemies[core].get_defines_range
 
     def neighbour_template(self):
@@ -273,8 +274,9 @@ class EnemyConfiguration:
         while True:
             enemy = randrange(self._enemy_cores)
             for j in self._enemies[enemy].neighbour():
-                self._enemies[enemy] = j
-                yield self
+                temp = deepcopy(self)
+                temp._enemies[enemy] = j
+                yield temp
 
     def set_all_templates(self, t_file, t_data_file):
         """
@@ -443,7 +445,7 @@ class SimulatedAnnealing:
         else:
             return math.exp(-abs(next_score - prev_score) / temperature)
 
-    def inner_anneal(self, sut, enemy_config, max_temperature=70, max_evaluations=30):
+    def inner_anneal(self, sut, enemy_config, max_temperature=70, max_evaluations=300):
 
         # wrap the objective function (so we record the best)
         objective_function = ObjectiveFunction(sut, max_temperature)
@@ -459,12 +461,14 @@ class SimulatedAnnealing:
             done = False
 
             for next_inner_config in current_inner_config.neighbour_define():
+
                 if num_evaluations >= max_evaluations:
                     done = True
                     break
 
                 next_inner_score = objective_function(next_inner_config)
                 num_evaluations += 1
+                print("Annealing temperature is ", inner_temperature, " and we are evaluating number", num_evaluations)
 
                 # probabilistically accept this solution
                 # always accepting better solutions
@@ -684,7 +688,9 @@ class Tuning(object):
         """
 
         sa = SimulatedAnnealing()
-        sa.anneal(self._sut, self._enemy_config)
+        self._enemy_config.set_all_templates("../templates/cache/template_cache_stress.c", "../templates/cache/parameters.json")
+        self._enemy_config.random_set_all()
+        sa.inner_anneal(self._sut, self._enemy_config)
 
 
 
