@@ -150,21 +150,22 @@ class ConfigurableEnemy(object):
         A generator for the neighbour defines
         """
         random_key = choice(list(self._defines))
-        direction = choice(["up", "down"])
 
         value = self._defines[random_key]
         min_val = self._define_range[random_key]["range"][0]
         max_val = self._define_range[random_key]["range"][1]
 
-        for i in range(1, max_val):
-            if direction == "down" and value-i > min_val:
-                temp = deepcopy(self)
-                temp._defines[random_key] = value - i
-                yield temp
-            if direction == "up" and value+i < max_val:
-                temp = deepcopy(self)
-                temp._defines[random_key] = value + i
-                yield temp
+        if self._define_range[random_key]["type"] == "int":
+            temp = deepcopy(self)
+            temp._defines[random_key] = randrange(min_val, max_val)
+            yield temp
+        elif self._define_range[random_key]["type"] == "float":
+            temp = deepcopy(self)
+            temp._defines[random_key] = uniform(min_val, max_val)
+            yield temp
+        else:
+            print("Unknown data type for param " + str(random_key))
+            sys.exit(1)
 
     def create_bin(self, output_file):
         """
@@ -539,20 +540,20 @@ class SimulatedAnnealing:
 
 
 
-class Test(Annealer):
-    def __init__(self, initial_state, sut):
-        Annealer.__init__(self, initial_state)
-        self._sut = sut
-
-    def move(self):
-        for x in self.state.neighbour_define():
-            self.state = x
-            yield self
-
-    def energy(self):
-        """Calculates the length of the route."""
-        objective_function = ObjectiveFunction(self._sut)
-        return 1/objective_function(self.state)
+# class Test(Annealer):
+#     def __init__(self, initial_state, sut):
+#         Annealer.__init__(self, initial_state)
+#         self._sut = sut
+#
+#     def move(self):
+#         for x in self.state.neighbour_define():
+#             self.state = x
+#             yield self
+#
+#     def energy(self):
+#         """Calculates the length of the route."""
+#         objective_function = ObjectiveFunction(self._sut)
+#         return 1/objective_function(self.state)
 
 class Tuning(object):
     """Run tuning based on fuzzing or Bayesian Optimisation
@@ -704,12 +705,10 @@ class Tuning(object):
         :return:
         """
 
-
+        sa = SimulatedAnnealing()
         self._enemy_config.set_all_templates("../templates/cache/template_cache_stress.c", "../templates/cache/parameters.json")
         self._enemy_config.random_set_all()
-        # sa.inner_anneal(self._sut, self._enemy_config)
-        sa = Test(self._enemy_config, self._sut)
-        state, score = sa.anneal()
+        state, score = sa.inner_anneal(self._sut, self._enemy_config)
         print(state, score)
 
 
