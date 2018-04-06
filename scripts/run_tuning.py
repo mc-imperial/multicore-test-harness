@@ -31,6 +31,7 @@ import math
 
 # from bayes_opt import BayesianOptimization
 # from time import time
+from simanneal import Annealer
 from random import randrange, uniform, choice, random
 from collections import OrderedDict
 from copy import deepcopy
@@ -372,7 +373,7 @@ class ObjectiveFunction:
     Class to evaluate an enemy config
     """
 
-    def __init__(self, sut, max_temperature):
+    def __init__(self, sut, max_temperature = 70):
         """
         :param sut: The system under test
         :param max_temperature: The maximum temperature before starting an evaluation
@@ -474,8 +475,8 @@ class SimulatedAnnealing:
                 # always accepting better solutions
                 p = self.p(current_inner_score, next_inner_score, inner_temperature)
                 if random() < p:
-                    current_outer_config = next_inner_config
-                    current_outer_score = next_inner_score
+                    current_inner_config = next_inner_config
+                    current_inner_score = next_inner_score
                     break
             # see if completely finished
             if done:
@@ -536,6 +537,22 @@ class SimulatedAnnealing:
 
         return best_score, best_mapping
 
+
+
+class Test(Annealer):
+    def __init__(self, initial_state, sut):
+        Annealer.__init__(self, initial_state)
+        self._sut = sut
+
+    def move(self):
+        for x in self.state.neighbour_define():
+            self.state = x
+            yield self
+
+    def energy(self):
+        """Calculates the length of the route."""
+        objective_function = ObjectiveFunction(self._sut)
+        return 1/objective_function(self.state)
 
 class Tuning(object):
     """Run tuning based on fuzzing or Bayesian Optimisation
@@ -687,10 +704,13 @@ class Tuning(object):
         :return:
         """
 
-        sa = SimulatedAnnealing()
+
         self._enemy_config.set_all_templates("../templates/cache/template_cache_stress.c", "../templates/cache/parameters.json")
         self._enemy_config.random_set_all()
-        sa.inner_anneal(self._sut, self._enemy_config)
+        # sa.inner_anneal(self._sut, self._enemy_config)
+        sa = Test(self._enemy_config, self._sut)
+        state, score = sa.anneal()
+        print(state, score)
 
 
 
