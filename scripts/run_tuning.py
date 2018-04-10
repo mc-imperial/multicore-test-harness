@@ -423,7 +423,7 @@ class SimulatedAnnealing:
     Class to performance annealing
     """
 
-    def __init__(self, outer_temp=20, outer_alpha=0.6, inner_temp=10, inner_alpha=0.9):
+    def __init__(self, outer_temp=20, outer_alpha=0.6, inner_temp=10, inner_alpha=0.8):
         """
         Create an Annealing object
         """
@@ -447,7 +447,7 @@ class SimulatedAnnealing:
         else:
             return math.exp(-abs(next_score - prev_score) / temperature)
 
-    def inner_anneal(self, sut, enemy_config, max_temperature=70, max_evaluations=300):
+    def inner_anneal(self, sut, enemy_config, max_temperature=70, max_evaluations=30):
 
         # wrap the objective function (so we record the best)
         objective_function = ObjectiveFunction(sut, max_temperature)
@@ -498,7 +498,6 @@ class SimulatedAnnealing:
         current_outer_score = objective_function(enemy_config)
         num_evaluations = 1
 
-
         outer_cooling_schedule = self.kirkpatrick_cooling(self._outer_temp, self._outer_alpha)
 
         for outer_temperature in outer_cooling_schedule:
@@ -513,7 +512,7 @@ class SimulatedAnnealing:
                     done = True
                     break
 
-                # print("Annealing temperature is ", outer_temperature, " and we are evaluating number", num_evaluations)
+                print("Outer annealing temperature is ", outer_temperature, " and we are evaluating number", num_evaluations)
                 next_outer_score, next_outer_config = self.inner_anneal(sut, next_outer_config)
 
                 # next_outer_score = objective_function(next_outer_config)
@@ -706,9 +705,8 @@ class Tuning(object):
         """
 
         sa = SimulatedAnnealing()
-        self._enemy_config.set_all_templates("../templates/cache/template_cache_stress.c", "../templates/cache/parameters.json")
         self._enemy_config.random_set_all()
-        state, score = sa.inner_anneal(self._sut, self._enemy_config)
+        state, score = sa.anneal(self._sut, self._enemy_config)
         print(state, score)
 
 
