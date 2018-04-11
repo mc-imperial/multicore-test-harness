@@ -423,7 +423,7 @@ class SimulatedAnnealing:
     Class to performance annealing
     """
 
-    def __init__(self, outer_temp=20, outer_alpha=0.6, inner_temp=10, inner_alpha=0.8):
+    def __init__(self, outer_temp=20, outer_alpha=0.6, inner_temp=50, inner_alpha=0.8):
         """
         Create an Annealing object
         """
@@ -447,7 +447,7 @@ class SimulatedAnnealing:
         else:
             return math.exp(-abs(next_score - prev_score) / temperature)
 
-    def inner_anneal(self, sut, enemy_config, max_temperature=70, max_evaluations=30):
+    def inner_anneal(self, sut, enemy_config, max_temperature=70, max_evaluations=50):
 
         # wrap the objective function (so we record the best)
         objective_function = ObjectiveFunction(sut, max_temperature)
@@ -470,7 +470,8 @@ class SimulatedAnnealing:
 
                 next_inner_score = objective_function(next_inner_config)
                 num_evaluations += 1
-                print("Annealing temperature is ", inner_temperature, " and we are evaluating number", num_evaluations)
+                # print("Inner annealing temperature is ", inner_temperature,
+                #       " and we are evaluating number", num_evaluations)
 
                 # probabilistically accept this solution
                 # always accepting better solutions
@@ -512,8 +513,12 @@ class SimulatedAnnealing:
                     done = True
                     break
 
-                print("Outer annealing temperature is ", outer_temperature, " and we are evaluating number", num_evaluations)
+                # print("Outer annealing temperature is ", outer_temperature,
+                      # " and we are evaluating number", num_evaluations)
                 next_outer_score, next_outer_config = self.inner_anneal(sut, next_outer_config)
+
+                # This is very bad, I should redo it if it works
+                next_outer_score = objective_function(next_outer_config)
 
                 # next_outer_score = objective_function(next_outer_config)
                 num_evaluations += 1
@@ -532,27 +537,8 @@ class SimulatedAnnealing:
         best_score = objective_function.best_score
         best_mapping = objective_function.best_mapping
 
-        print(best_mapping)
-        print(best_score)
-
         return best_score, best_mapping
 
-
-
-# class Test(Annealer):
-#     def __init__(self, initial_state, sut):
-#         Annealer.__init__(self, initial_state)
-#         self._sut = sut
-#
-#     def move(self):
-#         for x in self.state.neighbour_define():
-#             self.state = x
-#             yield self
-#
-#     def energy(self):
-#         """Calculates the length of the route."""
-#         objective_function = ObjectiveFunction(self._sut)
-#         return 1/objective_function(self.state)
 
 class Tuning(object):
     """Run tuning based on fuzzing or Bayesian Optimisation
@@ -708,10 +694,6 @@ class Tuning(object):
         self._enemy_config.random_set_all()
         state, score = sa.anneal(self._sut, self._enemy_config)
         print(state, score)
-
-
-
-
 
 
 
