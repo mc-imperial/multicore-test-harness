@@ -1,13 +1,55 @@
 {
-  "cache_bayesian_train": {
+  "1_train": {
     "sut": "../bin/sut/L2_unified_test",
-    "template_data": "../templates/cache/parameters.json",
-    "template_file": "../templates/cache/template_cache_stress.c",
     "cores": 3,
-    "method":"sa",
-    "kappa": 5,
-    "log_file": "cache_fuzz_log.txt",
-    "max_file": "cache_fuzz_max.txt",
+    "method":"ran_ran",
+    "log_file": "../results/cache_ran_ran_log.txt",
+    "max_file": "../results/cache_ran_ran_max.txt",
+    "training_time": 10,
+    "max_temperature": 70
+  },
+    "2_train": {
+    "sut": "../bin/sut/L2_unified_test",
+    "cores": 3,
+    "method":"ran_hc",
+    "log_file": "../results/cache_ran_hc_log.txt",
+    "max_file": "../results/cache_ran_hc_max.txt",
+    "training_time": 10,
+    "max_temperature": 70
+  },
+    "3_train": {
+    "sut": "../bin/sut/L2_unified_test",
+    "cores": 3,
+    "method":"ran_sa",
+    "log_file": "../results/cache_ran_sa_log.txt",
+    "max_file": "../results/cache_ran_sa_max.txt",
+    "training_time": 10,
+    "max_temperature": 70
+  },
+    "4_train": {
+    "sut": "../bin/sut/L2_unified_test",
+    "cores": 3,
+    "method":"sa_ran",
+    "log_file": "../results/cache_sa_ran_log.txt",
+    "max_file": "../results/cache_sa_ran_max.txt",
+    "training_time": 10,
+    "max_temperature": 70
+  },
+    "5_train": {
+    "sut": "../bin/sut/L2_unified_test",
+    "cores": 3,
+    "method":"sa_hc",
+    "log_file": "../results/cache_sa_hc_log.txt",
+    "max_file": "../results/cache_sa_hc_max.txt",
+    "training_time": 10,
+    "max_temperature": 70
+  },
+    "1_train": {
+    "sut": "../bin/sut/L2_unified_test",
+    "cores": 3,
+    "method":"sa_sa",
+    "log_file": "../results/cache_sa_sa_log.txt",
+    "max_file": "../results/cache_sa_sa_max.txt",
     "training_time": 10,
     "max_temperature": 70
   }

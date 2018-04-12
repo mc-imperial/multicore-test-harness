@@ -29,9 +29,10 @@ import sys
 import os
 import math
 
-# from bayes_opt import BayesianOptimization
-# from time import time
-from simanneal import Annealer
+#from bayes_opt import BayesianOptimization
+#from simanneal import Annealer
+from time import time
+
 from random import randrange, uniform, choice, random
 from collections import OrderedDict
 from copy import deepcopy
@@ -41,7 +42,7 @@ from run_sut_stress import SutStress
 from common import cool_down
 
 
-class ConfigurableEnemy(object):
+class ConfigurableEnemy:
     """
     Object that hold all information about an enemy
     """
@@ -241,21 +242,6 @@ class EnemyConfiguration:
         """
         self._same_defines = same_defines
 
-    def get_define_core(self, core):
-        """
-        :param core: The core on which to set the defines
-        :return: A dict that contains the defines of a specific core
-        """
-
-        return self._enemies[core].set_define()
-
-    def get_defines_range_core(self, core):
-        """
-        :param core: The core of which to return the defines
-        :return: Return the defines of a specific core
-        """;
-        return self._enemies[core].get_defines_range
-
     def neighbour_template(self):
         """
         A generator for the configs with different templates
@@ -306,7 +292,7 @@ class EnemyConfiguration:
     def random_set_all_defines(self):
         """
         Randomly instantiate the parameters of the enemy
-        :return: A dict of assigned defines
+        :return:
         """
         if self._same_defines:
             self._enemies[0].random_instantiate_defines()
@@ -316,8 +302,6 @@ class EnemyConfiguration:
         else:
             for i in range(self._enemy_cores):
                 self._enemies[i].random_instantiate_defines()
-
-        return self.get_all_defines()
 
     def random_set_all(self):
         """
@@ -412,26 +396,53 @@ class ObjectiveFunction:
         :return:
         """
 
-        for key in self._enemy_files:
-            cmd = "rm " + self._enemy_files[key]
-            print("Deleting:", cmd)
-            os.system(cmd)
+        if self._enemy_files:
+            for key in self._enemy_files:
+                cmd = "rm " + self._enemy_files[key]
+                print("Deleting:", cmd)
+                os.system(cmd)
 
 
-class SimulatedAnnealing:
+class Optimization:
     """
-    Class to performance annealing
+    Class for Optimization
     """
 
-    def __init__(self, outer_temp=20, outer_alpha=0.6, inner_temp=50, inner_alpha=0.8):
+    def __init__(self, sut, log_file, max_temperature=70):
         """
-        Create an Annealing object
+        Create an Optimization object
+        :param sut: The system under test
+        :param max_temperature: The maximum temperature allowed before an experiment starts
         """
 
-        self._outer_temp = outer_temp
-        self._outer_alpha = outer_alpha
-        self._inner_temp = inner_temp
-        self._inner_alpha = inner_alpha
+        self._sut = sut
+        self._log_file = log_file
+        self._write_log_header()
+        self._max_temperature = max_temperature
+
+        self._t_start = time()
+
+    def _write_log_header(self):
+        """
+        Write the log file header
+        :return:
+        """
+        with open(self._log_file, 'w') as data_file:
+            d = "Iterations\tTraining Time\tMax value found\t\tCurrent value\t\tParams\n"
+            data_file.write(d)
+
+    def _log_data(self, iterations, tuning_time, max_value, cur_value, conf):
+        """
+        Log the maximum time found after time to determine "convergence" speed
+        :param iterations: Total number of iterations so far
+        :param tuning_time: The time the record was made
+        :param max_value: The maximum value detected so far
+        :param cur_value: The value found with the current config
+        """
+        with open(self._log_file, 'a') as data_file:
+            d = str(iterations) + "\t\t" + str(tuning_time) + "\t\t" \
+                + str(max_value) + "\t\t" + str(cur_value) + "\t\t" + conf + "\n"
+            data_file.write(d)
 
     @staticmethod
     def kirkpatrick_cooling(start_temp, alpha):
@@ -441,23 +452,81 @@ class SimulatedAnnealing:
             temp = alpha * temp
 
     @staticmethod
-    def p(prev_score, next_score, temperature):
+    def p_score(prev_score, next_score, temperature):
         if next_score > prev_score:
             return 1.0
         else:
             return math.exp(-abs(next_score - prev_score) / temperature)
 
-    def inner_anneal(self, sut, enemy_config, max_temperature=70, max_evaluations=50):
+    def inner_random(self, enemy_config, max_evaluations=100, max_time=30):
+
+        objective_function = ObjectiveFunction(self._sut, self._max_temperature)
+
+        num_evaluations = 1
+        t_end = time() + 60 * max_time
+
+        while num_evaluations < max_evaluations and time() < t_end:
+            enemy_config.random_set_all_defines()
+            next_inner_score = objective_function(enemy_config)
+            num_evaluations += 1
+
+            self._log_data(num_evaluations,
+                           int(time() - self._t_start),
+                           objective_function.best_score,
+                           next_inner_score,
+                           str(enemy_config))
+
+        best_score = objective_function.best_score
+        best_mapping = objective_function.best_mapping
+
+        return best_score, best_mapping
+
+    def inner_hillclimb(self, enemy_config, max_evaluations=100, max_time=30):
+
+        objective_function = ObjectiveFunction(self._sut, self._max_temperature)
+
+        current_inner_config = enemy_config
+        current_inner_score = objective_function(enemy_config)
+
+        num_evaluations = 1
+        t_end = time() + 60 * max_time
+
+        while num_evaluations < max_evaluations and time() < t_end:
+            # examine moves around our current position
+            for next_inner_config in current_inner_config.neighbour_define():
+                if num_evaluations > max_evaluations:
+                    break
+
+                # see if this move is better than the current
+                next_inner_score = objective_function(next_inner_config)
+                num_evaluations += 1
+                if next_inner_score > current_inner_score:
+                    current_inner_config = next_inner_config
+                    current_inner_score = next_inner_score
+                    break  # depth first search
+
+                self._log_data(num_evaluations,
+                               int(time() - self._t_start),
+                               objective_function.best_score,
+                               next_inner_score,
+                               str(next_inner_config))
+
+        best_score = objective_function.best_score
+        best_mapping = objective_function.best_mapping
+
+        return best_score, best_mapping
+
+    def inner_anneal(self, enemy_config, max_evaluations=100, inner_temp=50, inner_alpha=0.8):
 
         # wrap the objective function (so we record the best)
-        objective_function = ObjectiveFunction(sut, max_temperature)
+        objective_function = ObjectiveFunction(self._sut, self._max_temperature)
 
         # Initialise SA
         current_inner_config = enemy_config
         current_inner_score = objective_function(enemy_config)
         num_evaluations = 1
 
-        inner_cooling_schedule = self.kirkpatrick_cooling(self._inner_temp, self._inner_alpha)
+        inner_cooling_schedule = self.kirkpatrick_cooling(inner_temp, inner_alpha)
 
         for inner_temperature in inner_cooling_schedule:
             done = False
@@ -470,16 +539,21 @@ class SimulatedAnnealing:
 
                 next_inner_score = objective_function(next_inner_config)
                 num_evaluations += 1
-                # print("Inner annealing temperature is ", inner_temperature,
-                #       " and we are evaluating number", num_evaluations)
 
                 # probabilistically accept this solution
                 # always accepting better solutions
-                p = self.p(current_inner_score, next_inner_score, inner_temperature)
+                p = self.p_score(current_inner_score, next_inner_score, inner_temperature)
                 if random() < p:
                     current_inner_config = next_inner_config
                     current_inner_score = next_inner_score
                     break
+
+                self._log_data(num_evaluations,
+                               int(time() - self._t_start),
+                               objective_function.best_score,
+                               next_inner_score,
+                               str(next_inner_config))
+
             # see if completely finished
             if done:
                 break
@@ -489,43 +563,70 @@ class SimulatedAnnealing:
 
         return best_score, best_mapping
 
-    def anneal(self, sut, enemy_config,  max_temperature=70, max_evaluations=40):
+    def outer_random(self, enemy_config, inner_tune,  max_evaluations=40, max_time=600):
+
+        objective_function = ObjectiveFunction(self._sut, self._max_temperature)
+
+        num_evaluations = 1
+        t_end = time() + 60 * max_time
+
+        while num_evaluations < max_evaluations and time() < t_end:
+            enemy_config.random_set_all_templates()
+
+            # The inner tune part
+            if inner_tune == "sa":
+                next_outer_score, next_outer_config = self.inner_anneal(next_outer_config)
+            elif inner_tune == "ran":
+                next_outer_score, next_outer_config = self.inner_random(next_outer_config)
+            elif inner_tune == "hc":
+                next_outer_score, next_outer_config = self.inner_hillclimb(next_outer_config)
+            else:
+                print("I do not know how to tune like that")
+
+            objective_function(next_outer_config)
+
+        best_score = objective_function.best_score
+        best_mapping = objective_function.best_mapping
+
+        return best_score, best_mapping
+
+    def outer_anneal(self, enemy_config, inner_tune, max_evaluations=40, outer_temp=20, outer_alpha=0.6):
 
         # wrap the objective function (so we record the best)
-        objective_function = ObjectiveFunction(sut, max_temperature)
+        objective_function = ObjectiveFunction(self._sut, self._max_temperature)
 
         # Initialise SA
         current_outer_config = enemy_config.random_set_all()
         current_outer_score = objective_function(enemy_config)
         num_evaluations = 1
 
-        outer_cooling_schedule = self.kirkpatrick_cooling(self._outer_temp, self._outer_alpha)
+        outer_cooling_schedule = self.kirkpatrick_cooling(outer_temp, outer_alpha)
 
         for outer_temperature in outer_cooling_schedule:
             done = False
-            # print(current_outer_config)
-            #
-            # for config in current_outer_config.neighbour_template():
-            #     print(config)
 
             for next_outer_config in current_outer_config.neighbour_template():
                 if num_evaluations >= max_evaluations:
                     done = True
                     break
 
-                # print("Outer annealing temperature is ", outer_temperature,
-                      # " and we are evaluating number", num_evaluations)
-                next_outer_score, next_outer_config = self.inner_anneal(sut, next_outer_config)
+                #The inner tune part
+                if inner_tune == "sa":
+                    next_outer_score, next_outer_config = self.inner_anneal(next_outer_config)
+                elif inner_tune == "ran":
+                    next_outer_score, next_outer_config = self.inner_random(next_outer_config)
+                elif inner_tune == "hc":
+                    next_outer_score, next_outer_config = self.inner_hillclimb(next_outer_config)
+                else:
+                    print("I do not know how to tune like that")
 
-                # This is very bad, I should redo it if it works
                 next_outer_score = objective_function(next_outer_config)
 
-                # next_outer_score = objective_function(next_outer_config)
                 num_evaluations += 1
 
                 # probabilistically accept this solution
                 # always accepting better solutions
-                p = self.p(current_outer_score, next_outer_score, outer_temperature)
+                p = self.p_score(current_outer_score, next_outer_score, outer_temperature)
                 if random() < p:
                     current_outer_config = next_outer_config
                     current_outer_score = next_outer_score
@@ -553,14 +654,15 @@ class Tuning(object):
 
         self._cores = None
         self._method = None
-        # self._kappa = None
-        # self._training_time = None
+
+        self._training_time = None
+        self._max_temperature = None
 
         # Store the enemy config
         self._enemy_config = None
 
-        # self._log_file = None
-        # self._max_file = None
+        self._log_file = None
+        self._max_file = None
 
     def read_json_object(self, json_object):
         """
@@ -587,154 +689,63 @@ class Tuning(object):
             print("Unable to find method in JSON")
             sys.exit(1)
 
-        # try:
-        #     self._kappa = int(json_object["kappa"])
-        # except KeyError:
-        #     print("Unable to find kappa in JSON")
-        #     sys.exit(1)
+        try:
+            self._log_file = str(json_object["log_file"])
+            # Delete the file contents
+            open(self._log_file, 'w').close()
+        except KeyError:
+            print("Unable to find log_file in JSON")
+            sys.exit(1)
 
-        # try:
-        #     self._log_file = str(json_object["log_file"])
-        #     # Delete the file contents
-        #     open(self._log_file, 'w').close()
-        # except KeyError:
-        #     print("Unable to find log_file in JSON")
-        #     sys.exit(1)
+        try:
+            self._max_file = str(json_object["max_file"])
+            # Delete the file contents
+            open(self._max_file, 'w').close()
+        except KeyError:
+            print("Unable to find max_file in JSON")
+            sys.exit(1)
 
-        # try:
-        #     self._max_file = str(json_object["max_file"])
-        #     # Delete the file contents
-        #     open(self._max_file, 'w').close()
-        # except KeyError:
-        #     print("Unable to find max_file in JSON")
-        #     sys.exit(1)
+        try:
+            self._training_time = int(json_object["training_time"])
+        except KeyError:
+            print("Unable to find training_time in JSON")
+            sys.exit(1)
 
-        # try:
-        #     self._training_time = int(json_object["training_time"])
-        # except KeyError:
-        #     print("Unable to find training_time in JSON")
-        #     sys.exit(1)
-
-        # try:
-        #     max_temperature = int(json_object["max_temperature"])
-        # except KeyError:
-        #     print("Unable to find max_temperature in JSON")
-        #     sys.exit(1)
+        try:
+            self._max_temperature = int(json_object["max_temperature"])
+        except KeyError:
+            print("Unable to find max_temperature in JSON")
+            sys.exit(1)
 
         self._enemy_config = EnemyConfiguration(self._cores)
 
-        # try:
-        #     template_data_file = str(json_object["template_data"])
-        #     t_file = str(json_object["template_file"])
-        #     self._enemy_config.set_all_templates(t_file, template_data_file)
-        # except KeyError:
-        #     print("No template file specified, will tune with every known template")
-
-    # def _write_log_header(self):
-    #     """
-    #     Write the log file header
-    #     :return:
-    #     """
-    #     with open(self._log_file, 'w') as data_file:
-    #         d = "Iterations\tTraining Time\tMax value found\t\tCurrent value\t\tParams\n"
-    #         data_file.write(d)
-    #
-    # def _log_data(self, iterations, tuning_time, max_value, cur_value, conf):
-    #     """
-    #     Log the maximum time found after time to determine "convergence" speed
-    #     :param iterations: Total number of iterations so far
-    #     :param tuning_time: The time the record was made
-    #     :param max_value: The maximum value detected so far
-    #     :param cur_value: The value found with the current config
-    #     """
-    #     with open(self._log_file, 'a') as data_file:
-    #         d = str(iterations) + "\t\t" + str(tuning_time) + "\t\t" \
-    #             + str(max_value) + "\t\t" + str(cur_value) + "\t\t" + conf + "\n"
-    #         data_file.write(d)
-
-    # def fuzz_tune(self):
-    #     """
-    #     Tuning by fuzzing
-    #     :return:
-    #     """
-    #
-    #     num_evaluations = 0
-    #     max_time = 0
-    #
-    #     t_start = time()
-    #     t_end = time() + 60 * self._training_time
-    #
-    #     while time() < t_end:
-    #
-    #         # def_param = self.random_instantiate_defines()
-    #         self._enemy_config.random_set_all()
-    #         ex_time = self.run_experiment()
-    #
-    #         print("found time of " + str(ex_time))
-    #         if ex_time > max_time:
-    #             max_time = ex_time
-    #         num_evaluations = num_evaluations + 1
-    #         self._log_data(num_evaluations,
-    #                        int(time() - t_start),
-    #                        max_time,
-    #                        ex_time,
-    #                        json.dumps(self._enemy_config.get_all_defines()))
-    #
-    #     f = open(self._max_file, 'w')
-    #     f.write("Max time " + str(max_time) + "\n" + json.dumps(self._enemy_config.get_all_defines()))
-    #     f.close()
-
-    def sa_tune(self):
+    def sa_tune(self, inner_tune_method):
         """
-        Tuning by simulated annealing
+        Tuning by simulated annealing on the outer loop
+        :param inner_tune_method: Optimization method for the inner loop
         :return:
         """
 
-        sa = SimulatedAnnealing()
-        self._enemy_config.random_set_all()
-        state, score = sa.anneal(self._sut, self._enemy_config)
-        print(state, score)
+        sa = Optimization(sut=self._sut, log_file=self._log_file)
+        best_state, best_score = sa.outer_anneal(self._enemy_config, inner_tune=inner_tune_method)
 
+        f = open(self._max_file, 'w')
+        f.write("Max time " + str(best_score) + "\n" + str(best_state))
+        f.close()
 
+    def ran_tune(self, inner_tune_method):
+        """
+        Tuning by randomising on the outer loop
+        :param inner_tune_method: Optimization method for the inner loop
+        :return:
+        """
 
-    # def bayesian_tune(self):
-    #     """
-    #     Tuning using Bayesian Optimisation
-    #     :return:
-    #     """
-    #     self._enemy_config.set_fixed_template(True)
-    #     self._enemy_config.set_same_defines(True)
-    #
-    #     init_pts = 5
-    #     data_range = {}
-    #
-    #     self._enemy_config.get_defines_range_core(0)
-    #
-    #     for d in self._defines:
-    #         for i in range(len(self._cores)):
-    #             data_range[str(i) + "." + str(d)] = (self._defines[d]["range"][0], self._defines[d]["range"][1])
-    #
-    #     bo = BayesianOptimization(self.run_experiment, data_range)
-    #
-    #     t_start = time()
-    #     t_end = time() + 60 * self._training_time
-    #
-    #     bo.init(init_points=init_pts)
-    #     iteration = init_pts  # I consider the init_points also as iterations, BO does not
-    #     while time() < t_end:
-    #         bo.maximize(n_iter=1, kappa=self._kappa)
-    #         print(bo.res['max'])
-    #         print(bo.res['all']['values'])
-    #         self._log_data(iteration,
-    #                        int(time() - t_start),
-    #                        bo.res['max']['max_val'],
-    #                        bo.res['all']['values'][iteration - init_pts],
-    #                        bo.res['all']['params'][iteration - init_pts])
-    #         iteration = iteration + 1
-    #
-    #     f = open(self._max_file, 'w')
-    #     f.write(str(bo.res['max']))
-    #     f.close()
+        sa = Optimization(sut=self._sut, log_file=self._log_file)
+        best_state, best_score = sa.outer_random(self._enemy_config, inner_tune=inner_tune_method)
+
+        f = open(self._max_file, 'w')
+        f.write("Max time " + str(best_score) + "\n" + str(best_state))
+        f.close()
 
     def run(self, input_file):
         """
@@ -749,18 +760,24 @@ class Tuning(object):
         for tuning_session in tuning_object:
             self.read_json_object(tuning_object[tuning_session])
 
-            # self._write_log_header()
-            if self._method == "fuzz":
-                print("Tuning by fuzzing")
-                self.fuzz_tune()
-            elif self._method == "sa":
-                print("Tuning by simulated anealing")
-                self.sa_tune()
-            elif self._method == "bayesian":
-                print("Tuning by Baysian Optimisation")
-                print("For the moment Bayesian optimisation only works with the same template and the same parameters "
-                      "on all core")
-                self.bayesian_tune()
+            if self._method == "sa_ran":
+                print("Tuning by simulated annealing on the outer loop and random on the inner loop")
+                self.sa_tune("ran")
+            elif self._method == "sa_hc":
+                print("Tuning by simulated annealing on the outer loop and hill climbing on the inner loop")
+                self.sa_tune("hc")
+            elif self._method == "sa_sa":
+                print("Tuning by simulated annealing on the outer loop and simulated annealing on the inner loop")
+                self.sa_tune("sa")
+            elif self._method == "ran_ran":
+                print("Tuning by randomising on the outer loop and random on the inner loop")
+                self.ran_tune("ran")
+            elif self._method == "ran_hc":
+                print("Tuning by randomising on the outer loop and hill climbing on the inner loop")
+                self.ran_tune("hc")
+            elif self._method == "ran_sa":
+                print("Tuning by randomising on the outer loop and simulated annealing on the inner loop")
+                self.ran_tune("sa")
             else:
                 print("I do not know how to train that way")
                 sys.exit(0)
