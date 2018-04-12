@@ -44,7 +44,7 @@
     "training_time": 10,
     "max_temperature": 70
   },
-    "1_train": {
+    "6_train": {
     "sut": "../bin/sut/L2_unified_test",
     "cores": 3,
     "method":"sa_sa",

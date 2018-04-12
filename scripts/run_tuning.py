@@ -567,23 +567,26 @@ class Optimization:
 
         objective_function = ObjectiveFunction(self._sut, self._max_temperature)
 
+        current_config = enemy_config
+        current_score = objective_function(enemy_config) 
+
         num_evaluations = 1
         t_end = time() + 60 * max_time
 
         while num_evaluations < max_evaluations and time() < t_end:
-            enemy_config.random_set_all_templates()
+            current_config.random_set_all_templates()
 
             # The inner tune part
             if inner_tune == "sa":
-                next_outer_score, next_outer_config = self.inner_anneal(next_outer_config)
+                score, config = self.inner_anneal(current_config)
             elif inner_tune == "ran":
-                next_outer_score, next_outer_config = self.inner_random(next_outer_config)
+                score, config = self.inner_random(current_config)
             elif inner_tune == "hc":
-                next_outer_score, next_outer_config = self.inner_hillclimb(next_outer_config)
+                score, config = self.inner_hillclimb(current_config)
             else:
                 print("I do not know how to tune like that")
 
-            objective_function(next_outer_config)
+            objective_function(config)
 
         best_score = objective_function.best_score
         best_mapping = objective_function.best_mapping
