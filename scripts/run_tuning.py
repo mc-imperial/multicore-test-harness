@@ -509,10 +509,9 @@ class Optimization:
                            next_inner_score,
                            str(enemy_config))
 
-        best_score = objective_function.best_score
         best_mapping = objective_function.best_mapping
 
-        return best_mapping, best_score
+        return best_mapping
 
     def inner_hill_climb(self, enemy_config, max_evaluations=100, max_time=30):
 
@@ -544,10 +543,9 @@ class Optimization:
                                next_inner_score,
                                str(next_inner_config))
 
-        best_score = objective_function.best_score
         best_mapping = objective_function.best_mapping
 
-        return best_mapping, best_score
+        return best_mapping
 
     def inner_anneal(self, enemy_config, max_evaluations=100, inner_temp=50, inner_alpha=0.8):
 
@@ -591,12 +589,11 @@ class Optimization:
             if done:
                 break
 
-        best_score = objective_function.best_score
         best_mapping = objective_function.best_mapping
 
-        return best_mapping, best_score
+        return best_mapping
 
-    def inner_bo(self, enemy_config, max_evaluations=30, kappa_val=6):
+    def inner_bo(self, enemy_config, max_evaluations=100, kappa_val=6):
 
         objective_function = ObjectiveFunction(self._sut, self._max_temperature)
         config = enemy_config
@@ -676,17 +673,17 @@ class Optimization:
 
                 #The inner tune part
                 if inner_tune == "ran":
-                    next_outer_config = self.inner_random(next_outer_config)
+                    best_inner_config = self.inner_random(next_outer_config)
                 elif inner_tune == "hc":
-                    next_outer_config = self.inner_hill_climb(next_outer_config)
+                    best_inner_config = self.inner_hill_climb(next_outer_config)
                 elif inner_tune == "sa":
-                    next_outer_config = self.inner_anneal(next_outer_config)
+                    best_inner_config = self.inner_anneal(next_outer_config)
                 elif inner_tune == "bo":
-                    next_outer_config = self.inner_bo(next_outer_config)
+                    best_inner_config = self.inner_bo(next_outer_config)
                 else:
                     print("I do not know how to tune like that")
 
-                next_outer_score = objective_function(next_outer_config)
+                next_outer_score = objective_function(best_inner_config)
 
                 num_evaluations += 1
 
