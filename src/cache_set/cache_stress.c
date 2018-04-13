@@ -44,7 +44,7 @@
 #define CACHE_SIZE      SIZE * KB
 
 /** Wrap the code in a loop consisting of ITERATIONS iterations */
-#define ITERATIONS      1000
+#define ITERATIONS      100
 
 /**
  @brief this main func
