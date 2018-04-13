@@ -82,7 +82,7 @@ class ConfigurableEnemy:
         self._d_file = data_file
 
         self._read_range_data()
-        self._random_instantiate_defines()
+        self.random_instantiate_defines()
 
     def get_template(self):
         """
@@ -232,6 +232,8 @@ class EnemyConfiguration:
         self._fixed_template = False
         # If this variable is true, all templates have the same parameters
         self._same_defines = False
+
+        self.random_set_all()
 
     def __str__(self):
         """
