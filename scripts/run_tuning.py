@@ -29,8 +29,7 @@ import sys
 import os
 import math
 
-#from bayes_opt import BayesianOptimization
-#from simanneal import Annealer
+from bayes_opt import BayesianOptimization
 from time import time
 
 from random import randrange, uniform, choice, random
@@ -65,9 +64,10 @@ class ConfigurableEnemy:
         """
         :return: Template name and defines
         """
-        string = "Template: " + str(self._t_file) + "\n"
+        string = "Template: " + str(self._t_file)
         for key in self._defines:
-            string += "\t" + str(key) + " " + str(self._defines[key]) + "\n"
+            string += "\t" + str(key) + " " + str(self._defines[key])
+        string += "\n"
         return string
 
     def set_template(self, template_file, data_file):
@@ -92,10 +92,16 @@ class ConfigurableEnemy:
 
     def get_defines_range(self):
         """
-        :return: Defines range
+        Return the define dictionary, the way BO wants it
+        :return: A dictionary with param as keyword and a tuple with (min,max)
         """
+        data_range = {}
+        for param in self._define_range:
+            min_val = self._define_range[param]["range"][0]
+            max_val = self._define_range[param]["range"][1]
+            data_range[str(param)] = (min_val, max_val)
 
-        return self._define_range
+        return data_range
 
     def _read_range_data(self):
         """
@@ -117,11 +123,22 @@ class ConfigurableEnemy:
 
     def set_defines(self, defines):
         """
-        Sets the defines of the enemy process
-        :param defines: A dictionary of defines
         :return:
         """
-        self._defines = defines
+        def_param = dict()
+
+        # Make sure that the parameters are of the correct type
+        # Workaround to force BO to generate int when needed
+        for key in defines:
+            if self._define_range[key]["type"] == "int":
+                def_param[key] = int(defines[key])
+            elif self._define_range[key]["type"] == "float":
+                def_param[key] = float(defines[key])
+            else:
+                print("Unknown data type for param " + str(key) )
+                sys.exit(1)
+
+        self._defines = def_param
 
     def get_defines(self):
         """
@@ -203,12 +220,12 @@ class EnemyConfiguration:
         :param enemy_cores: The total number of enemy processes
         """
 
-        self._enemy_cores = enemy_cores
-        self._enemies = []
+        self.enemy_cores = enemy_cores
+        self.enemies = []
 
-        for i in range(self._enemy_cores):
+        for i in range(self.enemy_cores):
             enemy = ConfigurableEnemy()
-            self._enemies.append(enemy)
+            self.enemies.append(enemy)
 
         # If this variable is true, the template across all enemies
         self._fixed_template = False
@@ -220,7 +237,7 @@ class EnemyConfiguration:
         :return: The template and defines for each core
         """
         string = ""
-        for enemy in self._enemies:
+        for enemy in self.enemies:
             string += str(enemy)
 
         string += "\n"
@@ -246,13 +263,13 @@ class EnemyConfiguration:
         """
         A generator for the configs with different templates
         """
-        for i in range(self._enemy_cores):
-            template = self._enemies[i].get_template()
+        for i in range(self.enemy_cores):
+            template = self.enemies[i].get_template()
             for v in self.def_files.keys():
                 if v != template:
                     self_copy = deepcopy(self)
-                    self_copy._enemies[i].set_template(v, self.def_files[v])
-                    self_copy._enemies[i].random_instantiate_defines()
+                    self_copy.enemies[i].set_template(v, self.def_files[v])
+                    self_copy.enemies[i].random_instantiate_defines()
                     yield self_copy
 
     def neighbour_define(self):
@@ -260,10 +277,10 @@ class EnemyConfiguration:
         A generator for configs with different defines
         """
         while True:
-            enemy = randrange(self._enemy_cores)
-            for j in self._enemies[enemy].neighbour():
+            enemy = randrange(self.enemy_cores)
+            for j in self.enemies[enemy].neighbour():
                 temp = deepcopy(self)
-                temp._enemies[enemy] = j
+                temp.enemies[enemy] = j
                 yield temp
 
     def set_all_templates(self, t_file, t_data_file):
@@ -273,8 +290,8 @@ class EnemyConfiguration:
         :param t_data_file: The template data file to be used on all enemy processes
         :return:
         """
-        for i in range(self._enemy_cores):
-            self._enemies[i].set_template(t_file, t_data_file)
+        for i in range(self.enemy_cores):
+            self.enemies[i].set_template(t_file, t_data_file)
 
         self._fixed_template = True
 
@@ -283,9 +300,9 @@ class EnemyConfiguration:
         Randomly set what type of enemy process you have
         :return: A dict of assigned templates
         """
-        for i in range(self._enemy_cores):
+        for i in range(self.enemy_cores):
             template_file, json_file = choice(list(EnemyConfiguration.def_files.items()))
-            self._enemies[i].set_template(template_file, json_file)
+            self.enemies[i].set_template(template_file, json_file)
 
         return self.get_all_templates()
 
@@ -295,13 +312,13 @@ class EnemyConfiguration:
         :return:
         """
         if self._same_defines:
-            self._enemies[0].random_instantiate_defines()
-            defines = self._enemies[0].get_defines()
-            for i in range(1, self._enemy_cores):
-                self._enemies[i].set_define(defines)
+            self.enemies[0].random_instantiate_defines()
+            defines = self.enemies[0].get_defines()
+            for i in range(1, self.enemy_cores):
+                self.enemies[i].set_define(defines)
         else:
-            for i in range(self._enemy_cores):
-                self._enemies[i].random_instantiate_defines()
+            for i in range(self.enemy_cores):
+                self.enemies[i].random_instantiate_defines()
 
     def random_set_all(self):
         """
@@ -322,8 +339,8 @@ class EnemyConfiguration:
         :return: A dict that contains core and its corresponding template
         """
         templates = {}
-        for i in range(self._enemy_cores):
-            templates[i] = self._enemies[i].get_template()
+        for i in range(self.enemy_cores):
+            templates[i] = self.enemies[i].get_template()
 
         return templates
 
@@ -332,8 +349,8 @@ class EnemyConfiguration:
         :return: A dict that contains core and its corresponding defines
         """
         defines = {}
-        for i in range(self._enemy_cores):
-            defines[i] = self._enemies[i].get_defines()
+        for i in range(self.enemy_cores):
+            defines[i] = self.enemies[i].get_defines()
 
         return defines
 
@@ -344,9 +361,9 @@ class EnemyConfiguration:
         """
         enemy_mapping = dict()
 
-        for i in range(self._enemy_cores):
+        for i in range(self.enemy_cores):
             filename = str(i+1) + "_enemy.out"
-            self._enemies[i].create_bin(filename)
+            self.enemies[i].create_bin(filename)
             # Start mapping the enemies from core 1
             enemy_mapping[i + 1] = filename
 
@@ -358,7 +375,7 @@ class ObjectiveFunction:
     Class to evaluate an enemy config
     """
 
-    def __init__(self, sut, max_temperature = 70):
+    def __init__(self, sut, max_temperature=70):
         """
         :param sut: The system under test
         :param max_temperature: The maximum temperature before starting an evaluation
@@ -372,6 +389,19 @@ class ObjectiveFunction:
         # Keep track of the best evaluation
         self.best_mapping = None
         self.best_score = None
+
+        # Stored mapping, workaround for BO
+        self.stored_mapping = None
+        self.optimized_core = None
+
+    def bo_call(self, **kwargs):
+
+        def_param = dict()
+        for key in kwargs:
+            def_param[key] = kwargs[key]
+
+        self.stored_mapping.enemies[self.optimized_core] .set_defines(def_param)
+        return self.__call__(self.stored_mapping)
 
     def __call__(self, enemy_config):
         """
@@ -481,7 +511,7 @@ class Optimization:
 
         return best_score, best_mapping
 
-    def inner_hillclimb(self, enemy_config, max_evaluations=100, max_time=30):
+    def inner_hill_climb(self, enemy_config, max_evaluations=100, max_time=30):
 
         objective_function = ObjectiveFunction(self._sut, self._max_temperature)
 
@@ -563,6 +593,32 @@ class Optimization:
 
         return best_score, best_mapping
 
+    def inner_bo(self, enemy_config, max_evaluations=30, kappa_val=6):
+
+        objective_function = ObjectiveFunction(self._sut, self._max_temperature)
+        config = enemy_config
+
+        # Devide the evaluations for each core
+        init_pts = 5
+        iterations = int(max_evaluations/config.enemy_cores - init_pts)
+
+        init_pts = 5
+
+        for core in range(config.enemy_cores):
+            objective_function.optimized_core = core
+            objective_function.stored_mapping = config
+            data_range = config.enemies[core].get_defines_range()
+
+            print(data_range)
+
+            bo = BayesianOptimization(objective_function.bo_call, data_range)
+            bo.init(init_points=init_pts)
+            bo.maximize(n_iter=iterations, kappa=kappa_val)
+
+            config.enemies[core].set_defines(bo.res['max']['max_params'])
+
+        return config
+
     def outer_random(self, enemy_config, inner_tune,  max_evaluations=40, max_time=600):
 
         objective_function = ObjectiveFunction(self._sut, self._max_temperature)
@@ -582,7 +638,7 @@ class Optimization:
             elif inner_tune == "ran":
                 score, config = self.inner_random(current_config)
             elif inner_tune == "hc":
-                score, config = self.inner_hillclimb(current_config)
+                score, config = self.inner_hill_climb(current_config)
             else:
                 print("I do not know how to tune like that")
 
@@ -619,7 +675,9 @@ class Optimization:
                 elif inner_tune == "ran":
                     next_outer_score, next_outer_config = self.inner_random(next_outer_config)
                 elif inner_tune == "hc":
-                    next_outer_score, next_outer_config = self.inner_hillclimb(next_outer_config)
+                    next_outer_score, next_outer_config = self.inner_hill_climb(next_outer_config)
+                elif inner_tune == "bo":
+                    next_outer_config = self.inner_bo(next_outer_config)
                 else:
                     print("I do not know how to tune like that")
 
@@ -772,6 +830,9 @@ class Tuning(object):
             elif self._method == "sa_sa":
                 print("Tuning by simulated annealing on the outer loop and simulated annealing on the inner loop")
                 self.sa_tune("sa")
+            elif self._method == "sa_bo":
+                print("Tuning by simulated annealing on the outer loop and bayesian optimization on the inner loop")
+                self.sa_tune("bo")
             elif self._method == "ran_ran":
                 print("Tuning by randomising on the outer loop and random on the inner loop")
                 self.ran_tune("ran")
