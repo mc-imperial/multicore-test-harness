@@ -82,6 +82,7 @@ class ConfigurableEnemy:
         self._d_file = data_file
 
         self._read_range_data()
+        self._random_instantiate_defines()
 
     def get_template(self):
         """
@@ -624,7 +625,7 @@ class Optimization:
         objective_function = ObjectiveFunction(self._sut, self._max_temperature)
 
         current_config = enemy_config
-        current_score = objective_function(enemy_config) 
+        objective_function(enemy_config)
 
         num_evaluations = 1
         t_end = time() + 60 * max_time
