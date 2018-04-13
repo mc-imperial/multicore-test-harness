@@ -510,7 +510,7 @@ class Optimization:
         best_score = objective_function.best_score
         best_mapping = objective_function.best_mapping
 
-        return best_score, best_mapping
+        return best_mapping, best_score
 
     def inner_hill_climb(self, enemy_config, max_evaluations=100, max_time=30):
 
@@ -545,7 +545,7 @@ class Optimization:
         best_score = objective_function.best_score
         best_mapping = objective_function.best_mapping
 
-        return best_score, best_mapping
+        return best_mapping, best_score
 
     def inner_anneal(self, enemy_config, max_evaluations=100, inner_temp=50, inner_alpha=0.8):
 
@@ -592,7 +592,7 @@ class Optimization:
         best_score = objective_function.best_score
         best_mapping = objective_function.best_mapping
 
-        return best_score, best_mapping
+        return best_mapping, best_score
 
     def inner_bo(self, enemy_config, max_evaluations=30, kappa_val=6):
 
@@ -620,7 +620,7 @@ class Optimization:
 
         return config
 
-    def outer_random(self, enemy_config, inner_tune,  max_evaluations=40, max_time=600):
+    def outer_random(self, enemy_config, inner_tune,  max_evaluations=30, max_time=600):
 
         objective_function = ObjectiveFunction(self._sut, self._max_temperature)
 
@@ -634,12 +634,14 @@ class Optimization:
             current_config.random_set_all_templates()
 
             # The inner tune part
-            if inner_tune == "sa":
-                score, config = self.inner_anneal(current_config)
-            elif inner_tune == "ran":
-                score, config = self.inner_random(current_config)
+            if inner_tune == "ran":
+                config = self.inner_random(current_config)
             elif inner_tune == "hc":
-                score, config = self.inner_hill_climb(current_config)
+                config = self.inner_hill_climb(current_config)
+            elif inner_tune == "sa":
+                config = self.inner_anneal(current_config)
+            elif inner_tune == "bo":
+                config = self.inner_bo(current_config)
             else:
                 print("I do not know how to tune like that")
 
@@ -650,7 +652,7 @@ class Optimization:
 
         return best_score, best_mapping
 
-    def outer_anneal(self, enemy_config, inner_tune, max_evaluations=40, outer_temp=20, outer_alpha=0.6):
+    def outer_anneal(self, enemy_config, inner_tune, max_evaluations=30, outer_temp=20, outer_alpha=0.6):
 
         # wrap the objective function (so we record the best)
         objective_function = ObjectiveFunction(self._sut, self._max_temperature)
@@ -671,12 +673,12 @@ class Optimization:
                     break
 
                 #The inner tune part
-                if inner_tune == "sa":
-                    next_outer_score, next_outer_config = self.inner_anneal(next_outer_config)
-                elif inner_tune == "ran":
-                    next_outer_score, next_outer_config = self.inner_random(next_outer_config)
+                if inner_tune == "ran":
+                    next_outer_config = self.inner_random(next_outer_config)
                 elif inner_tune == "hc":
-                    next_outer_score, next_outer_config = self.inner_hill_climb(next_outer_config)
+                    next_outer_config = self.inner_hill_climb(next_outer_config)
+                elif inner_tune == "sa":
+                    next_outer_config = self.inner_anneal(next_outer_config)
                 elif inner_tune == "bo":
                     next_outer_config = self.inner_bo(next_outer_config)
                 else:
@@ -843,6 +845,9 @@ class Tuning(object):
             elif self._method == "ran_sa":
                 print("Tuning by randomising on the outer loop and simulated annealing on the inner loop")
                 self.ran_tune("sa")
+            elif self._method == "ran_bo":
+                print("Tuning by randomising on the outer loop and bayesian optimization on the inner loop")
+                self.ran_tune("bo")
             else:
                 print("I do not know how to train that way")
                 sys.exit(0)
