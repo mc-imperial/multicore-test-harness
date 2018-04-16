@@ -229,7 +229,7 @@ class EnemyConfiguration:
             self.enemies.append(enemy)
 
         # If this variable is true, the template across all enemies
-        self._fixed_template = False
+        self.fixed_template = False
         # If this variable is true, all templates have the same parameters
         self._same_defines = False
 
@@ -252,7 +252,7 @@ class EnemyConfiguration:
         :param fix_template: Boolean variable
         :return:
         """
-        self._fixed_template = fix_template
+        self.fixed_template = fix_template
 
     def set_same_defines(self, same_defines):
         """
@@ -296,7 +296,7 @@ class EnemyConfiguration:
         for i in range(self.enemy_cores):
             self.enemies[i].set_template(t_file, t_data_file)
 
-        self._fixed_template = True
+        self.fixed_template = True
 
     def random_set_all_templates(self):
         """
@@ -329,7 +329,7 @@ class EnemyConfiguration:
         If the template is set, just set the defines
         :return: A tuple of the set templates and defines
         """
-        if self._fixed_template:
+        if self.fixed_template:
             self.random_set_all_defines()
         else:
             self.random_set_all_templates()
@@ -510,8 +510,9 @@ class Optimization:
                            str(enemy_config))
 
         best_mapping = objective_function.best_mapping
+        best_score = objective_function.best_score
 
-        return best_mapping
+        return best_mapping, best_score
 
     def inner_hill_climb(self, enemy_config, max_evaluations=100, max_time=30):
 
@@ -544,8 +545,9 @@ class Optimization:
                                str(next_inner_config))
 
         best_mapping = objective_function.best_mapping
+        best_score = objective_function.best_score
 
-        return best_mapping
+        return best_mapping, best_score
 
     def inner_anneal(self, enemy_config, max_evaluations=100, inner_temp=50, inner_alpha=0.8):
 
@@ -590,8 +592,9 @@ class Optimization:
                 break
 
         best_mapping = objective_function.best_mapping
+        best_score = objective_function.best_score
 
-        return best_mapping
+        return best_mapping, best_score
 
     def inner_bo(self, enemy_config, max_evaluations=100, kappa_val=6):
 
@@ -609,15 +612,15 @@ class Optimization:
             objective_function.stored_mapping = config
             data_range = config.enemies[core].get_defines_range()
 
-            print(data_range)
-
             bo = BayesianOptimization(objective_function.bo_call, data_range)
             bo.init(init_points=init_pts)
             bo.maximize(n_iter=iterations, kappa=kappa_val)
 
             config.enemies[core].set_defines(bo.res['max']['max_params'])
 
-        return config
+        best_score = objective_function.best_score
+
+        return config, best_score
 
     def outer_random(self, enemy_config, inner_tune,  max_evaluations=30, max_time=600):
 
@@ -746,6 +749,15 @@ class Tuning(object):
             print("Unable to find cores in JSON")
             sys.exit(1)
 
+        self._enemy_config = EnemyConfiguration(self._cores)
+
+        try:
+            enemy_template = str(json_object["enemy_template"])
+            enemy_range = str(json_object["enemy_range"])
+            self._enemy_config.set_all_templates(enemy_template, enemy_range)
+        except KeyError:
+            pass
+
         try:
             self._method = str(json_object["method"])
         except KeyError:
@@ -780,31 +792,48 @@ class Tuning(object):
             print("Unable to find max_temperature in JSON")
             sys.exit(1)
 
-        self._enemy_config = EnemyConfiguration(self._cores)
-
-    def sa_tune(self, inner_tune_method):
+    def bilevel_tune(self, outer_tune_method, inner_tune_method):
         """
-        Tuning by simulated annealing on the outer loop
+        Tuning by using a nested method for both the outer and inner loop
+        :param outer_tune_method: Optimization method for the outer loop
         :param inner_tune_method: Optimization method for the inner loop
         :return:
         """
 
         sa = Optimization(sut=self._sut, log_file=self._log_file)
-        best_state, best_score = sa.outer_anneal(self._enemy_config, inner_tune=inner_tune_method)
+
+        if outer_tune_method == "ran":
+            best_state, best_score = sa.outer_random(self._enemy_config, inner_tune=inner_tune_method)
+        elif outer_tune_method == "sa":
+            best_state, best_score = sa.outer_anneal(self._enemy_config, inner_tune=inner_tune_method)
+        else:
+            print("I do not know how to train that way")
+            sys.exit(0)
 
         f = open(self._max_file, 'w')
         f.write("Max time " + str(best_score) + "\n" + str(best_state))
         f.close()
 
-    def ran_tune(self, inner_tune_method):
+    def simple_tune(self, tune_method):
         """
-        Tuning by randomising on the outer loop
-        :param inner_tune_method: Optimization method for the inner loop
+        This method can be used only if the template is fixed and we only need to determine the parameters
+        :param tune_method: Optimization method
         :return:
         """
+        assert self._enemy_config.fixed_template, "Can not train this way if the template is not given"
 
         sa = Optimization(sut=self._sut, log_file=self._log_file)
-        best_state, best_score = sa.outer_random(self._enemy_config, inner_tune=inner_tune_method)
+        if tune_method == "ran":
+            best_state, best_score = sa.inner_random(self._enemy_config)
+        elif tune_method == "hc":
+            best_state, best_score = sa.inner_hill_climb(self._enemy_config)
+        elif tune_method == "so":
+            best_state, best_score = sa.inner_anneal(self._enemy_config)
+        elif tune_method == "bo":
+            best_state, best_score = sa.inner_bo(self._enemy_config)
+        else:
+            print("I do not know how to train that way")
+            sys.exit(0)
 
         f = open(self._max_file, 'w')
         f.write("Max time " + str(best_score) + "\n" + str(best_state))
@@ -825,28 +854,40 @@ class Tuning(object):
 
             if self._method == "sa_ran":
                 print("Tuning by simulated annealing on the outer loop and random on the inner loop")
-                self.sa_tune("ran")
+                self.bilevel_tune("sa", "ran")
             elif self._method == "sa_hc":
                 print("Tuning by simulated annealing on the outer loop and hill climbing on the inner loop")
-                self.sa_tune("hc")
+                self.bilevel_tune("sa", "hc")
             elif self._method == "sa_sa":
                 print("Tuning by simulated annealing on the outer loop and simulated annealing on the inner loop")
-                self.sa_tune("sa")
+                self.bilevel_tune("sa", "sa")
             elif self._method == "sa_bo":
                 print("Tuning by simulated annealing on the outer loop and bayesian optimization on the inner loop")
-                self.sa_tune("bo")
+                self.bilevel_tune("sa", "bo")
             elif self._method == "ran_ran":
                 print("Tuning by randomising on the outer loop and random on the inner loop")
-                self.ran_tune("ran")
+                self.bilevel_tune("ran", "ran")
             elif self._method == "ran_hc":
                 print("Tuning by randomising on the outer loop and hill climbing on the inner loop")
-                self.ran_tune("hc")
+                self.bilevel_tune("ran", "hc")
             elif self._method == "ran_sa":
                 print("Tuning by randomising on the outer loop and simulated annealing on the inner loop")
-                self.ran_tune("sa")
+                self.bilevel_tune("ran", "sa")
             elif self._method == "ran_bo":
                 print("Tuning by randomising on the outer loop and bayesian optimization on the inner loop")
-                self.ran_tune("bo")
+                self.bilevel_tune("ran", "bo")
+            elif self._method == "ran":
+                print("Tuning by randomising with a fixed template")
+                self.simple_tune("ran")
+            elif self._method == "hc":
+                print("Tuning by hillclimbing with a fixed template")
+                self.simple_tune("hc")
+            elif self._method == "sa":
+                print("Tuning by simulated annealing with a fixed template")
+                self.simple_tune("sa")
+            elif self._method == "bo":
+                print("Tuning with bayesian optimization with a fixed template")
+                self.simple_tune("bo")
             else:
                 print("I do not know how to train that way")
                 sys.exit(0)
