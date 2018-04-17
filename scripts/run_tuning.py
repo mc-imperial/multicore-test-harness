@@ -807,7 +807,7 @@ class Tuning(object):
         elif outer_tune_method == "sa":
             best_state, best_score = sa.outer_anneal(self._enemy_config, inner_tune=inner_tune_method)
         else:
-            print("I do not know how to train that way")
+            print("I do not know how to bilevele train that way")
             sys.exit(0)
 
         f = open(self._max_file, 'w')
@@ -827,12 +827,12 @@ class Tuning(object):
             best_state, best_score = sa.inner_random(self._enemy_config)
         elif tune_method == "hc":
             best_state, best_score = sa.inner_hill_climb(self._enemy_config)
-        elif tune_method == "so":
+        elif tune_method == "sa":
             best_state, best_score = sa.inner_anneal(self._enemy_config)
         elif tune_method == "bo":
             best_state, best_score = sa.inner_bo(self._enemy_config)
         else:
-            print("I do not know how to train that way")
+            print("I do not know how to simple train that way")
             sys.exit(0)
 
         f = open(self._max_file, 'w')
