@@ -30,6 +30,8 @@ import os
 import math
 
 from bayes_opt import BayesianOptimization
+from simanneal import Annealer
+
 from time import time
 
 from random import randrange, uniform, choice, random
@@ -136,7 +138,7 @@ class ConfigurableEnemy:
             elif self._define_range[key]["type"] == "float":
                 def_param[key] = float(defines[key])
             else:
-                print("Unknown data type for param " + str(key) )
+                print("Unknown data type for param " + str(key))
                 sys.exit(1)
 
         self._defines = def_param
@@ -433,6 +435,18 @@ class ObjectiveFunction:
                 os.system(cmd)
 
 
+class DefineAnneal(Annealer):
+    def __init__(self, initial_state, sut, temp):
+        Annealer.__init__(self, initial_state)
+        self.objective_function = ObjectiveFunction(sut, temp)
+
+    def move(self):
+        self.state = self.state.neighbour_define()
+
+    def energy(self):
+        return 1/self.objective_function(self.state)
+
+
 class Optimization:
     """
     Class for Optimization
@@ -488,7 +502,7 @@ class Optimization:
         else:
             return math.exp(-abs(next_score - prev_score) / temperature)
 
-    def inner_random(self, enemy_config, max_evaluations=100, max_time=30):
+    def inner_random(self, enemy_config, max_evaluations=200, max_time=30):
 
         objective_function = ObjectiveFunction(self._sut, self._max_temperature)
 
@@ -511,7 +525,7 @@ class Optimization:
 
         return best_mapping, best_score
 
-    def inner_hill_climb(self, enemy_config, max_evaluations=100, max_time=30):
+    def inner_hill_climb(self, enemy_config, max_evaluations=200, max_time=30):
 
         objective_function = ObjectiveFunction(self._sut, self._max_temperature)
 
@@ -545,7 +559,19 @@ class Optimization:
 
         return best_mapping, best_score
 
-    def inner_anneal(self, enemy_config, max_evaluations=100, inner_temp=50, inner_alpha=0.8):
+    def inner_anneal(self, enemy_config, max_evaluations=200):
+
+        inner_anneal = DefineAnneal(enemy_config, self._sut, self._max_temperature)
+
+        inner_anneal.steps = max_evaluations
+        inner_anneal.anneal()
+
+        best_mapping = inner_anneal.objective_function.best_mapping
+        best_score = inner_anneal.objective_function.best_score
+
+        return best_mapping, best_score
+
+    def inner_anneal2(self, enemy_config, max_evaluations=200, inner_temp=50, inner_alpha=0.8):
 
         # wrap the objective function (so we record the best)
         objective_function = ObjectiveFunction(self._sut, self._max_temperature)
@@ -593,7 +619,7 @@ class Optimization:
 
         return best_mapping, best_score
 
-    def inner_bo(self, enemy_config, max_evaluations=100, kappa_val=6):
+    def inner_bo(self, enemy_config, max_evaluations=200, kappa_val=8):
 
         objective_function = ObjectiveFunction(self._sut, self._max_temperature)
         config = enemy_config
@@ -601,8 +627,6 @@ class Optimization:
         # Devide the evaluations for each core
         init_pts = 5
         iterations = int(max_evaluations/config.enemy_cores - init_pts)
-
-        init_pts = 5
 
         for core in range(config.enemy_cores):
             objective_function.optimized_core = core
