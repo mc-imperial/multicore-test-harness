@@ -170,18 +170,17 @@ class ConfigurableEnemy:
         """
         random_key = choice(list(self._defines))
 
-        value = self._defines[random_key]
         min_val = self._define_range[random_key]["range"][0]
         max_val = self._define_range[random_key]["range"][1]
 
         if self._define_range[random_key]["type"] == "int":
             temp = deepcopy(self)
             temp._defines[random_key] = randrange(min_val, max_val)
-            yield temp
+            return temp
         elif self._define_range[random_key]["type"] == "float":
             temp = deepcopy(self)
             temp._defines[random_key] = uniform(min_val, max_val)
-            yield temp
+            return temp
         else:
             print("Unknown data type for param " + str(random_key))
             sys.exit(1)
@@ -279,12 +278,10 @@ class EnemyConfiguration:
         """
         A generator for configs with different defines
         """
-        while True:
-            enemy = randrange(self.enemy_cores)
-            for j in self.enemies[enemy].neighbour():
-                temp = deepcopy(self)
-                temp.enemies[enemy] = j
-                yield temp
+        enemy = randrange(self.enemy_cores)
+        temp = deepcopy(self)
+        temp.enemies[enemy] = self.enemies[enemy].neighbour()
+        return temp
 
     def set_all_templates(self, t_file, t_data_file):
         """
@@ -518,31 +515,30 @@ class Optimization:
 
         objective_function = ObjectiveFunction(self._sut, self._max_temperature)
 
-        current_inner_config = enemy_config
-        current_inner_score = objective_function(enemy_config)
+        current_config = enemy_config
+        current_score = objective_function(enemy_config)
 
         num_evaluations = 1
         t_end = time() + 60 * max_time
 
         while num_evaluations < max_evaluations and time() < t_end:
             # examine moves around our current position
-            for next_inner_config in current_inner_config.neighbour_define():
-                if num_evaluations > max_evaluations:
-                    break
+            if num_evaluations > max_evaluations:
+                break
+            next_config = current_config.neighbour_define()
 
-                # see if this move is better than the current
-                next_inner_score = objective_function(next_inner_config)
-                num_evaluations += 1
-                if next_inner_score > current_inner_score:
-                    current_inner_config = next_inner_config
-                    current_inner_score = next_inner_score
-                    break  # depth first search
+            # see if this move is better than the current
+            next_score = objective_function(next_config)
+            num_evaluations += 1
+            if next_score > current_score:
+                current_config = next_config
+                current_score = next_score
 
-                self._log_data(num_evaluations,
-                               int(time() - self._t_start),
-                               objective_function.best_score,
-                               next_inner_score,
-                               str(next_inner_config))
+            self._log_data(num_evaluations,
+                           int(time() - self._t_start),
+                           objective_function.best_score,
+                           next_score,
+                           str(next_config))
 
         best_mapping = objective_function.best_mapping
         best_score = objective_function.best_score
@@ -555,8 +551,8 @@ class Optimization:
         objective_function = ObjectiveFunction(self._sut, self._max_temperature)
 
         # Initialise SA
-        current_inner_config = enemy_config
-        current_inner_score = objective_function(enemy_config)
+        current_config = enemy_config
+        current_score = objective_function(enemy_config)
         num_evaluations = 1
 
         inner_cooling_schedule = self.kirkpatrick_cooling(inner_temp, inner_alpha)
@@ -564,28 +560,29 @@ class Optimization:
         for inner_temperature in inner_cooling_schedule:
             done = False
 
-            for next_inner_config in current_inner_config.neighbour_define():
+            while True:
+                next_config = current_config.neighbour_define()
 
                 if num_evaluations >= max_evaluations:
                     done = True
                     break
 
-                next_inner_score = objective_function(next_inner_config)
+                next_score = objective_function(next_config)
                 num_evaluations += 1
 
                 # probabilistically accept this solution
                 # always accepting better solutions
-                p = self.p_score(current_inner_score, next_inner_score, inner_temperature)
+                p = self.p_score(current_score, next_score, inner_temperature)
                 if random() < p:
-                    current_inner_config = next_inner_config
-                    current_inner_score = next_inner_score
+                    current_config = next_config
+                    current_score = next_score
                     break
 
                 self._log_data(num_evaluations,
                                int(time() - self._t_start),
                                objective_function.best_score,
-                               next_inner_score,
-                               str(next_inner_config))
+                               next_score,
+                               str(next_config))
 
             # see if completely finished
             if done:
@@ -800,7 +797,7 @@ class Tuning(object):
         :return:
         """
 
-        sa = Optimization(sut=self._sut, log_file=self._log_file)
+        sa = Optimization(sut=self._sut, log_file=self._log_file, max_temperature=self._max_temperature)
 
         if outer_tune_method == "ran":
             best_state, best_score = sa.outer_random(self._enemy_config, inner_tune=inner_tune_method)
@@ -822,7 +819,7 @@ class Tuning(object):
         """
         assert self._enemy_config.fixed_template, "Can not train this way if the template is not given"
 
-        sa = Optimization(sut=self._sut, log_file=self._log_file)
+        sa = Optimization(sut=self._sut, log_file=self._log_file, max_temperature=self._max_temperature)
         if tune_method == "ran":
             best_state, best_score = sa.inner_random(self._enemy_config)
         elif tune_method == "hc":
