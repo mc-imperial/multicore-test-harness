@@ -40,7 +40,7 @@ from copy import deepcopy
 
 
 from run_sut_stress import SutStress
-from common import cool_down
+
 
 
 class ConfigurableEnemy:
@@ -410,11 +410,10 @@ class ObjectiveFunction:
         :param enemy_config: An EnemyConfiguration object
         :return: Execution time (latency)
         """
-        cool_down(self._max_temperature)
 
         self._enemy_files = enemy_config.get_file_mapping()
         s = SutStress()
-        ex_time, ex_temp = s.run_mapping(self._sut, self._enemy_files)
+        ex_time = s.run_mapping(self._sut, self._enemy_files)
 
         if self.best_score is None or ex_time > self.best_score:
             self.best_score = ex_time
