@@ -8,39 +8,7 @@
     "log_file": "../results/cache_ran_log.txt",
     "max_file": "../results/cache_ran_max.txt",
     "training_time": 10,
-    "max_temperature": 70
-  },
-  "2_train": {
-    "sut": "../bin/sut/L2_unified_test",
-    "cores": 3,
-    "enemy_template": "../templates/cache/template_cache_stress.c",
-    "enemy_range": "../templates/cache/parameters.json",
-    "method":"hc",
-    "log_file": "../results/cache_hc_log.txt",
-    "max_file": "../results/cache_hc_max.txt",
-    "training_time": 10,
-    "max_temperature": 70
-  },
-  "3_train": {
-    "sut": "../bin/sut/L2_unified_test",
-    "cores": 3,
-    "enemy_template": "../templates/cache/template_cache_stress.c",
-    "enemy_range": "../templates/cache/parameters.json",
-    "method":"sa",
-    "log_file": "../results/cache_sa_log.txt",
-    "max_file": "../results/cache_sa_max.txt",
-    "training_time": 10,
-    "max_temperature": 70
-  },
-  "4_train": {
-    "sut": "../bin/sut/L2_unified_test",
-    "cores": 3,
-    "enemy_template": "../templates/cache/template_cache_stress.c",
-    "enemy_range": "../templates/cache/parameters.json",
-    "method":"bo",
-    "log_file": "../results/cache_bo_log.txt",
-    "max_file": "../results/cache_bo_max.txt",
-    "training_time": 10,
-    "max_temperature": 70
+    "max_temperature": 70,
+    "network": "doc-di13"
   }
 }

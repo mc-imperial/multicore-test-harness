@@ -28,19 +28,20 @@ import json
 import sys
 import os
 import math
-
-from bayes_opt import BayesianOptimization
-from simanneal import Annealer
+import socket
+import pickle
 
 from time import time
-
 from random import randrange, uniform, choice, random
 from collections import OrderedDict
 from copy import deepcopy
 
+# optimization packages
+from bayes_opt import BayesianOptimization
+from simanneal import Annealer
 
+# my packages
 from run_sut_stress import SutStress
-
 
 
 class ConfigurableEnemy:
@@ -377,7 +378,7 @@ class ObjectiveFunction:
     Class to evaluate an enemy config
     """
 
-    def __init__(self, sut, max_temperature=70):
+    def __init__(self, sut, max_temperature=70, socket_connect=None):
         """
         :param sut: The system under test
         :param max_temperature: The maximum temperature before starting an evaluation
@@ -396,6 +397,9 @@ class ObjectiveFunction:
         self.stored_mapping = None
         self.optimized_core = None
 
+        # Network connection
+        self.socket = socket_connect
+
     def bo_call(self, **kwargs):
 
         def_param = dict()
@@ -411,13 +415,23 @@ class ObjectiveFunction:
         :return: Execution time (latency)
         """
 
-        self._enemy_files = enemy_config.get_file_mapping()
-        s = SutStress()
-        ex_time = s.run_mapping(self._sut, self._enemy_files)
+        if self.socket:
+            pickled_enemy_config = pickle.dumps(enemy_config)
 
-        if self.best_score is None or ex_time > self.best_score:
-            self.best_score = ex_time
-            self.best_mapping = enemy_config
+            # Then send actual enemy config
+            self.socket.send(pickled_enemy_config)
+
+            # Receive the execution time
+            pickled_ex_time = self.socket.recv(1024)
+            return pickle.loads(pickled_ex_time)
+        else:
+            self._enemy_files = enemy_config.get_file_mapping()
+            s = SutStress()
+            ex_time = s.run_mapping(self._sut, self._enemy_files)
+
+            if self.best_score is None or ex_time > self.best_score:
+                self.best_score = ex_time
+                self.best_mapping = enemy_config
 
         return ex_time
 
@@ -435,9 +449,9 @@ class ObjectiveFunction:
 
 
 class DefineAnneal(Annealer):
-    def __init__(self, initial_state, sut, temp):
+    def __init__(self, initial_state, sut, temp, network_socket=None):
         Annealer.__init__(self, initial_state)
-        self.objective_function = ObjectiveFunction(sut, temp)
+        self.objective_function = ObjectiveFunction(sut, temp, network_socket)
 
     def move(self):
         self.state = self.state.neighbour_define()
@@ -451,7 +465,7 @@ class Optimization:
     Class for Optimization
     """
 
-    def __init__(self, sut, log_file, max_temperature=70):
+    def __init__(self, sut, log_file, max_temperature=70, network_socket=None):
         """
         Create an Optimization object
         :param sut: The system under test
@@ -464,6 +478,8 @@ class Optimization:
         self._max_temperature = max_temperature
 
         self._t_start = time()
+
+        self._socket = network_socket
 
     def _write_log_header(self):
         """
@@ -503,7 +519,7 @@ class Optimization:
 
     def inner_random(self, enemy_config, max_evaluations=200, max_time=30):
 
-        objective_function = ObjectiveFunction(self._sut, self._max_temperature)
+        objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._socket)
 
         num_evaluations = 1
         t_end = time() + 60 * max_time
@@ -526,7 +542,7 @@ class Optimization:
 
     def inner_hill_climb(self, enemy_config, max_evaluations=200, max_time=30):
 
-        objective_function = ObjectiveFunction(self._sut, self._max_temperature)
+        objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._socket)
 
         current_config = enemy_config
         current_score = objective_function(enemy_config)
@@ -560,7 +576,7 @@ class Optimization:
 
     def inner_anneal(self, enemy_config, max_evaluations=200):
 
-        inner_anneal = DefineAnneal(enemy_config, self._sut, self._max_temperature)
+        inner_anneal = DefineAnneal(enemy_config, self._sut, self._max_temperature, self._socket)
 
         inner_anneal.steps = max_evaluations
         inner_anneal.anneal()
@@ -573,7 +589,7 @@ class Optimization:
     def inner_anneal2(self, enemy_config, max_evaluations=200, inner_temp=50, inner_alpha=0.8):
 
         # wrap the objective function (so we record the best)
-        objective_function = ObjectiveFunction(self._sut, self._max_temperature)
+        objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._socket)
 
         # Initialise SA
         current_config = enemy_config
@@ -620,7 +636,7 @@ class Optimization:
 
     def inner_bo(self, enemy_config, max_evaluations=200, kappa_val=8):
 
-        objective_function = ObjectiveFunction(self._sut, self._max_temperature)
+        objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._socket)
         config = enemy_config
 
         # Devide the evaluations for each core
@@ -644,7 +660,7 @@ class Optimization:
 
     def outer_random(self, enemy_config, inner_tune,  max_evaluations=30, max_time=600):
 
-        objective_function = ObjectiveFunction(self._sut, self._max_temperature)
+        objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._socket)
 
         current_config = enemy_config
         objective_function(enemy_config)
@@ -677,7 +693,7 @@ class Optimization:
     def outer_anneal(self, enemy_config, inner_tune, max_evaluations=30, outer_temp=20, outer_alpha=0.6):
 
         # wrap the objective function (so we record the best)
-        objective_function = ObjectiveFunction(self._sut, self._max_temperature)
+        objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._socket)
 
         # Initialise SA
         current_outer_config = enemy_config.random_set_all()
@@ -750,6 +766,15 @@ class Tuning(object):
         self._log_file = None
         self._max_file = None
 
+        # For network connection
+        self._socket = None
+
+    def cleanup(self):
+        if self._socket:
+            self._socket.send(pickle.dumps("Finished!"))
+            self._socket.close()
+            self._socket = None
+
     def read_json_object(self, json_object):
         """
         Sets the tuning data based on JSON object
@@ -812,6 +837,18 @@ class Tuning(object):
             print("Unable to find max_temperature in JSON")
             sys.exit(1)
 
+        try:
+            host = str(json_object["network"])
+            self._socket = socket.socket()
+            port = 12345  # Reserve a port for your service
+            self._socket.connect((host, port))
+            self._socket.send(self._sut.encode('utf-8'))
+            print(self._sut)
+            self._socket.send(str(self._max_temperature).encode('utf-8'))
+            print(self._max_temperature)
+        except KeyError:
+            self._socket = None
+
     def bilevel_tune(self, outer_tune_method, inner_tune_method):
         """
         Tuning by using a nested method for both the outer and inner loop
@@ -820,7 +857,10 @@ class Tuning(object):
         :return:
         """
 
-        sa = Optimization(sut=self._sut, log_file=self._log_file, max_temperature=self._max_temperature)
+        sa = Optimization(sut=self._sut,
+                          log_file=self._log_file,
+                          max_temperature=self._max_temperature,
+                          network_socket=self._socket)
 
         if outer_tune_method == "ran":
             best_state, best_score = sa.outer_random(self._enemy_config, inner_tune=inner_tune_method)
@@ -842,7 +882,10 @@ class Tuning(object):
         """
         assert self._enemy_config.fixed_template, "Can not train this way if the template is not given"
 
-        sa = Optimization(sut=self._sut, log_file=self._log_file, max_temperature=self._max_temperature)
+        sa = Optimization(sut=self._sut,
+                          log_file=self._log_file,
+                          max_temperature=self._max_temperature,
+                          network_socket=self._socket)
         if tune_method == "ran":
             best_state, best_score = sa.inner_random(self._enemy_config)
         elif tune_method == "hc":
@@ -911,6 +954,8 @@ class Tuning(object):
             else:
                 print("I do not know how to train that way")
                 sys.exit(0)
+
+            self.cleanup()
 
 
 if __name__ == "__main__":
