@@ -1,0 +1,28 @@
+{
+  "DEFINES": {
+    "SIZE_MB": {
+      "range" :[1,200],
+      "type": "int"
+    },
+    "INSTR1": {
+      "range" :[1,4],
+      "type": "int"
+    },
+    "INSTR2": {
+      "range" :[1,4],
+      "type": "int"
+    },
+    "INSTR3": {
+      "range" :[1,4],
+      "type": "int"
+    },
+    "INSTR4": {
+      "range" :[1,4],
+      "type": "int"
+    },
+    "INSTR5": {
+      "range" :[1,4],
+      "type": "int"
+    }
+  }
+}
