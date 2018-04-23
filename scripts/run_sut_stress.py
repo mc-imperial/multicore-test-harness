@@ -25,8 +25,7 @@ Runs individual tests.
 """
 
 import sys
-from common import ProcessManagement, get_event, get_temp
-
+from common import ProcessManagement, get_event, get_temp, cool_down
 
 
 class SutStress:
@@ -35,6 +34,7 @@ class SutStress:
     """
     ## Profiling tools options for the SUT
     INSTRUMENT_CMDS = ["", "bash my_perf_script.sh", "bash my_perf.sh", "strace -c"]
+
     def __init__(self):
         """
         Create a stressed SUT object
@@ -72,7 +72,8 @@ class SutStress:
         s_out,s_err = self._processes.system_call(cmd)
         return s_out, s_err
 
-    def _check_error(self, s_err):
+    @staticmethod
+    def _check_error(s_err):
         """
         If there are errors. print them and terminate
         :param s_err: The possible error message
@@ -83,38 +84,51 @@ class SutStress:
             print(s_err)
             sys.exit(1)
 
-    def run_mapping(self, sut,  mapping, style = 0):
+    def run_mapping(self, sut,  mapping, max_temperature=50, style=0):
         """
         :param sut: System under stress
         :param mapping: A mapping of enemies o cores
+        :param max_temperature: If the temperature is above this, discard the result
         :param style: Run the SUT with perf or some similar instrument
         """
-        # start up the stress in accordance with the mapping
-        for core in mapping:
-            self.start_stress(mapping[core], core)
 
+        delta_temp = 10
 
-        #Run the program on core 0
-        s_out,s_err = self.run_program_single(sut,0, style)
-        self._check_error(s_err)
+        while True:
+            cool_down(max_temperature - delta_temp)
 
-        if len(mapping) > 0:
-            self._processes.kill_stress()
+            # start up the stress in accordance with the mapping
+            for core in mapping:
+                self.start_stress(mapping[core], core)
 
+            # Run the program on core 0
+            s_out,s_err = self.run_program_single(sut, 0, style)
+            self._check_error(s_err)
 
-        if get_event(s_out, "total time(us): "):
-            ex_time = get_event(s_out, "total time(us): ")
-        elif get_event(s_out, "Total time (secs): "):
-            ex_time = get_event(s_out, "Total time (secs): ")
-        elif get_event(s_out, "Max: "):
-            ex_time = get_event(s_out, "Max: ")
-        else:
-            print("Unable find execution time or maximum latency")
-            sys.exit(0)
+            if len(mapping) > 0:
+                self._processes.kill_stress()
 
-        ex_temp = get_temp()
+            if get_event(s_out, "total time(us): "):
+                ex_time = get_event(s_out, "total time(us): ")
+            elif get_event(s_out, "Total time (secs): "):
+                ex_time = get_event(s_out, "Total time (secs): ")
+            elif get_event(s_out, "Max: "):
+                ex_time = get_event(s_out, "Max: ")
+            else:
+                print("Unable find execution time or maximum latency")
+                sys.exit(0)
 
-        return ex_time, ex_temp
+            final_temp = get_temp()
+            if final_temp < max_temperature:
+                break
+            else:
+                print("The final temperature was to high, redoing experiment")
+                delta_temp += 2
+                if delta_temp > 15:
+                    print("The test heats up the processor more than 15 degrees, I o not know what to do")
+                    exit(1)
+
+        return ex_time
 
     def run_sut_stress(self, sut, stress, cores, style = 0):
         """
