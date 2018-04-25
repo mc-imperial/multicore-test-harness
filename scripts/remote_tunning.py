@@ -429,36 +429,41 @@ class ObjectiveFunction:
                 os.system(cmd)
 
 
+class PackedStart:
+    def __init__(self, sut, temperature):
+        self.sut = sut
+        self.temperature = temperature
+
+
 if __name__ == "__main__":
     s = socket.socket()
-    host = socket.gethostname()  # Get local machine name
-    port = 12345                    # Reserve a port for your service.
-
-    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    s.bind((host, port))  # Bind to the port
     host = socket.gethostname()     # Get local machine name
+    port = 12345                    # Reserve a port for your service.
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    s.bind((host, port))            # Bind to the port
 
     while True:
-        s.listen(5)  # Now wait for client connection.
+        s.listen(5)                 # Now wait for client connection.
 
-        c, addr = s.accept()  # Establish connection with client.
-        sut = c.recv(1024)
-        print(sut)
-        print("Portocala")
-        max_temperature = int(c.recv(1024))
-        print(max_temperature)
-        objective_function = ObjectiveFunction(sut, max_temperature)
+        c, addr = s.accept()        # Establish connection with client
+
+        pickle_pack = c.recv(1024)
+        pack = pickle.loads(pickle_pack)
+        objective_function = ObjectiveFunction(pack.sut, pack.temperature)
 
         while True:
 
             # Receive message
             message = pickle.loads(c.recv(4096))
-            print(message)
-            if message == "Finished":
+            # print(message)
+            if message == "Finished!":
                 break
-            else:
+            elif isinstance(message, EnemyConfiguration):
                 ex_time = objective_function(message)
                 c.send(pickle.dumps(ex_time))
+            else:
+                print("I received something strange")
+                sys.exit(1)
 
         c.close()  # Close the connection
     s.close()

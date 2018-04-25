@@ -423,6 +423,7 @@ class ObjectiveFunction:
 
             # Receive the execution time
             pickled_ex_time = self.socket.recv(1024)
+            # print(pickle.loads(pickled_ex_time))
             return pickle.loads(pickled_ex_time)
         else:
             self._enemy_files = enemy_config.get_file_mapping()
@@ -517,7 +518,7 @@ class Optimization:
         else:
             return math.exp(-abs(next_score - prev_score) / temperature)
 
-    def inner_random(self, enemy_config, max_evaluations=200, max_time=30):
+    def inner_random(self, enemy_config, max_evaluations=2, max_time=30):
 
         objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._socket)
 
@@ -540,7 +541,7 @@ class Optimization:
 
         return best_mapping, best_score
 
-    def inner_hill_climb(self, enemy_config, max_evaluations=200, max_time=30):
+    def inner_hill_climb(self, enemy_config, max_evaluations=2, max_time=30):
 
         objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._socket)
 
@@ -574,7 +575,7 @@ class Optimization:
 
         return best_mapping, best_score
 
-    def inner_anneal(self, enemy_config, max_evaluations=200):
+    def inner_anneal(self, enemy_config, max_evaluations=2):
 
         inner_anneal = DefineAnneal(enemy_config, self._sut, self._max_temperature, self._socket)
 
@@ -586,7 +587,7 @@ class Optimization:
 
         return best_mapping, best_score
 
-    def inner_anneal2(self, enemy_config, max_evaluations=200, inner_temp=50, inner_alpha=0.8):
+    def inner_anneal2(self, enemy_config, max_evaluations=2, inner_temp=50, inner_alpha=0.8):
 
         # wrap the objective function (so we record the best)
         objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._socket)
@@ -634,7 +635,7 @@ class Optimization:
 
         return best_mapping, best_score
 
-    def inner_bo(self, enemy_config, max_evaluations=200, kappa_val=8):
+    def inner_bo(self, enemy_config, max_evaluations=2, kappa_val=8):
 
         objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._socket)
         config = enemy_config
@@ -743,7 +744,13 @@ class Optimization:
         return best_score, best_mapping
 
 
-class Tuning(object):
+class PackedStart:
+    def __init__(self, sut, temperature):
+        self.sut = sut
+        self.temperature = temperature
+
+
+class Tuning:
     """Run tuning based on fuzzing or Bayesian Optimisation
     Reads and runs the tuning described in the JSON file.
     """
@@ -842,10 +849,12 @@ class Tuning(object):
             self._socket = socket.socket()
             port = 12345  # Reserve a port for your service
             self._socket.connect((host, port))
-            self._socket.send(self._sut.encode('utf-8'))
-            print(self._sut)
-            self._socket.send(str(self._max_temperature).encode('utf-8'))
-            print(self._max_temperature)
+
+            pack = PackedStart(self._sut, self._max_temperature)
+            pickle_pack = pickle.dumps(pack)
+            # self._socket.send(sys.getsizeof(pickle_pack))
+            self._socket.send(pickle_pack)
+
         except KeyError:
             self._socket = None
 
@@ -863,9 +872,13 @@ class Tuning(object):
                           network_socket=self._socket)
 
         if outer_tune_method == "ran":
-            best_state, best_score = sa.outer_random(self._enemy_config, inner_tune=inner_tune_method)
+            best_state, best_score = sa.outer_random(
+                self._enemy_config,
+                inner_tune=inner_tune_method)
         elif outer_tune_method == "sa":
-            best_state, best_score = sa.outer_anneal(self._enemy_config, inner_tune=inner_tune_method)
+            best_state, best_score = sa.outer_anneal(
+                self._enemy_config,
+                inner_tune=inner_tune_method)
         else:
             print("I do not know how to bilevele train that way")
             sys.exit(0)
@@ -916,28 +929,36 @@ class Tuning(object):
             self.read_json_object(tuning_object[tuning_session])
 
             if self._method == "sa_ran":
-                print("Tuning by simulated annealing on the outer loop and random on the inner loop")
+                print("Tuning by simulated annealing on the "
+                      "outer loop and random on the inner loop")
                 self.bilevel_tune("sa", "ran")
             elif self._method == "sa_hc":
-                print("Tuning by simulated annealing on the outer loop and hill climbing on the inner loop")
+                print("Tuning by simulated annealing on the "
+                      "outer loop and hill climbing on the inner loop")
                 self.bilevel_tune("sa", "hc")
             elif self._method == "sa_sa":
-                print("Tuning by simulated annealing on the outer loop and simulated annealing on the inner loop")
+                print("Tuning by simulated annealing on the "
+                      "outer loop and simulated annealing on the inner loop")
                 self.bilevel_tune("sa", "sa")
             elif self._method == "sa_bo":
-                print("Tuning by simulated annealing on the outer loop and bayesian optimization on the inner loop")
+                print("Tuning by simulated annealing on the "
+                      "outer loop and bayesian optimization on the inner loop")
                 self.bilevel_tune("sa", "bo")
             elif self._method == "ran_ran":
-                print("Tuning by randomising on the outer loop and random on the inner loop")
+                print("Tuning by randomising on the outer "
+                      "loop and random on the inner loop")
                 self.bilevel_tune("ran", "ran")
             elif self._method == "ran_hc":
-                print("Tuning by randomising on the outer loop and hill climbing on the inner loop")
+                print("Tuning by randomising on the outer "
+                      "loop and hill climbing on the inner loop")
                 self.bilevel_tune("ran", "hc")
             elif self._method == "ran_sa":
-                print("Tuning by randomising on the outer loop and simulated annealing on the inner loop")
+                print("Tuning by randomising on the outer "
+                      "loop and simulated annealing on the inner loop")
                 self.bilevel_tune("ran", "sa")
             elif self._method == "ran_bo":
-                print("Tuning by randomising on the outer loop and bayesian optimization on the inner loop")
+                print("Tuning by randomising on the outer "
+                      "loop and bayesian optimization on the inner loop")
                 self.bilevel_tune("ran", "bo")
             elif self._method == "ran":
                 print("Tuning by randomising with a fixed template")
