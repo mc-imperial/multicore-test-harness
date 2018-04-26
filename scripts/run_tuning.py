@@ -418,12 +418,12 @@ class ObjectiveFunction:
         if self.socket:
             pickled_enemy_config = pickle.dumps(enemy_config)
 
-            # Then send actual enemy config
-            self.socket.send(pickled_enemy_config)
+            # Then send actual enemy config + delim
+            self.socket.sendall(pickled_enemy_config + b'data_end')
 
             # Receive the execution time
             pickled_ex_time = self.socket.recv(1024)
-            # print(pickle.loads(pickled_ex_time))
+            print(pickle.loads(pickled_ex_time))
             return pickle.loads(pickled_ex_time)
         else:
             self._enemy_files = enemy_config.get_file_mapping()
@@ -518,7 +518,7 @@ class Optimization:
         else:
             return math.exp(-abs(next_score - prev_score) / temperature)
 
-    def inner_random(self, enemy_config, max_evaluations=2, max_time=30):
+    def inner_random(self, enemy_config, max_evaluations=10, max_time=30):
 
         objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._socket)
 
@@ -744,6 +744,37 @@ class Optimization:
         return best_score, best_mapping
 
 
+class MySocket:
+    def __init__(self, sock=None):
+        if sock is None:
+            self.sock = socket.socket(
+                socket.AF_INET, socket.SOCK_STREAM)
+        else:
+            self.sock = sock
+
+    def connect(self, host, port):
+        self.sock.connect((host, port))
+
+    def mysend(self, msg, msglen):
+        totalsent = 0
+        while totalsent < msglen:
+            sent = self.sock.send(msg[totalsent:])
+            if sent == 0:
+                raise RuntimeError("socket connection broken")
+            totalsent = totalsent + sent
+
+    def myreceive(self, msglen):
+        chunks = []
+        bytes_recd = 0
+        while bytes_recd < msglen:
+            chunk = self.sock.recv(min(msglen - bytes_recd, 2048))
+            if chunk == '':
+                raise RuntimeError("socket connection broken")
+            chunks.append(chunk)
+            bytes_recd = bytes_recd + len(chunk)
+        return ''.join(chunks)
+
+
 class PackedStart:
     def __init__(self, sut, temperature):
         self.sut = sut
@@ -778,7 +809,7 @@ class Tuning:
 
     def cleanup(self):
         if self._socket:
-            self._socket.send(pickle.dumps("Finished!"))
+            self._socket.send(pickle.dumps("Finished!") + b'data_end')
             self._socket.close()
             self._socket = None
 
@@ -848,12 +879,14 @@ class Tuning:
             host = str(json_object["network"])
             self._socket = socket.socket()
             port = 12345  # Reserve a port for your service
+            print(host, port)
             self._socket.connect((host, port))
 
             pack = PackedStart(self._sut, self._max_temperature)
             pickle_pack = pickle.dumps(pack)
-            # self._socket.send(sys.getsizeof(pickle_pack))
             self._socket.send(pickle_pack)
+            pickle_sync = self._socket.recv(1024)      # Sync message
+            print(pickle.loads(pickle_sync))
 
         except KeyError:
             self._socket = None
@@ -981,7 +1014,7 @@ class Tuning:
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("usage: " + sys.argv[0] + " <experments_file>.json\n")
+        print("usage: " + sys.argv[0] + " <experiments_file>.json\n")
         exit(1)
 
     tr = Tuning()

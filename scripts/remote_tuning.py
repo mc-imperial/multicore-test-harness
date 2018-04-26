@@ -408,7 +408,7 @@ class ObjectiveFunction:
 
         self._enemy_files = enemy_config.get_file_mapping()
         s = SutStress()
-        ex_time = s.run_mapping(self._sut, self._enemy_files)
+        ex_time = s.run_mapping(self._sut, self._enemy_files, self._max_temperature)
 
         if self.best_score is None or ex_time > self.best_score:
             self.best_score = ex_time
@@ -435,11 +435,29 @@ class PackedStart:
         self.temperature = temperature
 
 
+def read_lines(sock, recv_buffer=4096, delim=b'data_end'):
+    buffer = b''
+    data = True
+    while data:
+        data = sock.recv(recv_buffer)
+        buffer += data 
+
+        while buffer.find(delim) != -1:
+            line, buffer = buffer.split(b'data_end', 1)
+            yield line
+    return
+
+
 if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("usage: " + sys.argv[0] + " hostname\n")
+        exit(1)
+
+    host = sys.argv[1]  # Get local machine name
+
     s = socket.socket()
-    host = socket.gethostname()     # Get local machine name
     port = 12345                    # Reserve a port for your service.
-    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    #s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind((host, port))            # Bind to the port
 
     while True:
@@ -449,14 +467,19 @@ if __name__ == "__main__":
 
         pickle_pack = c.recv(1024)
         pack = pickle.loads(pickle_pack)
+        c.send(pickle.dumps("Sync"))
+        print(pack.sut, pack.temperature)
         objective_function = ObjectiveFunction(pack.sut, pack.temperature)
 
-        while True:
+        for line in read_lines(c):
 
             # Receive message
-            message = pickle.loads(c.recv(4096))
+            print(line)
+            print(sys.getsizeof(line))
+            message = pickle.loads(line)
             # print(message)
             if message == "Finished!":
+                print(message)
                 break
             elif isinstance(message, EnemyConfiguration):
                 ex_time = objective_function(message)
