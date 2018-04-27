@@ -48,7 +48,7 @@
 
 /** 1st tunnable parameter */
 #if SIZE == 1
-#define SIZE_A uint8_t 
+#define SIZE_A uint8_t
 #elif SIZE == 2
 #define SIZE_A int8_t
 #elif SIZE == 3
@@ -121,21 +121,21 @@
  */
 int main ()
 {
-	SIZE *mem1;
-    SIZE *mem2;
+	SIZE_A *mem1;
+  SIZE_A *mem2;
 
 	srand(time(NULL));
-    memset((SIZE *)mem, rand(), MEM_SIZE);
+  memset((SIZE_A *)mem, rand(), MEM_SIZE);
 
 
 	while(1)
 	{
-        mem1 = (SIZE*) malloc(MEM_SIZE);
+        mem1 = (SIZE_A*) malloc(MEM_SIZE);
         DIE ( mem1 == NULL, "Unable to allocate memory\n");
-        memset((SIZE *)mem1, rand(), MEM_SIZE);
-        mem2 = (SIZE*) malloc(MEM_SIZE);
+        memset((SIZE_A *)mem1, rand(), MEM_SIZE);
+        mem2 = (SIZE_A*) malloc(MEM_SIZE);
         DIE ( mem2 == NULL, "Unable to allocate memory\n");
-        memset((SIZE *)mem2, rand(), MEM_SIZE);
+        memset((SIZE_A *)mem2, rand(), MEM_SIZE);
         INSTR1_V;
         INSTR2_V;
         INSTR3_V;
