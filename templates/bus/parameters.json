@@ -4,6 +4,10 @@
       "range" :[1,200],
       "type": "int"
     },
+    "SIZE": {
+      "range" :[1,8],
+      "type": "int"
+    },
     "INSTR1": {
       "range" :[1,4],
       "type": "int"

@@ -38,7 +38,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <time.h>
-#include "../../common/common.h"
+#include "../../src/common/common.h"
 
 /** Helper defines for memory allocation */
 #define MB              (((1) << 10) << 10)
