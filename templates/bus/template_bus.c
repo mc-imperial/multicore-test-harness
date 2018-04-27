@@ -66,9 +66,9 @@
 #endif
 
 /** location 1 to location 2 */
-#define MEM1_2_MEM2 for (SIZE i; i < MEM_SIZE/sizeof(SIZE); i++) mem2[i] = mem1[i] + rand()
+#define MEM1_2_MEM2 for (SIZE_A i; i < MEM_SIZE/sizeof(SIZE_A); i++) mem2[i] = mem1[i] + rand()
 /** location 2 to location 1 */
-#define MEM2_1_MEM1 for (SIZE i; i < MEM_SIZE/sizeof(SIZE); i++) mem1[i] = mem2[i] + rand()
+#define MEM2_2_MEM1 for (SIZE_A i; i < MEM_SIZE/sizeof(SIZE_A); i++) mem1[i] = mem2[i] + rand()
 
 /** 1st tunnable parameter */
 #if INSTR1 == 1
@@ -125,7 +125,6 @@ int main ()
   SIZE_A *mem2;
 
 	srand(time(NULL));
-  memset((SIZE_A *)mem, rand(), MEM_SIZE);
 
 
 	while(1)
