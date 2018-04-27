@@ -207,14 +207,16 @@ class EnemyConfiguration:
     """
 
     def_files = OrderedDict([
-                            ("../templates/cache/template_cache_stress.c",
+                            ("../templates/bus/template_bus.c",
+                             "../templates/bus/parameters.json"),
+                            ("../templates/cache/template_cache.c",
                              "../templates/cache/parameters.json"),
-                            ("../templates/mem_thrashing/template_mem_thrashing.c",
-                             "../templates/mem_thrashing/parameters.json"),
-                            ("../templates/pipeline_stress/template_pipeline_stress.c",
-                             "../templates/pipeline_stress/parameters.json"),
-                            ("../templates/system_calls/template_system_calls.c",
-                             "../templates/system_calls/parameters.json")
+                            ("../templates/mem/template_mem.c",
+                             "../templates/mem/parameters.json"),
+                            ("../templates/pipeline/template_pipeline.c",
+                             "../templates/pipeline/parameters.json"),
+                            ("../templates/system/template_system.c",
+                             "../templates/system/parameters.json")
                             ])
 
     def __init__(self, enemy_cores):
