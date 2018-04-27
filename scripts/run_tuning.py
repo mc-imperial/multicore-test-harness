@@ -455,6 +455,7 @@ class DefineAnneal(Annealer):
     def __init__(self, initial_state, sut, temp, network_socket=None):
         Annealer.__init__(self, initial_state)
         self.objective_function = ObjectiveFunction(sut, temp, network_socket)
+        print("The annealer got " + str(temp))
 
     def move(self):
         self.state = self.state.neighbour_define()
@@ -520,7 +521,7 @@ class Optimization:
         else:
             return math.exp(-abs(next_score - prev_score) / temperature)
 
-    def inner_random(self, enemy_config, max_evaluations=10, max_time=30):
+    def inner_random(self, enemy_config, max_evaluations=2000, max_time=30):
 
         objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._socket)
 
@@ -543,7 +544,7 @@ class Optimization:
 
         return best_mapping, best_score
 
-    def inner_hill_climb(self, enemy_config, max_evaluations=2, max_time=30):
+    def inner_hill_climb(self, enemy_config, max_evaluations=2000, max_time=30):
 
         objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._socket)
 
@@ -577,7 +578,7 @@ class Optimization:
 
         return best_mapping, best_score
 
-    def inner_anneal(self, enemy_config, max_evaluations=2):
+    def inner_anneal(self, enemy_config, max_evaluations=2000):
 
         inner_anneal = DefineAnneal(enemy_config, self._sut, self._max_temperature, self._socket)
 
@@ -589,7 +590,7 @@ class Optimization:
 
         return best_mapping, best_score
 
-    def inner_anneal2(self, enemy_config, max_evaluations=2, inner_temp=50, inner_alpha=0.8):
+    def inner_anneal2(self, enemy_config, max_evaluations=2000, inner_temp=50, inner_alpha=0.8):
 
         # wrap the objective function (so we record the best)
         objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._socket)
@@ -637,7 +638,7 @@ class Optimization:
 
         return best_mapping, best_score
 
-    def inner_bo(self, enemy_config, max_evaluations=2, kappa_val=8):
+    def inner_bo(self, enemy_config, max_evaluations=2000, kappa_val=6):
 
         objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._socket)
         config = enemy_config
