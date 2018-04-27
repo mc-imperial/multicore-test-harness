@@ -430,7 +430,7 @@ class ObjectiveFunction:
         else:
             self._enemy_files = enemy_config.get_file_mapping()
             s = SutStress()
-            ex_time = s.run_mapping(self._sut, self._enemy_files)
+            ex_time = s.run_mapping(self._sut, self._enemy_files, self._max_temperature)
 
             if self.best_score is None or ex_time > self.best_score:
                 self.best_score = ex_time
