@@ -123,9 +123,9 @@ class SutStress:
                 break
             else:
                 print("The final temperature was to high, redoing experiment")
-                delta_temp += 2
-                if delta_temp > 15:
-                    print("The test heats up the processor more than 15 degrees, I o not know what to do")
+                delta_temp += 5
+                if delta_temp > 25:
+                    print("The test heats up the processor more than 25 degrees, I o not know what to do")
                     exit(1)
 
         return ex_time
