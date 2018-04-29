@@ -677,13 +677,13 @@ class Optimization:
 
             # The inner tune part
             if inner_tune == "ran":
-                config = self.inner_random(current_config)
+                config, score = self.inner_random(current_config)
             elif inner_tune == "hc":
-                config = self.inner_hill_climb(current_config)
+                config, score = self.inner_hill_climb(current_config)
             elif inner_tune == "sa":
-                config = self.inner_anneal(current_config)
+                config, score = self.inner_anneal(current_config)
             elif inner_tune == "bo":
-                config = self.inner_bo(current_config)
+                config, score = self.inner_bo(current_config)
             else:
                 print("I do not know how to tune like that")
 
@@ -716,13 +716,13 @@ class Optimization:
 
                 #The inner tune part
                 if inner_tune == "ran":
-                    best_inner_config = self.inner_random(next_outer_config)
+                    best_inner_config, score = self.inner_random(next_outer_config)
                 elif inner_tune == "hc":
-                    best_inner_config = self.inner_hill_climb(next_outer_config)
+                    best_inner_config, score = self.inner_hill_climb(next_outer_config)
                 elif inner_tune == "sa":
-                    best_inner_config = self.inner_anneal(next_outer_config)
+                    best_inner_config, score = self.inner_anneal(next_outer_config)
                 elif inner_tune == "bo":
-                    best_inner_config = self.inner_bo(next_outer_config)
+                    best_inner_config, score = self.inner_bo(next_outer_config)
                 else:
                     print("I do not know how to tune like that")
 
