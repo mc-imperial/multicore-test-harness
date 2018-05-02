@@ -452,16 +452,51 @@ class ObjectiveFunction:
 
 
 class DefineAnneal(Annealer):
-    def __init__(self, initial_state, sut, temp, network_socket=None):
+    def __init__(self, initial_state, sut, temp, log_file=None, network_socket=None):
         Annealer.__init__(self, initial_state)
         self.objective_function = ObjectiveFunction(sut, temp, network_socket)
-        print("The annealer got " + str(temp))
+        self._log_file = log_file
+        self._write_log_header()
+
+        self.iteration = 0 # Just for logging purpouses
 
     def move(self):
         self.state = self.state.neighbour_define()
 
     def energy(self):
-        return 1/self.objective_function(self.state)
+
+        self.iteration += 1
+        score = 1/self.objective_function(self.state)
+
+        if self._log_file:
+            self._log_data(self.iteration,
+                           int(time() - self.start),
+                           self.objective_function.best_score,
+                           1/score)
+
+        return score
+
+    def _write_log_header(self):
+        """
+        Write the log file header
+        :return:
+        """
+        with open(self._log_file, 'a') as data_file:
+            d = "Iter\t\tTime\t\tMax\t\t\tCur\t\t\n"
+            data_file.write(d)
+
+    def _log_data(self, iterations, tuning_time, max_value, cur_value):
+        """
+        Log the maximum time found after time to determine "convergence" speed
+        :param iterations: Total number of iterations so far
+        :param tuning_time: The time the record was made
+        :param max_value: The maximum value detected so far
+        :param cur_value: The value found with the current config
+        """
+        with open(self._log_file, 'a') as data_file:
+            d = str(iterations) + "\t\t\t" + str(tuning_time) + "\t\t\t" \
+                + str(max_value) + "\t\t" + str(cur_value) + "\n"
+            data_file.write(d)
 
 
 class Optimization:
@@ -478,7 +513,6 @@ class Optimization:
 
         self._sut = sut
         self._log_file = log_file
-        self._write_log_header()
         self._max_temperature = max_temperature
 
         self._t_start = time()
@@ -490,11 +524,11 @@ class Optimization:
         Write the log file header
         :return:
         """
-        with open(self._log_file, 'w') as data_file:
-            d = "Iterations\tTraining Time\tMax value found\t\tCurrent value\t\tParams\n"
+        with open(self._log_file, 'a') as data_file:
+            d = "Iter\t\tTime\t\tMax\t\t\tCur\t\t\n"
             data_file.write(d)
 
-    def _log_data(self, iterations, tuning_time, max_value, cur_value, conf):
+    def _log_data(self, iterations, tuning_time, max_value, cur_value):
         """
         Log the maximum time found after time to determine "convergence" speed
         :param iterations: Total number of iterations so far
@@ -503,8 +537,8 @@ class Optimization:
         :param cur_value: The value found with the current config
         """
         with open(self._log_file, 'a') as data_file:
-            d = str(iterations) + "\t\t" + str(tuning_time) + "\t\t" \
-                + str(max_value) + "\t\t" + str(cur_value) + "\t\t" + conf + "\n"
+            d = str(iterations) + "\t\t\t" + str(tuning_time) + "\t\t\t" \
+                + str(max_value) + "\t\t" + str(cur_value) + "\n"
             data_file.write(d)
 
     @staticmethod
@@ -536,8 +570,7 @@ class Optimization:
             self._log_data(num_evaluations,
                            int(time() - self._t_start),
                            objective_function.best_score,
-                           next_inner_score,
-                           str(enemy_config))
+                           next_inner_score)
 
         best_mapping = objective_function.best_mapping
         best_score = objective_function.best_score
@@ -570,17 +603,16 @@ class Optimization:
             self._log_data(num_evaluations,
                            int(time() - self._t_start),
                            objective_function.best_score,
-                           next_score,
-                           str(next_config))
+                           next_score)
 
         best_mapping = objective_function.best_mapping
         best_score = objective_function.best_score
 
         return best_mapping, best_score
 
-    def inner_anneal(self, enemy_config, max_evaluations=2000):
+    def inner_anneal(self, enemy_config, max_evaluations=2):
 
-        inner_anneal = DefineAnneal(enemy_config, self._sut, self._max_temperature, self._socket)
+        inner_anneal = DefineAnneal(enemy_config, self._sut, self._max_temperature,self._log_file, self._socket)
 
         inner_anneal.steps = max_evaluations
         inner_anneal.anneal()
@@ -626,8 +658,7 @@ class Optimization:
                 self._log_data(num_evaluations,
                                int(time() - self._t_start),
                                objective_function.best_score,
-                               next_score,
-                               str(next_config))
+                               next_score)
 
             # see if completely finished
             if done:
@@ -714,6 +745,11 @@ class Optimization:
                     done = True
                     break
 
+                with open(self._log_file, 'a') as data_file:
+                    d = "Starting outer loop " + str(num_evaluations) +\
+                        " best score " + str(objective_function.best_score) + "\n"
+                    data_file.write(d)
+
                 #The inner tune part
                 if inner_tune == "ran":
                     best_inner_config, score = self.inner_random(next_outer_config)
@@ -725,6 +761,8 @@ class Optimization:
                     best_inner_config, score = self.inner_bo(next_outer_config)
                 else:
                     print("I do not know how to tune like that")
+
+
 
                 next_outer_score = objective_function(best_inner_config)
 
