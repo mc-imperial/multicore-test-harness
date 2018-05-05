@@ -67,8 +67,8 @@ class SutStress:
         :param style: Run the SUT with perf or some simillar instrument
         :return: Output and error
         """
-        cmd = self._get_taskset_cmd(core) + " " + \
-                self.INSTRUMENT_CMDS[style] + " " + "./" + sut
+        cmd = self._get_taskset_cmd(core) + " " + "nice -20" + \
+              self.INSTRUMENT_CMDS[style] + " " + "./" + sut
         s_out,s_err = self._processes.system_call(cmd)
         return s_out, s_err
 
@@ -103,7 +103,14 @@ class SutStress:
                 self.start_stress(mapping[core], core)
 
             for i in range(5):
+
+                # Clear the cache first
+                cmd = "sync; echo 1 > /proc/sys/vm/drop_caches"
+                s_out, s_err = self._processes.system_call(cmd)
+                self._check_error(s_err)
+
                 # Run the program on core 0
+
                 s_out,s_err = self.run_program_single(sut, 0, style)
                 self._check_error(s_err)
 
