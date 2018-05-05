@@ -61,7 +61,7 @@ def get_temp():
     :return: The system temperature
     """
     c = ProcessManagement()
-    cmd = "cat /sys/class/thermal/thermal_zone*/temp"
+    cmd = "cat /sys/class/thermal/thermal_zone0/temp"
     command_output = c.system_call(cmd, True)[0]
     try:
         temp = float(command_output) / 1000
