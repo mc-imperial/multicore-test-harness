@@ -214,9 +214,7 @@ class EnemyConfiguration:
                             ("../templates/mem/template_mem.c",
                              "../templates/mem/parameters.json"),
                             ("../templates/pipeline/template_pipeline.c",
-                             "../templates/pipeline/parameters.json"),
-                            ("../templates/system/template_system.c",
-                             "../templates/system/parameters.json")
+                             "../templates/pipeline/parameters.json")
                             ])
 
     def __init__(self, enemy_cores):
@@ -425,16 +423,15 @@ class ObjectiveFunction:
 
             # Receive the execution time
             pickled_ex_time = self.socket.recv(1024)
-            print(pickle.loads(pickled_ex_time))
-            return pickle.loads(pickled_ex_time)
+            ex_time = pickle.loads(pickled_ex_time)
         else:
             self._enemy_files = enemy_config.get_file_mapping()
             s = SutStress()
             ex_time = s.run_mapping(self._sut, self._enemy_files, self._max_temperature)
 
-            if self.best_score is None or ex_time > self.best_score:
-                self.best_score = ex_time
-                self.best_mapping = enemy_config
+        if self.best_score is None or ex_time > self.best_score:
+            self.best_score = ex_time
+            self.best_mapping = enemy_config
 
         return ex_time
 
@@ -458,7 +455,7 @@ class DefineAnneal(Annealer):
         self._log_file = log_file
         self._write_log_header()
 
-        self.iteration = 0 # Just for logging purpouses
+        self.iteration = 0  # Just for logging purposes
 
     def move(self):
         self.state = self.state.neighbour_define()
@@ -482,7 +479,7 @@ class DefineAnneal(Annealer):
         :return:
         """
         with open(self._log_file, 'a') as data_file:
-            d = "Iter\t\tTime\t\tMax\t\t\tCur\t\t\n"
+            d = "Iter\t\t\tTime\t\t\tMax\t\tCur\t\t\n"
             data_file.write(d)
 
     def _log_data(self, iterations, tuning_time, max_value, cur_value):
@@ -525,7 +522,7 @@ class Optimization:
         :return:
         """
         with open(self._log_file, 'a') as data_file:
-            d = "Iter\t\tTime\t\tMax\t\t\tCur\t\t\n"
+            d = "Iter\t\t\tTime\t\t\tMax\t\t\tCur\t\t\n"
             data_file.write(d)
 
     def _log_data(self, iterations, tuning_time, max_value, cur_value):
@@ -610,7 +607,7 @@ class Optimization:
 
         return best_mapping, best_score
 
-    def inner_anneal(self, enemy_config, max_evaluations=2):
+    def inner_anneal(self, enemy_config, max_evaluations=20):
 
         inner_anneal = DefineAnneal(enemy_config, self._sut, self._max_temperature,self._log_file, self._socket)
 
@@ -762,8 +759,6 @@ class Optimization:
                 else:
                     print("I do not know how to tune like that")
 
-
-
                 next_outer_score = objective_function(best_inner_config)
 
                 num_evaluations += 1
@@ -772,7 +767,7 @@ class Optimization:
                 # always accepting better solutions
                 p = self.p_score(current_outer_score, next_outer_score, outer_temperature)
                 if random() < p:
-                    current_outer_config = next_outer_config
+                    current_outer_config = best_inner_config
                     current_outer_score = next_outer_score
                     break
             # see if completely finished
