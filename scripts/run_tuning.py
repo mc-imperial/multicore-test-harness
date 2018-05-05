@@ -607,7 +607,7 @@ class Optimization:
 
         return best_mapping, best_score
 
-    def inner_anneal(self, enemy_config, max_evaluations=20):
+    def inner_anneal(self, enemy_config, max_evaluations=2000):
 
         inner_anneal = DefineAnneal(enemy_config, self._sut, self._max_temperature,self._log_file, self._socket)
 
