@@ -93,6 +93,7 @@ class SutStress:
         """
 
         delta_temp = 10
+        total_time = []
 
         while True:
             cool_down(max_temperature - delta_temp)
@@ -101,22 +102,24 @@ class SutStress:
             for core in mapping:
                 self.start_stress(mapping[core], core)
 
-            # Run the program on core 0
-            s_out,s_err = self.run_program_single(sut, 0, style)
-            self._check_error(s_err)
+            for i in range(5):
+                # Run the program on core 0
+                s_out,s_err = self.run_program_single(sut, 0, style)
+                self._check_error(s_err)
+
+                if get_event(s_out, "total time(us): "):
+                    ex_time = get_event(s_out, "total time(us): ")
+                elif get_event(s_out, "Total time (secs): "):
+                    ex_time = get_event(s_out, "Total time (secs): ")
+                elif get_event(s_out, "Max: "):
+                    ex_time = get_event(s_out, "Max: ")
+                else:
+                    print("Unable find execution time or maximum latency")
+                    sys.exit(0)
+                total_time.append((ex_time))
 
             if len(mapping) > 0:
                 self._processes.kill_stress()
-
-            if get_event(s_out, "total time(us): "):
-                ex_time = get_event(s_out, "total time(us): ")
-            elif get_event(s_out, "Total time (secs): "):
-                ex_time = get_event(s_out, "Total time (secs): ")
-            elif get_event(s_out, "Max: "):
-                ex_time = get_event(s_out, "Max: ")
-            else:
-                print("Unable find execution time or maximum latency")
-                sys.exit(0)
 
             final_temp = get_temp()
             if final_temp < max_temperature:
@@ -127,8 +130,9 @@ class SutStress:
                 if delta_temp > 25:
                     print("The test heats up the processor more than 25 degrees, I o not know what to do")
                     exit(1)
+        print(total_time)
 
-        return ex_time
+        return sum(total_time) / len(total_time)
 
     def run_sut_stress(self, sut, stress, cores, style = 0):
         """
