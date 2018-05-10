@@ -2,11 +2,9 @@
   "cache_train": {
     "sut": "../bin/sut/L2_unified_test",
     "cores": 3,
-    "enemy_template": "../templates/cache/template_cache_stress.c",
-    "enemy_range": "../templates/cache/parameters.json",
-    "method":"sa",
-    "log_file": "../results/cache_ran_log.txt",
-    "max_file": "../results/cache_ran_max.txt",
+    "method":"sa_sa",
+    "log_file": "../results/cache_sa_sa_log.txt",
+    "max_file": "../results/cache_sa_sa_max.txt",
     "training_time": 10,
     "inner_iterations": 2000,
     "max_temperature": 80
