@@ -1,26 +1,14 @@
 {
-  "mem_fuzz_train": {
+  "mem_sa_train": {
     "sut": "../bin/sut/mem_thrashing_test",
     "template_data": "../templates/mem_thrashing/parameters.json",
     "template_file": "../templates/mem_thrashing/template_mem_thrashing.c",
     "cores": 3,
-    "method":"fuzz",
-    "kappa": 0,
-    "log_file": "mem_fuzz_log.txt",
-    "max_file": "mem_fuzz_max.txt",
+    "method":"sa",
+    "log_file": "../results/mem_fuzz_log.txt",
+    "max_file": "../results/mem_fuzz_max.txt",
     "training_time": 240,
-    "max_temperature": 70
-  },
-  "mem_baysian_train": {
-    "sut": "../bin/sut/mem_thrashing_test",
-    "template_data": "../templates/mem_thrashing/parameters.json",
-    "template_file": "../templates/mem_thrashing/template_mem_thrashing.c",
-    "cores": 3,
-    "method":"bayesian",
-    "kappa": 5,
-    "log_file": "mem_bayesian_log.txt",
-    "max_file": "mem_bayesian_max.txt",
-    "training_time": 240,
+    "inner_iterations": 2000,
     "max_temperature": 70
   }
 }

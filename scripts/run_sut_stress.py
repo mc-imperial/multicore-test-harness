@@ -26,6 +26,7 @@ Runs individual tests.
 
 import sys
 from common import ProcessManagement, get_event, get_temp, cool_down
+from statistics import median_high
 
 
 class SutStress:
@@ -102,7 +103,7 @@ class SutStress:
             for core in mapping:
                 self.start_stress(mapping[core], core)
 
-            for i in range(5):
+            for i in range(10):
 
                 # Clear the cache first
                 cmd = "sync; echo 1 > /proc/sys/vm/drop_caches"
@@ -138,9 +139,9 @@ class SutStress:
                     print("The test heats up the processor more than 25 degrees, I o not know what to do")
                     exit(1)
         print(total_time)
-        print(min(total_time))
+        print(median_high(total_time))
 
-        return min(total_time)
+        return median_high(total_time)
 
     def run_sut_stress(self, sut, stress, cores, style = 0):
         """

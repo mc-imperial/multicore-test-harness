@@ -6,6 +6,7 @@
     "log_file": "../results/nsichneu_wcet_sa_sa_log.txt",
     "max_file": "../results/nsichneu_wcet_sa_sa_max.txt",
     "training_time": 10,
-    "max_temperature": 80
+    "inner_iterations": 2000,
+    "max_temperature": 100
   }
 }

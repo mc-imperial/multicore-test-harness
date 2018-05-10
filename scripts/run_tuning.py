@@ -501,7 +501,7 @@ class Optimization:
     Class for Optimization
     """
 
-    def __init__(self, sut, log_file, max_temperature=70, network_socket=None):
+    def __init__(self, sut, log_file, max_temperature=80, inner_iterations=2000, network_socket=None):
         """
         Create an Optimization object
         :param sut: The system under test
@@ -511,6 +511,7 @@ class Optimization:
         self._sut = sut
         self._log_file = log_file
         self._max_temperature = max_temperature
+        self._inner_iterations = inner_iterations
 
         self._t_start = time()
 
@@ -552,14 +553,14 @@ class Optimization:
         else:
             return math.exp(-abs(next_score - prev_score) / temperature)
 
-    def inner_random(self, enemy_config, max_evaluations=2000, max_time=30):
+    def inner_random(self, enemy_config, max_time=30):
 
         objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._socket)
 
         num_evaluations = 1
         t_end = time() + 60 * max_time
 
-        while num_evaluations < max_evaluations and time() < t_end:
+        while num_evaluations < self._inner_iterations and time() < t_end:
             enemy_config.random_set_all_defines()
             next_inner_score = objective_function(enemy_config)
             num_evaluations += 1
@@ -574,7 +575,7 @@ class Optimization:
 
         return best_mapping, best_score
 
-    def inner_hill_climb(self, enemy_config, max_evaluations=2000, max_time=30):
+    def inner_hill_climb(self, enemy_config, max_time=30):
 
         objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._socket)
 
@@ -584,9 +585,9 @@ class Optimization:
         num_evaluations = 1
         t_end = time() + 60 * max_time
 
-        while num_evaluations < max_evaluations and time() < t_end:
+        while num_evaluations < self._inner_iterations and time() < t_end:
             # examine moves around our current position
-            if num_evaluations > max_evaluations:
+            if num_evaluations > self._inner_iterations:
                 break
             next_config = current_config.neighbour_define()
 
@@ -607,11 +608,11 @@ class Optimization:
 
         return best_mapping, best_score
 
-    def inner_anneal(self, enemy_config, max_evaluations=2000):
+    def inner_anneal(self, enemy_config):
 
         inner_anneal = DefineAnneal(enemy_config, self._sut, self._max_temperature,self._log_file, self._socket)
 
-        inner_anneal.steps = max_evaluations
+        inner_anneal.steps = self._inner_iterations
         inner_anneal.anneal()
 
         best_mapping = inner_anneal.objective_function.best_mapping
@@ -619,7 +620,7 @@ class Optimization:
 
         return best_mapping, best_score
 
-    def inner_anneal2(self, enemy_config, max_evaluations=2000, inner_temp=50, inner_alpha=0.8):
+    def inner_anneal2(self, enemy_config, inner_temp=50, inner_alpha=0.8):
 
         # wrap the objective function (so we record the best)
         objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._socket)
@@ -637,7 +638,7 @@ class Optimization:
             while True:
                 next_config = current_config.neighbour_define()
 
-                if num_evaluations >= max_evaluations:
+                if num_evaluations >= self._inner_iterations:
                     done = True
                     break
 
@@ -666,14 +667,14 @@ class Optimization:
 
         return best_mapping, best_score
 
-    def inner_bo(self, enemy_config, max_evaluations=2000, kappa_val=6):
+    def inner_bo(self, enemy_config, kappa_val=6):
 
         objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._socket)
         config = enemy_config
 
         # Devide the evaluations for each core
         init_pts = 5
-        iterations = int(max_evaluations/config.enemy_cores - init_pts)
+        iterations = int(self._inner_iterations/config.enemy_cores - init_pts)
 
         for core in range(config.enemy_cores):
             objective_function.optimized_core = core
@@ -832,6 +833,7 @@ class Tuning:
         self._method = None
 
         self._training_time = None
+        self._inner_iterations = None
         self._max_temperature = None
 
         # Store the enemy config
@@ -906,6 +908,12 @@ class Tuning:
             sys.exit(1)
 
         try:
+            self._inner_iterations = int(json_object["inner_iterations"])
+        except KeyError:
+            print("Unable to find inner_iterations in JSON")
+            sys.exit(1)
+
+        try:
             self._max_temperature = int(json_object["max_temperature"])
         except KeyError:
             print("Unable to find max_temperature in JSON")
@@ -938,6 +946,7 @@ class Tuning:
         sa = Optimization(sut=self._sut,
                           log_file=self._log_file,
                           max_temperature=self._max_temperature,
+                          inner_iterations=self._inner_iterations,
                           network_socket=self._socket)
 
         if outer_tune_method == "ran":
@@ -967,6 +976,7 @@ class Tuning:
         sa = Optimization(sut=self._sut,
                           log_file=self._log_file,
                           max_temperature=self._max_temperature,
+                          inner_iterations=self._inner_iterations,
                           network_socket=self._socket)
         if tune_method == "ran":
             best_state, best_score = sa.inner_random(self._enemy_config)

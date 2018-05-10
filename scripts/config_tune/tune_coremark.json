@@ -6,6 +6,7 @@
     "log_file": "../results/coremark_sa_sa_log.txt",
     "max_file": "../results/coremark_sa_sa.txt",
     "training_time": 10,
+    "inner_iterations": 2000,
     "max_temperature": 80
   }
 }
