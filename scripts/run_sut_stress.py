@@ -139,9 +139,9 @@ class SutStress:
                     print("The test heats up the processor more than 25 degrees, I o not know what to do")
                     exit(1)
         print(total_time)
-        print(median_high(total_time))
+        print(max(total_time))
 
-        return median_high(total_time)
+        return max(total_time)
 
     def run_sut_stress(self, sut, stress, cores, style = 0):
         """
