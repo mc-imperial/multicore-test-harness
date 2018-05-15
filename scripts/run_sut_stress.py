@@ -96,13 +96,14 @@ class SutStress:
         delta_temp = 10
         total_time = []
 
-        # start up the stress in accordance with the mapping
-        for core in mapping:
-            self.start_stress(mapping[core], core)
+        while True:
+            cool_down(max_temperature - delta_temp)
 
-        for i in range(10):
-            while True:
-                cool_down(max_temperature - delta_temp)
+            # start up the stress in accordance with the mapping
+            for core in mapping:
+                self.start_stress(mapping[core], core)
+
+            for i in range(10):
 
                 # Clear the cache first
                 cmd = "sync; echo 1 > /proc/sys/vm/drop_caches"
@@ -125,23 +126,22 @@ class SutStress:
                     sys.exit(0)
                 total_time.append((ex_time))
 
-                final_temp = get_temp()
-                if final_temp < max_temperature:
-                    break
-                else:
-                    print("The final temperature was to high, redoing experiment")
-                    delta_temp += 5
-                    if delta_temp > 25:
-                        print("The test heats up the processor more than 25 degrees, I o not know what to do")
-                        exit(1)
+            if len(mapping) > 0:
+                self._processes.kill_stress()
 
-        if len(mapping) > 0:
-            self._processes.kill_stress()
-
+            final_temp = get_temp()
+            if final_temp < max_temperature:
+                break
+            else:
+                print("The final temperature was to high, redoing experiment")
+                delta_temp += 5
+                if delta_temp > 25:
+                    print("The test heats up the processor more than 25 degrees, I o not know what to do")
+                    exit(1)
         print(total_time)
-        print(max(total_time))
+        print(median_high(total_time))
 
-        return max(total_time)
+        return median_high(total_time)
 
     def run_sut_stress(self, sut, stress, cores, style = 0):
         """
