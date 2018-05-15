@@ -958,7 +958,7 @@ class Tuning:
                 self._enemy_config,
                 inner_tune=inner_tune_method)
         else:
-            print("I do not know how to bilevele train that way")
+            print("I do not know how to bilevel train that way")
             sys.exit(0)
 
         f = open(self._max_file, 'w')
