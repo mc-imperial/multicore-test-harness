@@ -96,14 +96,12 @@ class SutStress:
         delta_temp = 10
         total_time = []
 
-        while True:
+        # start up the stress in accordance with the mapping
+        for core in mapping:
+            self.start_stress(mapping[core], core)
 
-
-            # start up the stress in accordance with the mapping
-            for core in mapping:
-                self.start_stress(mapping[core], core)
-
-            for i in range(10):
+        for i in range(10):
+            while True:
                 cool_down(max_temperature - delta_temp)
 
                 # Clear the cache first
@@ -137,8 +135,8 @@ class SutStress:
                         print("The test heats up the processor more than 25 degrees, I o not know what to do")
                         exit(1)
 
-            if len(mapping) > 0:
-                self._processes.kill_stress()
+        if len(mapping) > 0:
+            self._processes.kill_stress()
 
         print(total_time)
         print(max(total_time))
