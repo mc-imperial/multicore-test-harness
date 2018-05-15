@@ -26,7 +26,7 @@ Runs individual tests.
 
 import sys
 from common import ProcessManagement, get_event, get_temp, cool_down
-from statistics import median_high
+from statistics import median_high, pstdev
 
 
 class SutStress:
@@ -140,6 +140,9 @@ class SutStress:
                     exit(1)
         print(total_time)
         print(median_high(total_time))
+        print(pstdev(total_time))
+        if pstdev(total_time) > 0.1:
+            exit(1)
 
         return median_high(total_time)
 
