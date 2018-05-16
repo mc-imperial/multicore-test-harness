@@ -26,7 +26,7 @@ Runs individual tests.
 
 import sys
 from common import ProcessManagement, get_event, get_temp, cool_down
-from statistics import median_high, pstdev
+from statistics import pstdev
 
 
 class SutStress:
@@ -94,7 +94,7 @@ class SutStress:
         """
 
         delta_temp = 10
-        total_time = []
+        total_times = []
 
         while True:
             cool_down(max_temperature - delta_temp)
@@ -124,7 +124,7 @@ class SutStress:
                 else:
                     print("Unable find execution time or maximum latency")
                     sys.exit(0)
-                total_time.append((ex_time))
+                total_times.append(ex_time)
 
             if len(mapping) > 0:
                 self._processes.kill_stress()
@@ -139,10 +139,10 @@ class SutStress:
                     print("The test heats up the processor more than 25 degrees, I o not know what to do")
                     exit(1)
 
-        print(total_time)
-        print("Standard deviation " + str(pstdev(total_time)))
+        print(total_times)
+        print("Standard deviation " + str(pstdev(total_times)))
 
-        return pstdev(total_time)
+        return total_times
 
     def run_sut_stress(self, sut, stress, cores, style = 0):
         """

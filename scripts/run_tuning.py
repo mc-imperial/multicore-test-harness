@@ -35,6 +35,7 @@ from time import time
 from random import randrange, uniform, choice, random
 from collections import OrderedDict
 from copy import deepcopy
+from statistics import pstdev
 
 # optimization packages
 from bayes_opt import BayesianOptimization
@@ -407,7 +408,7 @@ class ObjectiveFunction:
             def_param[key] = kwargs[key]
 
         self.stored_mapping.enemies[self.optimized_core] .set_defines(def_param)
-        return self.__call__(self.stored_mapping)
+        return pstdev(self.__call__(self.stored_mapping))
 
     def __call__(self, enemy_config):
         """
@@ -423,17 +424,19 @@ class ObjectiveFunction:
 
             # Receive the execution time
             pickled_ex_time = self.socket.recv(1024)
-            ex_time = pickle.loads(pickled_ex_time)
+            times = pickle.loads(pickled_ex_time)
         else:
             self._enemy_files = enemy_config.get_file_mapping()
             s = SutStress()
-            ex_time = s.run_mapping(self._sut, self._enemy_files, self._max_temperature)
+            times = s.run_mapping(self._sut, self._enemy_files, self._max_temperature)
 
-        if self.best_score is None or ex_time > self.best_score:
-            self.best_score = ex_time
+        std_dev = pstdev(times)
+
+        if self.best_score is None or std_dev > self.best_score:
+            self.best_score = std_dev
             self.best_mapping = enemy_config
 
-        return ex_time
+        return times
 
     def __del__(self):
         """
@@ -463,13 +466,15 @@ class DefineAnneal(Annealer):
     def energy(self):
 
         self.iteration += 1
-        score = 1/self.objective_function(self.state)
+        times = self.objective_function(self.state)
+        score = 1/pstdev(times)
 
         if self._log_file:
             self._log_data(self.iteration,
                            int(time() - self.start),
                            self.objective_function.best_score,
-                           1/score)
+                           1/score,
+                           times)
 
         return score
 
@@ -479,20 +484,24 @@ class DefineAnneal(Annealer):
         :return:
         """
         with open(self._log_file, 'a') as data_file:
-            d = "Iter\t\t\tTime\t\t\tMax\t\tCur\t\t\n"
+            d = "Iter\t\t\tTime\t\t\tMax\t\tCur\t\tTimes\n"
             data_file.write(d)
 
-    def _log_data(self, iterations, tuning_time, max_value, cur_value):
+    def _log_data(self, iterations, tuning_time, max_value, cur_value, times):
         """
         Log the maximum time found after time to determine "convergence" speed
         :param iterations: Total number of iterations so far
         :param tuning_time: The time the record was made
         :param max_value: The maximum value detected so far
         :param cur_value: The value found with the current config
+        :param times: A list of execution times that was received this time
         """
         with open(self._log_file, 'a') as data_file:
-            d = str(iterations) + "\t\t\t" + str(tuning_time) + "\t\t\t" \
-                + str(max_value) + "\t\t" + str(cur_value) + "\n"
+            d = str(iterations) + "\t\t\t" + \
+                str(tuning_time) + "\t\t\t" + \
+                str(max_value) + "\t\t" + \
+                str(cur_value) + "\t\t" + \
+                str(times) + "\n"
             data_file.write(d)
 
 
@@ -526,17 +535,21 @@ class Optimization:
             d = "Iter\t\t\tTime\t\t\tMax\t\t\tCur\t\t\n"
             data_file.write(d)
 
-    def _log_data(self, iterations, tuning_time, max_value, cur_value):
+    def _log_data(self, iterations, tuning_time, max_value, cur_value, times):
         """
         Log the maximum time found after time to determine "convergence" speed
         :param iterations: Total number of iterations so far
         :param tuning_time: The time the record was made
         :param max_value: The maximum value detected so far
         :param cur_value: The value found with the current config
+        :param times: A list of execution times that was received this time
         """
         with open(self._log_file, 'a') as data_file:
-            d = str(iterations) + "\t\t\t" + str(tuning_time) + "\t\t\t" \
-                + str(max_value) + "\t\t" + str(cur_value) + "\n"
+            d = str(iterations) + "\t\t\t" + \
+                str(tuning_time) + "\t\t\t" + \
+                str(max_value) + "\t\t" + \
+                str(cur_value) + "\t\t" + \
+                str(times) + "\n"
             data_file.write(d)
 
     @staticmethod
@@ -562,13 +575,15 @@ class Optimization:
 
         while num_evaluations < self._inner_iterations and time() < t_end:
             enemy_config.random_set_all_defines()
-            next_inner_score = objective_function(enemy_config)
+            times = objective_function(enemy_config)
+            next_inner_score = pstdev(times)
             num_evaluations += 1
 
             self._log_data(num_evaluations,
                            int(time() - self._t_start),
                            objective_function.best_score,
-                           next_inner_score)
+                           next_inner_score,
+                           times)
 
         best_mapping = objective_function.best_mapping
         best_score = objective_function.best_score
@@ -580,7 +595,7 @@ class Optimization:
         objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._socket)
 
         current_config = enemy_config
-        current_score = objective_function(enemy_config)
+        current_score = pstdev(objective_function(enemy_config))
 
         num_evaluations = 1
         t_end = time() + 60 * max_time
@@ -592,7 +607,8 @@ class Optimization:
             next_config = current_config.neighbour_define()
 
             # see if this move is better than the current
-            next_score = objective_function(next_config)
+            times = objective_function(next_config)
+            next_score = pstdev(times)
             num_evaluations += 1
             if next_score > current_score:
                 current_config = next_config
@@ -601,7 +617,8 @@ class Optimization:
             self._log_data(num_evaluations,
                            int(time() - self._t_start),
                            objective_function.best_score,
-                           next_score)
+                           next_score,
+                           times)
 
         best_mapping = objective_function.best_mapping
         best_score = objective_function.best_score
@@ -730,7 +747,7 @@ class Optimization:
 
         # Initialise SA
         current_outer_config = enemy_config.random_set_all()
-        current_outer_score = objective_function(enemy_config)
+        current_outer_score = pstdev(objective_function(enemy_config))
         num_evaluations = 1
 
         outer_cooling_schedule = self.kirkpatrick_cooling(outer_temp, outer_alpha)
@@ -760,7 +777,7 @@ class Optimization:
                 else:
                     print("I do not know how to tune like that")
 
-                next_outer_score = objective_function(best_inner_config)
+                next_outer_score = pstdev(objective_function(best_inner_config))
 
                 num_evaluations += 1
 
