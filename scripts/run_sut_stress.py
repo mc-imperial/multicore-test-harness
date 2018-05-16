@@ -93,7 +93,7 @@ class SutStress:
         :param style: Run the SUT with perf or some similar instrument
         """
 
-        delta_temp = 10
+        delta_temp = 12
         total_times = []
 
         while True:
@@ -103,7 +103,7 @@ class SutStress:
             for core in mapping:
                 self.start_stress(mapping[core], core)
 
-            for i in range(100):
+            for i in range(50):
 
                 # Clear the cache first
                 cmd = "sync; echo 1 > /proc/sys/vm/drop_caches"

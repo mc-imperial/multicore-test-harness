@@ -467,13 +467,13 @@ class DefineAnneal(Annealer):
 
         self.iteration += 1
         times = self.objective_function(self.state)
-        score = 1/pstdev(times)
+        score = 1 - pstdev(times)
 
         if self._log_file:
             self._log_data(self.iteration,
                            int(time() - self.start),
                            self.objective_function.best_score,
-                           1/score,
+                           pstdev(times),
                            times)
 
         return score
@@ -484,7 +484,7 @@ class DefineAnneal(Annealer):
         :return:
         """
         with open(self._log_file, 'a') as data_file:
-            d = "Iter\t\t\tTime\t\t\tMax\t\tCur\t\tTimes\n"
+            d = "Iter\t\t\tTime\t\t\tMax\t\t\t\tCur\t\t\t\tTimes\n"
             data_file.write(d)
 
     def _log_data(self, iterations, tuning_time, max_value, cur_value, times):
@@ -760,10 +760,7 @@ class Optimization:
                     done = True
                     break
 
-                with open(self._log_file, 'a') as data_file:
-                    d = "Starting outer loop " + str(num_evaluations) +\
-                        " best score " + str(objective_function.best_score) + "\n"
-                    data_file.write(d)
+
 
                 #The inner tune part
                 if inner_tune == "ran":
@@ -777,7 +774,14 @@ class Optimization:
                 else:
                     print("I do not know how to tune like that")
 
-                next_outer_score = pstdev(objective_function(best_inner_config))
+                rechecked_times = objective_function(best_inner_config)
+                next_outer_score = pstdev(rechecked_times)
+
+                with open(self._log_file, 'a') as data_file:
+                    d = "Finishing outer loop " + str(num_evaluations) +\
+                        " best score " + str(objective_function.best_score) + \
+                        " rechecked times " + str(rechecked_times) + "\n"
+                    data_file.write(d)
 
                 num_evaluations += 1
 
