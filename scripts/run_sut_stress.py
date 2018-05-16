@@ -103,7 +103,7 @@ class SutStress:
             for core in mapping:
                 self.start_stress(mapping[core], core)
 
-            for i in range(10):
+            for i in range(20):
 
                 # Clear the cache first
                 cmd = "sync; echo 1 > /proc/sys/vm/drop_caches"
@@ -138,13 +138,11 @@ class SutStress:
                 if delta_temp > 25:
                     print("The test heats up the processor more than 25 degrees, I o not know what to do")
                     exit(1)
-        print(total_time)
-        print(median_high(total_time))
-        print(pstdev(total_time))
-        if pstdev(total_time) > 0.1:
-            exit(1)
 
-        return median_high(total_time)
+        print(total_time)
+        print("Standard deviation " + str(pstdev(total_time)))
+
+        return pstdev(total_time)
 
     def run_sut_stress(self, sut, stress, cores, style = 0):
         """
