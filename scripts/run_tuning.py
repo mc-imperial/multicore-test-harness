@@ -760,8 +760,6 @@ class Optimization:
                     done = True
                     break
 
-
-
                 #The inner tune part
                 if inner_tune == "ran":
                     best_inner_config, score = self.inner_random(next_outer_config)
@@ -782,6 +780,7 @@ class Optimization:
                         " best score " + str(objective_function.best_score) + \
                         " rechecked times " + str(rechecked_times) + "\n"
                     data_file.write(d)
+                    data_file.write(str(best_inner_config))
 
                 num_evaluations += 1
 
