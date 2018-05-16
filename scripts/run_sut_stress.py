@@ -103,7 +103,7 @@ class SutStress:
             for core in mapping:
                 self.start_stress(mapping[core], core)
 
-            for i in range(20):
+            for i in range(100):
 
                 # Clear the cache first
                 cmd = "sync; echo 1 > /proc/sys/vm/drop_caches"
