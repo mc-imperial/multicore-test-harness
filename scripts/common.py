@@ -61,32 +61,25 @@ def get_temp():
     :return: The system temperature
     """
     c = ProcessManagement()
-    cmd = "cat /sys/class/thermal/thermal_zone0/temp"
-    command_output = c.system_call(cmd, True)[0]
+
+    # Try to get the time from multiple thermal zones
+    cmd = "cat /sys/class/thermal/thermal_zone*/temp"
+    command_output = c.system_call(cmd, True)[0].decode('ascii')
+
     try:
-        temp = float(command_output) / 1000
+        temperatures = command_output.splitlines()
+        # print("Got the following temperatures", str(command_output))
+        # Check which of the values look realistic
+        for temp in temperatures:
+            value = float(temp) / 1000
+            # A realistic value would be between 20 (room temperature) and 100 (this is the usual limit in the BIOS)
+            if 20 < value < 100:
+                temperature = value
+                break
     except ValueError:
         print("\n\tWARNING: Unable to find temperature for this system\n")
         return None
-    return temp
-
-
-def cool_down(temp_threshold=70):
-    """
-    If the temperature is above a certain threshold, this function will delay
-    the next experiment until the chip has cooled down.
-    :param temp_threshold: The maximum temperature allowed
-    """
-    temp = get_temp()
-    if temp:
-        while temp > temp_threshold:
-            print("Temperature " + str(temp) + " is too high! Cooling down")
-            time.sleep(5)
-            temp = get_temp()
-        print("Temperature " + str(temp) + " is ok. Running experiment")
-    else:
-        print("\n\tWARNING: Using default cooldown time of 30 s\n")
-        time.sleep(30)
+    return temperature
 
 
 class ProcessManagement:

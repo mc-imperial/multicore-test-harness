@@ -5,6 +5,7 @@
     "method":"sa_sa",
     "log_file": "../results/coremark_sa_sa_log.txt",
     "max_file": "../results/coremark_sa_sa_max.txt",
+    "metric": "pstdev",
     "training_time": 10,
     "inner_iterations": 200,
     "max_temperature": 80

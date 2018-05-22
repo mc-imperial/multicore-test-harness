@@ -25,8 +25,9 @@ Runs individual tests.
 """
 
 import sys
-from common import ProcessManagement, get_event, get_temp, cool_down
+from common import ProcessManagement, get_event, get_temp
 from statistics import pstdev
+from time import sleep
 
 
 class SutStress:
@@ -85,7 +86,51 @@ class SutStress:
             print(s_err)
             sys.exit(1)
 
-    def run_mapping(self, sut,  mapping, max_temperature=50, style=0):
+    def cool_down(self, temp_threshold=80, stress_present=False):
+        """
+        If the temperature is above a certain threshold, this function will delay
+        the next experiment until the chip has cooled down.
+        :param temp_threshold: The maximum temperature allowed
+        :param stress_present: If true, we need to kill the stress before cooldown
+        :return: If it was forced to kill stress
+        """
+        killed_stress = False
+        temp = get_temp()
+        if temp:
+            while temp > temp_threshold:
+                print("Temperature " + str(temp) + " is too high! Cooling down")
+                if stress_present:
+                    self._processes.kill_stress()
+                    killed_stress = True
+                sleep(10)
+                temp = get_temp()
+            print("Temperature " + str(temp) + " is ok. Running experiment")
+        else:
+            print("\n\tWARNING: Using default cooldown time of 30 s\n")
+            sleep(30)
+
+        return killed_stress
+
+    @staticmethod
+    def get_metric(s_out):
+        """
+        Get the time from the output string
+        :param s_out: The string to be processed
+        :return: The numerical metric
+        """
+        if get_event(s_out, "total time(us): "):
+            metric = get_event(s_out, "total time(us): ")
+        elif get_event(s_out, "Total time (secs): "):
+            metric = get_event(s_out, "Total time (secs): ")
+        elif get_event(s_out, "Max: "):
+            metric = get_event(s_out, "Max: ")
+        else:
+            print("Unable find execution time or maximum latency")
+            sys.exit(0)
+
+        return metric
+
+    def run_mapping(self, sut,  mapping, iterations=50, max_temperature=50, style=0):
         """
         :param sut: System under stress
         :param mapping: A mapping of enemies o cores
@@ -95,43 +140,34 @@ class SutStress:
 
         delta_temp = 12
         total_times = []
+        total_temps = []
 
-        while True:
-            cool_down(max_temperature - delta_temp)
+        it = 0
 
-            # start up the stress in accordance with the mapping
-            for core in mapping:
-                self.start_stress(mapping[core], core)
+        # start up the stress in accordance with the mapping
+        for core in mapping:
+            self.start_stress(mapping[core], core)
 
-            for i in range(50):
+        while it < iterations:
+            if self.cool_down(max_temperature - delta_temp, mapping):
+                for core in mapping:
+                    self.start_stress(mapping[core], core)
 
-                # Clear the cache first
-                cmd = "sync; echo 1 > /proc/sys/vm/drop_caches"
-                s_out, s_err = self._processes.system_call(cmd)
-                self._check_error(s_err)
+            # Clear the cache first
+            cmd = "sync; echo 1 > /proc/sys/vm/drop_caches"
+            s_out, s_err = self._processes.system_call(cmd)
+            self._check_error(s_err)
 
-                # Run the program on core 0
+            # Run the program on core 0
 
-                s_out,s_err = self.run_program_single(sut, 0, style)
-                self._check_error(s_err)
-
-                if get_event(s_out, "total time(us): "):
-                    ex_time = get_event(s_out, "total time(us): ")
-                elif get_event(s_out, "Total time (secs): "):
-                    ex_time = get_event(s_out, "Total time (secs): ")
-                elif get_event(s_out, "Max: "):
-                    ex_time = get_event(s_out, "Max: ")
-                else:
-                    print("Unable find execution time or maximum latency")
-                    sys.exit(0)
-                total_times.append(ex_time)
-
-            if len(mapping) > 0:
-                self._processes.kill_stress()
+            s_out,s_err = self.run_program_single(sut, 0, style)
+            self._check_error(s_err)
 
             final_temp = get_temp()
             if final_temp < max_temperature:
-                break
+                total_times.append(self.get_metric(s_out))
+                total_temps.append(final_temp)
+                it = it + 1
             else:
                 print("The final temperature was to high, redoing experiment")
                 delta_temp += 5
@@ -139,10 +175,13 @@ class SutStress:
                     print("The test heats up the processor more than 25 degrees, I o not know what to do")
                     exit(1)
 
+        if len(mapping) > 0:
+            self._processes.kill_stress()
+
         print(total_times)
         print("Standard deviation " + str(pstdev(total_times)))
 
-        return total_times
+        return total_times, total_temps
 
     def run_sut_stress(self, sut, stress, cores, style = 0):
         """
