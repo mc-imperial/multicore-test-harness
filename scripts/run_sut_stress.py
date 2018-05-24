@@ -130,13 +130,18 @@ class SutStress:
 
         return metric
 
-    def run_mapping(self, sut,  mapping, iterations=50, max_temperature=50, style=0):
+    def run_mapping(self, sut,  mapping, iterations=50, max_temperature=50, style=0, governor="powersave"):
         """
         :param sut: System under stress
         :param mapping: A mapping of enemies o cores
         :param max_temperature: If the temperature is above this, discard the result
         :param style: Run the SUT with perf or some similar instrument
         """
+
+        # Make sure the governor is correctly
+        cmd = "echo " + governor + " | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor"
+        self._processes.system_call_background(cmd)
+
 
         delta_temp = 12
         total_times = []
