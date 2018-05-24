@@ -142,8 +142,7 @@ class SutStress:
         cmd = "echo " + governor + " | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor"
         self._processes.system_call_background(cmd)
 
-
-        delta_temp = 12
+        delta_temp = 10
         total_times = []
         total_temps = []
 
