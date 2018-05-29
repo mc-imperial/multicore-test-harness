@@ -36,6 +36,7 @@ from random import randrange, uniform, choice, random
 from collections import OrderedDict
 from copy import deepcopy
 from statistics import pstdev
+from scipy.stats.mstats import mquantiles
 
 # optimization packages
 from bayes_opt import BayesianOptimization
@@ -408,7 +409,7 @@ class ObjectiveFunction:
             def_param[key] = kwargs[key]
 
         self.stored_mapping.enemies[self.optimized_core] .set_defines(def_param)
-        return pstdev(self.__call__(self.stored_mapping))
+        return mquantiles(self.__call__(self.stored_mapping), .9)
 
     def __call__(self, enemy_config):
         """
@@ -428,9 +429,11 @@ class ObjectiveFunction:
         else:
             self._enemy_files = enemy_config.get_file_mapping()
             s = SutStress()
-            times = s.run_mapping(self._sut, self._enemy_files, self._max_temperature)
+            times = s.run_mapping(sut=self._sut,
+                                  mapping=self._enemy_files,
+                                  max_temperature=self._max_temperature)
 
-        std_dev = pstdev(times)
+        std_dev = mquantiles(times, .9)
 
         if self.best_score is None or std_dev > self.best_score:
             self.best_score = std_dev
@@ -467,13 +470,13 @@ class DefineAnneal(Annealer):
 
         self.iteration += 1
         times = self.objective_function(self.state)
-        score = 1 - pstdev(times)
+        score = 1/mquantiles(times, .9)
 
         if self._log_file:
             self._log_data(self.iteration,
                            int(time() - self.start),
                            self.objective_function.best_score,
-                           pstdev(times),
+                           mquantiles(times, .9),
                            times)
 
         return score
@@ -576,7 +579,7 @@ class Optimization:
         while num_evaluations < self._inner_iterations and time() < t_end:
             enemy_config.random_set_all_defines()
             times = objective_function(enemy_config)
-            next_inner_score = pstdev(times)
+            next_inner_score = mquantiles(times, .9)
             num_evaluations += 1
 
             self._log_data(num_evaluations,
@@ -595,7 +598,7 @@ class Optimization:
         objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._socket)
 
         current_config = enemy_config
-        current_score = pstdev(objective_function(enemy_config))
+        current_score = mquantiles(objective_function(enemy_config), .9)
 
         num_evaluations = 1
         t_end = time() + 60 * max_time
@@ -608,7 +611,7 @@ class Optimization:
 
             # see if this move is better than the current
             times = objective_function(next_config)
-            next_score = pstdev(times)
+            next_score = mquantiles(times, .9)
             num_evaluations += 1
             if next_score > current_score:
                 current_config = next_config
@@ -747,7 +750,7 @@ class Optimization:
 
         # Initialise SA
         current_outer_config = enemy_config.random_set_all()
-        current_outer_score = pstdev(objective_function(enemy_config))
+        current_outer_score = mquantiles(objective_function(enemy_config), .9)
         num_evaluations = 1
 
         outer_cooling_schedule = self.kirkpatrick_cooling(outer_temp, outer_alpha)
@@ -773,7 +776,7 @@ class Optimization:
                     print("I do not know how to tune like that")
 
                 rechecked_times = objective_function(best_inner_config)
-                next_outer_score = pstdev(rechecked_times)
+                next_outer_score = mquantiles(rechecked_times, .9)
 
                 with open(self._log_file, 'a') as data_file:
                     d = "Finishing outer loop " + str(num_evaluations) +\

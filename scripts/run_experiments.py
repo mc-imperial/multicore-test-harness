@@ -283,11 +283,13 @@ class Experiment(object):
 
                 (time_list_baseline, temp_list_baseline) = s.run_mapping(self._sut[0],
                                                                          dict(),
+                                                                         .9,
                                                                          self._iterations,
                                                                          self._max_temperature)
 
                 (time_list_enemy, temp_list_enemy) = s.run_mapping(self._sut[0],
                                                                    self._mapping,
+                                                                   .9,
                                                                    self._iterations,
                                                                    self._max_temperature)
                 output[experiment] = self._log_data2(self._sut,
