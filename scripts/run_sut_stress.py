@@ -132,11 +132,10 @@ class SutStress:
 
         return metric
 
-    def run_mapping(self, sut,  mapping, quantile=.9, iterations=30, max_temperature=50, style=0, governor="powersave"):
+    def run_mapping(self, sut,  mapping, iterations=50, max_temperature=50, style=0, governor="powersave"):
         """
         :param sut: System under stress
         :param mapping: A mapping of enemies o cores
-        :param quantile: What quantile to use
         :param iterations: The total number of times to repeat the experiment
         :param max_temperature: If the temperature is above this, discard the result
         :param style: Run the SUT with perf or some similar instrument

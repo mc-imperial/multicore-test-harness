@@ -35,7 +35,6 @@ from time import time
 from random import randrange, uniform, choice, random
 from collections import OrderedDict
 from copy import deepcopy
-from statistics import pstdev
 from scipy.stats.mstats import mquantiles
 
 # optimization packages
@@ -430,14 +429,14 @@ class ObjectiveFunction:
             self._enemy_files = enemy_config.get_file_mapping()
             s = SutStress()
             times, temps = s.run_mapping(sut=self._sut,
-                                        mapping=self._enemy_files,
-                                        max_temperature=self._max_temperature)
+                                         mapping=self._enemy_files,
+                                         max_temperature=self._max_temperature)
 
-        quantile = mquantiles(times, .9)[0]
-        print(quantile)
+        quantiles = mquantiles(times, .9)[0]
+        print(quantiles)
 
-        if self.best_score is None or quantile > self.best_score:
-            self.best_score = quantile
+        if self.best_score is None or quantiles > self.best_score:
+            self.best_score = quantiles
             self.best_mapping = enemy_config
 
         return times
