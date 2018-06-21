@@ -214,14 +214,16 @@ class SutStress:
                         print("The test heats up the processor more than 25 degrees, I o not know what to do")
                         exit(1)
 
+            if len(mapping) > 0:
+                self._processes.kill_stress()
+
             conf_var = confidence_variation(total_times, .9)
             print("The confidence variation is ", conf_var)
 
             if conf_var < max_confidence_variation:
                 break
 
-        if len(mapping) > 0:
-            self._processes.kill_stress()
+
 
         print(total_times)
 
