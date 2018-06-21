@@ -487,7 +487,7 @@ class DefineAnneal(Annealer):
         :return:
         """
         with open(self._log_file, 'a') as data_file:
-            d = "Iter\t\t\tTime\t\t\tMax\t\t\t\tCur\t\t\t\tTimes\n"
+            d = "Iter\t\t\tTime\t\t\tMax\t\t\tCur\t\t\t\tTimes\n"
             data_file.write(d)
 
     def _log_data(self, iterations, tuning_time, max_value, cur_value, times):
