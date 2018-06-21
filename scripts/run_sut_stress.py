@@ -26,10 +26,39 @@ Runs individual tests.
 
 import sys
 from common import ProcessManagement, get_event, get_temp
-from statistics import pstdev
+from scipy.stats.mstats import mquantiles
+from scipy.stats import binom
 from time import sleep
 
 
+def confidence_variation(x, quantile, desired_confidence=.9):
+
+    assert isinstance(x, list)
+    x.sort()
+    print(x)
+    q = mquantiles(x, quantile)[0]
+    n = len(x)
+
+    confidence = 0
+    middle = round(quantile * (n+1))
+    ui = middle
+    li = middle
+    while confidence < desired_confidence:
+        if ui < n-1:
+            ui = ui + 1
+        if li > 0:
+            li = li-1
+        confidence = binom.cdf(ui-1, n, quantile) - binom.cdf(li-1, n, quantile)
+
+        if ui == n-1 and li == 0:
+            break
+
+    lower_range = x[li]
+    upper_range = x[ui]
+
+    confidence_range = upper_range - lower_range
+
+    return (confidence_range/q)*100
 
 
 class SutStress:
@@ -132,7 +161,8 @@ class SutStress:
 
         return metric
 
-    def run_mapping(self, sut,  mapping, iterations=50, max_temperature=50, style=0, governor="powersave"):
+    def run_mapping(self, sut,  mapping, iterations=20, max_temperature=50, style=0, max_confidence_variation=10,
+                    governor="powersave"):
         """
         :param sut: System under stress
         :param mapping: A mapping of enemies o cores
@@ -145,49 +175,55 @@ class SutStress:
         cmd = "echo " + governor + " | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor"
         self._processes.system_call(cmd)
 
-        delta_temp = 10
+        delta_temp = 5
         total_times = []
         total_temps = []
 
-        it = 0
+        while True:
+            it = 0
 
-        # start up the stress in accordance with the mapping
-        for core in mapping:
-            self.start_stress(mapping[core], core)
+            # start up the stress in accordance with the mapping
+            for core in mapping:
+                self.start_stress(mapping[core], core)
 
-        while it < iterations:
-            if self.cool_down(max_temperature - delta_temp, mapping):
-                for core in mapping:
-                    self.start_stress(mapping[core], core)
+            while it < iterations:
+                if self.cool_down(max_temperature - delta_temp, mapping):
+                    for core in mapping:
+                        self.start_stress(mapping[core], core)
 
-            # Clear the cache first
-            cmd = "sync; echo 1 > /proc/sys/vm/drop_caches"
-            s_out, s_err = self._processes.system_call(cmd)
-            self._check_error(s_err)
+                # Clear the cache first
+                cmd = "sync; echo 1 > /proc/sys/vm/drop_caches"
+                s_out, s_err = self._processes.system_call(cmd)
+                self._check_error(s_err)
 
-            # Run the program on core 0
+                # Run the program on core 0
 
-            s_out,s_err = self.run_program_single(sut, 0, style)
-            self._check_error(s_err)
+                s_out,s_err = self.run_program_single(sut, 0, style)
+                self._check_error(s_err)
 
-            final_temp = get_temp()
-            if final_temp < max_temperature:
-                total_times.append(self.get_metric(s_out))
-                total_temps.append(final_temp)
-                it = it + 1
+                final_temp = get_temp()
+                if final_temp < max_temperature:
+                    total_times.append(self.get_metric(s_out))
+                    total_temps.append(final_temp)
+                    it = it + 1
 
-            else:
-                print("The final temperature was to high, redoing experiment")
-                delta_temp += 5
-                if delta_temp > 25:
-                    print("The test heats up the processor more than 25 degrees, I o not know what to do")
-                    exit(1)
+                else:
+                    print("The final temperature was to high, redoing experiment")
+                    delta_temp += 5
+                    if delta_temp > 25:
+                        print("The test heats up the processor more than 25 degrees, I o not know what to do")
+                        exit(1)
+
+            conf_var = confidence_variation(total_times, .9)
+            print("The confidence variation is ", conf_var)
+
+            if conf_var < max_confidence_variation:
+                break
 
         if len(mapping) > 0:
             self._processes.kill_stress()
 
         print(total_times)
-        print("Standard deviation " + str(pstdev(total_times)))
 
         return total_times, total_temps
 

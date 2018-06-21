@@ -502,7 +502,7 @@ class DefineAnneal(Annealer):
         with open(self._log_file, 'a') as data_file:
             d = str(iterations) + "\t\t\t" + \
                 str(tuning_time) + "\t\t\t" + \
-                str(max_value) + "\t\t" + \
+                str(max_value) + "\t\t\t" + \
                 str(cur_value) + "\t\t" + \
                 str(times) + "\n"
             data_file.write(d)
@@ -550,7 +550,7 @@ class Optimization:
         with open(self._log_file, 'a') as data_file:
             d = str(iterations) + "\t\t\t" + \
                 str(tuning_time) + "\t\t\t" + \
-                str(max_value) + "\t\t" + \
+                str(max_value) + "\t\t\t" + \
                 str(cur_value) + "\t\t" + \
                 str(times) + "\n"
             data_file.write(d)
@@ -743,7 +743,7 @@ class Optimization:
 
         return best_score, best_mapping
 
-    def outer_anneal(self, enemy_config, inner_tune, max_evaluations=30, outer_temp=100, outer_alpha=0.6):
+    def outer_anneal(self, enemy_config, inner_tune, max_evaluations=30, outer_temp=100, outer_alpha=0.8):
 
         # wrap the objective function (so we record the best)
         objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._socket)
