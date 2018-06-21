@@ -161,7 +161,7 @@ class SutStress:
 
         return metric
 
-    def run_mapping(self, sut,  mapping, iterations=20, max_temperature=50, style=0, max_confidence_variation=10,
+    def run_mapping(self, sut,  mapping, iterations=20, max_temperature=50, style=0, max_confidence_variation=5,
                     governor="powersave"):
         """
         :param sut: System under stress
