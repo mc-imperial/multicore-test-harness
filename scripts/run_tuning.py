@@ -500,11 +500,11 @@ class DefineAnneal(Annealer):
         :param times: A list of execution times that was received this time
         """
         with open(self._log_file, 'a') as data_file:
-            d = str(iterations) + "\t\t\t" + \
-                str(tuning_time) + "\t\t\t" + \
-                str(max_value) + "\t\t\t" + \
-                str(cur_value) + "\t\t" + \
-                str(times) + "\n"
+            d = str("{0:.4f}".format(iterations)) + "\t\t\t" + \
+                str("{0:.4f}".format(tuning_time)) + "\t\t\t" + \
+                str("{0:.4f}".format(max_value)) + "\t\t\t" + \
+                str("{0:.4f}".format(cur_value)) + "\t\t" + \
+                str("{0:.4f}".format(times)) + "\n"
             data_file.write(d)
 
 
@@ -548,11 +548,11 @@ class Optimization:
         :param times: A list of execution times that was received this time
         """
         with open(self._log_file, 'a') as data_file:
-            d = str(iterations) + "\t\t\t" + \
-                str(tuning_time) + "\t\t\t" + \
-                str(max_value) + "\t\t\t" + \
-                str(cur_value) + "\t\t" + \
-                str(times) + "\n"
+            d = str("{0:.4f}".format(iterations)) + "\t\t\t" + \
+                str("{0:.4f}".format(tuning_time)) + "\t\t\t" + \
+                str("{0:.4f}".format(max_value)) + "\t\t\t" + \
+                str("{0:.4f}".format(cur_value)) + "\t\t" + \
+                str("{0:.4f}".format(times)) + "\n"
             data_file.write(d)
 
     @staticmethod
