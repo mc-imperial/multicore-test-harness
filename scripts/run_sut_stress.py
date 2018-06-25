@@ -223,6 +223,9 @@ class SutStress:
             if conf_var < max_confidence_variation:
                 break
 
+            # It sometimes happens that we never get the desired confidence interval
+            if len(total_times) > 150:
+                break
 
 
         print(total_times)
