@@ -504,7 +504,7 @@ class DefineAnneal(Annealer):
                 str("{0:.4f}".format(tuning_time)) + "\t\t\t" + \
                 str("{0:.4f}".format(max_value)) + "\t\t\t" + \
                 str("{0:.4f}".format(cur_value)) + "\t\t" + \
-                str("{0:.4f}".format(times)) + "\n"
+                str(times) + "\n"
             data_file.write(d)
 
 
@@ -529,6 +529,13 @@ class Optimization:
 
         self._socket = network_socket
 
+
+        # Delete old log files
+        try:
+            os.remove(self._log_file)
+        except OSError:
+            pass
+
     def _write_log_header(self):
         """
         Write the log file header
@@ -552,7 +559,7 @@ class Optimization:
                 str("{0:.4f}".format(tuning_time)) + "\t\t\t" + \
                 str("{0:.4f}".format(max_value)) + "\t\t\t" + \
                 str("{0:.4f}".format(cur_value)) + "\t\t" + \
-                str("{0:.4f}".format(times)) + "\n"
+                str(times) + "\n"
             data_file.write(d)
 
     @staticmethod
