@@ -32,7 +32,7 @@ import socket
 import pickle
 
 from time import time
-from random import randrange, uniform, choice, random
+from random import randrange, uniform, choice, random, shuffle
 from collections import OrderedDict
 from copy import deepcopy
 from scipy.stats.mstats import mquantiles
@@ -269,13 +269,18 @@ class EnemyConfiguration:
         """
         A generator for the configs with different templates
         """
-        for i in range(self.enemy_cores):
-            template = self.enemies[i].get_template()
-            for v in self.def_files.keys():
-                if v != template:
+        list_cores= list(range(self.enemy_cores))
+        shuffle(list_cores)
+        for core in list_cores:
+            template = self.enemies[core].get_template()
+            keyList = sorted(self.def_files.keys())
+
+            for i, v in enumerate(keyList):
+                if v == template:
                     self_copy = deepcopy(self)
-                    self_copy.enemies[i].set_template(v, self.def_files[v])
-                    self_copy.enemies[i].random_instantiate_defines()
+                    index = (i+1) % len(self.def_files)
+                    self_copy.enemies[core].set_template(keyList[index], self.def_files[keyList[index]])
+                    self_copy.enemies[core].random_instantiate_defines()
                     yield self_copy
 
     def neighbour_define(self):
@@ -750,7 +755,7 @@ class Optimization:
 
         return best_score, best_mapping
 
-    def outer_anneal(self, enemy_config, inner_tune, max_evaluations=30, outer_temp=100, outer_alpha=0.8):
+    def outer_anneal(self, enemy_config, inner_tune, max_evaluations=30, outer_temp=20, outer_alpha=0.8):
 
         # wrap the objective function (so we record the best)
         objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._socket)

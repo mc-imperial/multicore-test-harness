@@ -155,6 +155,8 @@ class SutStress:
             metric = get_event(s_out, "Total time (secs): ")
         elif get_event(s_out, "Max: "):
             metric = get_event(s_out, "Max: ")
+        elif get_event(s_out, "time(ns)="):
+            metric = get_event(s_out, "time(ns)=")
         else:
             print("Unable find execution time or maximum latency")
             sys.exit(0)
@@ -197,7 +199,6 @@ class SutStress:
                 self._check_error(s_err)
 
                 # Run the program on core 0
-
                 s_out,s_err = self.run_program_single(sut, 0, style)
                 self._check_error(s_err)
 
@@ -224,8 +225,8 @@ class SutStress:
                 break
 
             # It sometimes happens that we never get the desired confidence interval
-            if len(total_times) > 150:
-                break
+            if len(total_times) > 100:
+                total_times = []
 
 
         print(total_times)
