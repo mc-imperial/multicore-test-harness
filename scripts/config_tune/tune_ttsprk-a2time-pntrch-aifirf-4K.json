@@ -6,7 +6,7 @@
     "log_file": "../results/ttsprk-a2time-pntrch-tblook-4K_log.txt",
     "max_file": "../results/ttsprk-a2time-pntrch-tblook-4K_max.txt",
     "training_time": 10,
-    "inner_iterations": 2,
+    "inner_iterations": 200,
     "max_temperature": 80
   }
 }

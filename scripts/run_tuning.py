@@ -755,7 +755,7 @@ class Optimization:
 
         return best_score, best_mapping
 
-    def outer_anneal(self, enemy_config, inner_tune, max_evaluations=30, outer_temp=20, outer_alpha=0.8):
+    def outer_anneal(self, enemy_config, inner_tune, max_evaluations=30, outer_temp=20, outer_alpha=0.6):
 
         # wrap the objective function (so we record the best)
         objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._socket)
