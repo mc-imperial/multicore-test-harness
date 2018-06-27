@@ -467,6 +467,7 @@ class DefineAnneal(Annealer):
         self._write_log_header()
 
         self.iteration = 0  # Just for logging purposes
+        self.start = time()
 
     def move(self):
         self.state = self.state.neighbour_define()
@@ -978,6 +979,8 @@ class Tuning:
         :return:
         """
 
+        start_time = time()
+
         sa = Optimization(sut=self._sut,
                           log_file=self._log_file,
                           max_temperature=self._max_temperature,
@@ -997,7 +1000,9 @@ class Tuning:
             sys.exit(0)
 
         f = open(self._max_file, 'w')
-        f.write("Max time " + str(best_score) + "\n" + str(best_state))
+        f.write("Max time " + str(best_score) +
+                "\n" + str(best_state) +
+                "\n" + "Total time " + str(time()-start_time))
         f.close()
 
     def simple_tune(self, tune_method):
