@@ -76,10 +76,15 @@ def get_temp():
             if 20 < value < 100:
                 temperature = value
                 break
+
+        return temperature
     except ValueError:
         print("\n\tWARNING: Unable to find temperature for this system\n")
         return None
-    return temperature
+
+    return None
+
+
 
 
 class ProcessManagement:
