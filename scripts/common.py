@@ -71,7 +71,7 @@ def get_temp():
         # print("Got the following temperatures", str(command_output))
         # Check which of the values look realistic
         for temp in temperatures:
-            if value>1000:
+            if float(temp)>1000:
                 value = float(temp) / 1000
             else:
                 value = float(value)
