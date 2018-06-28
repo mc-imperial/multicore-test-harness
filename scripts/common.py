@@ -74,7 +74,7 @@ def get_temp():
             if float(temp)>1000:
                 value = float(temp) / 1000
             else:
-                value = float(value)
+                value = float(temp)
             # A realistic value would be between 20 (room temperature) and 100 (this is the usual limit in the BIOS)
             if 20 < value < 100:
                 temperature = value
