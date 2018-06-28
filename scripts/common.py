@@ -71,7 +71,10 @@ def get_temp():
         # print("Got the following temperatures", str(command_output))
         # Check which of the values look realistic
         for temp in temperatures:
-            value = float(temp) / 1000
+            if value>1000:
+                value = float(temp) / 1000
+            else:
+                value = float(value)
             # A realistic value would be between 20 (room temperature) and 100 (this is the usual limit in the BIOS)
             if 20 < value < 100:
                 temperature = value
