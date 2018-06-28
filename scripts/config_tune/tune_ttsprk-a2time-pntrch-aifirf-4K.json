@@ -1,6 +1,6 @@
 {
   "coremark_train": {
-    "sut": "../../automotive/bin/ttsprk-a2time-pntrch-tblook-4K.exe -v0 -c1 -i1",
+    "sut": "../bin/automotive/ttsprk-a2time-pntrch-tblook-4K.exe -v0 -c1 -i1",
     "cores": 3,
     "method":"sa_sa",
     "log_file": "../results/ttsprk-a2time-pntrch-tblook-4K_log.txt",
