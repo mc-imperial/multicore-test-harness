@@ -384,13 +384,14 @@ class ObjectiveFunction:
     Class to evaluate an enemy config
     """
 
-    def __init__(self, sut, max_temperature=70, socket_connect=None):
+    def __init__(self, sut, max_temperature=70, quantile =.9, socket_connect=None):
         """
         :param sut: The system under test
         :param max_temperature: The maximum temperature before starting an evaluation
         """
         self._sut = sut
         self._max_temperature = max_temperature
+        self._quantile = quantile
 
         # Keep the created files for cleanup
         self._enemy_files = None
@@ -413,7 +414,7 @@ class ObjectiveFunction:
             def_param[key] = kwargs[key]
 
         self.stored_mapping.enemies[self.optimized_core] .set_defines(def_param)
-        return mquantiles(self.__call__(self.stored_mapping), .9)
+        return mquantiles(self.__call__(self.stored_mapping), self._quantile)
 
     def __call__(self, enemy_config):
         """
@@ -435,9 +436,10 @@ class ObjectiveFunction:
             s = SutStress()
             times, temps = s.run_mapping(sut=self._sut,
                                          mapping=self._enemy_files,
+                                         quantile=self._quantile,
                                          max_temperature=self._max_temperature)
 
-        quantiles = mquantiles(times, .9)[0]
+        quantiles = mquantiles(times, self._quantile)[0]
         print(quantiles)
 
         if self.best_score is None or quantiles > self.best_score:
@@ -460,11 +462,12 @@ class ObjectiveFunction:
 
 
 class DefineAnneal(Annealer):
-    def __init__(self, initial_state, sut, temp, log_file=None, network_socket=None):
+    def __init__(self, initial_state, sut, temp, quantile =.9, log_file=None, network_socket=None):
         Annealer.__init__(self, initial_state)
         self.objective_function = ObjectiveFunction(sut, temp, network_socket)
         self._log_file = log_file
         self._write_log_header()
+        self._quantile = quantile
 
         self.iteration = 0  # Just for logging purposes
         self.start = time()
@@ -476,13 +479,13 @@ class DefineAnneal(Annealer):
 
         self.iteration += 1
         times = self.objective_function(self.state)
-        score = 1/mquantiles(times, .9)[0]
+        score = 1/mquantiles(times, self._quantile)[0]
 
         if self._log_file:
             self._log_data(self.iteration,
                            int(time() - self.start),
                            self.objective_function.best_score,
-                           mquantiles(times, .9)[0],
+                           mquantiles(times, self._quantile )[0],
                            times)
 
         return score
@@ -519,7 +522,12 @@ class Optimization:
     Class for Optimization
     """
 
-    def __init__(self, sut, log_file, max_temperature=80, inner_iterations=2000, network_socket=None):
+    def __init__(self, sut,
+                 log_file,
+                 max_temperature=80,
+                 quantile=.9,
+                 inner_iterations=2000,
+                 network_socket=None):
         """
         Create an Optimization object
         :param sut: The system under test
@@ -530,6 +538,8 @@ class Optimization:
         self._log_file = log_file
         self._max_temperature = max_temperature
         self._inner_iterations = inner_iterations
+
+        self._quantile=quantile
 
         self._t_start = time()
 
@@ -592,7 +602,7 @@ class Optimization:
         while num_evaluations < self._inner_iterations and time() < t_end:
             enemy_config.random_set_all_defines()
             times = objective_function(enemy_config)
-            next_inner_score = mquantiles(times, .9)[0]
+            next_inner_score = mquantiles(times, self._quantile)[0]
             num_evaluations += 1
 
             self._log_data(num_evaluations,
@@ -611,7 +621,7 @@ class Optimization:
         objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._socket)
 
         current_config = enemy_config
-        current_score = mquantiles(objective_function(enemy_config), .9)[0]
+        current_score = mquantiles(objective_function(enemy_config), self._quantile)[0]
 
         num_evaluations = 1
         t_end = time() + 60 * max_time
@@ -624,7 +634,7 @@ class Optimization:
 
             # see if this move is better than the current
             times = objective_function(next_config)
-            next_score = mquantiles(times, .9)[0]
+            next_score = mquantiles(times, self._quantile)[0]
             num_evaluations += 1
             if next_score > current_score:
                 current_config = next_config
@@ -643,7 +653,13 @@ class Optimization:
 
     def inner_anneal(self, enemy_config):
 
-        inner_anneal = DefineAnneal(enemy_config, self._sut, self._max_temperature,self._log_file, self._socket)
+        inner_anneal = DefineAnneal(enemy_config=enemy_config,
+                                    quantile=self._quantile,
+                                    sut=self._sut,
+                                    temp=self._max_temperature,
+                                    log_file= self._log_file,
+                                    network_socket=self._socket
+                                    )
 
         inner_anneal.steps = self._inner_iterations
         inner_anneal.anneal()
@@ -763,7 +779,7 @@ class Optimization:
 
         # Initialise SA
         current_outer_config = enemy_config.random_set_all()
-        current_outer_score = mquantiles(objective_function(enemy_config), .9)[0]
+        current_outer_score = mquantiles(objective_function(enemy_config), self._quantile)[0]
         num_evaluations = 1
 
         outer_cooling_schedule = self.kirkpatrick_cooling(outer_temp, outer_alpha)
@@ -789,7 +805,7 @@ class Optimization:
                     print("I do not know how to tune like that")
 
                 rechecked_times = objective_function(best_inner_config)
-                next_outer_score = mquantiles(rechecked_times, .9)[0]
+                next_outer_score = mquantiles(rechecked_times, self._quantile)[0]
 
                 with open(self._log_file, 'a') as data_file:
                     d = "Finishing outer loop " + str(num_evaluations) +\
@@ -872,6 +888,8 @@ class Tuning:
         self._inner_iterations = None
         self._max_temperature = None
 
+        self._quantile = 0.9
+
         # Store the enemy config
         self._enemy_config = None
 
@@ -898,6 +916,12 @@ class Tuning:
             self._sut = str(json_object["sut"])
         except KeyError:
             print("Unable to find sut in JSON")
+            sys.exit(1)
+
+        try:
+            self._quantile = float(json_object["quantile"])
+        except KeyError:
+            print("Unable to find quartile in JSON")
             sys.exit(1)
 
         try:
@@ -984,6 +1008,7 @@ class Tuning:
         sa = Optimization(sut=self._sut,
                           log_file=self._log_file,
                           max_temperature=self._max_temperature,
+                          quantile=self._quantile,
                           inner_iterations=self._inner_iterations,
                           network_socket=self._socket)
 
@@ -1016,6 +1041,7 @@ class Tuning:
         sa = Optimization(sut=self._sut,
                           log_file=self._log_file,
                           max_temperature=self._max_temperature,
+                          quantile=self._quantile,
                           inner_iterations=self._inner_iterations,
                           network_socket=self._socket)
         if tune_method == "ran":

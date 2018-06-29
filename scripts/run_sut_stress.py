@@ -163,8 +163,14 @@ class SutStress:
 
         return metric
 
-    def run_mapping(self, sut,  mapping, iterations=20, max_temperature=50, style=0, max_confidence_variation=5,
-                    governor="powersave"):
+    def run_mapping(self, sut,  mapping,
+                    iterations=20,
+                    max_temperature=50,
+                    quantile=.9,
+                    style=0,
+                    max_confidence_variation=5,
+                    governor="powersave"
+                    ):
         """
         :param sut: System under stress
         :param mapping: A mapping of enemies o cores
@@ -218,7 +224,7 @@ class SutStress:
             if len(mapping) > 0:
                 self._processes.kill_stress()
 
-            conf_var = confidence_variation(total_times, .9)
+            conf_var = confidence_variation(total_times, quantile)
             print("The confidence variation is ", conf_var)
 
             if conf_var < max_confidence_variation:
@@ -227,7 +233,6 @@ class SutStress:
             # It sometimes happens that we never get the desired confidence interval
             if len(total_times) > 200:
                 break
-
 
         print(total_times)
 
