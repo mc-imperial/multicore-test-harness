@@ -163,7 +163,8 @@ class SutStress:
 
         return metric
 
-    def run_mapping(self, sut,  mapping,
+    def run_mapping(self, sut,
+                    mapping,
                     iterations=20,
                     max_temperature=50,
                     quantile=.9,
@@ -186,6 +187,15 @@ class SutStress:
         delta_temp = 5
         total_times = []
         total_temps = []
+
+        # print(sut)
+        # print(mapping)
+        # print(iterations)
+        # print(max_temperature)
+        # print(quantile)
+        # print(style)
+        # print(max_confidence_variation)
+        # print(governor)
 
         while True:
             it = 0

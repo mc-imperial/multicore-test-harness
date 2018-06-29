@@ -393,6 +393,7 @@ class ObjectiveFunction:
         self._max_temperature = max_temperature
         self._quantile = quantile
 
+
         # Keep the created files for cleanup
         self._enemy_files = None
 
@@ -464,7 +465,7 @@ class ObjectiveFunction:
 class DefineAnneal(Annealer):
     def __init__(self, initial_state, sut, temp, quantile =.9, log_file=None, network_socket=None):
         Annealer.__init__(self, initial_state)
-        self.objective_function = ObjectiveFunction(sut, temp, network_socket)
+        self.objective_function = ObjectiveFunction(sut, temp, quantile, network_socket)
         self._log_file = log_file
         self._write_log_header()
         self._quantile = quantile
@@ -594,7 +595,7 @@ class Optimization:
 
     def inner_random(self, enemy_config, max_time=30):
 
-        objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._socket)
+        objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._quantile, self._socket)
 
         num_evaluations = 1
         t_end = time() + 60 * max_time
@@ -618,7 +619,7 @@ class Optimization:
 
     def inner_hill_climb(self, enemy_config, max_time=30):
 
-        objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._socket)
+        objective_function = ObjectiveFunction(self._sut, self._max_temperature,self._quantile,  self._socket)
 
         current_config = enemy_config
         current_score = mquantiles(objective_function(enemy_config), self._quantile)[0]
@@ -653,7 +654,7 @@ class Optimization:
 
     def inner_anneal(self, enemy_config):
 
-        inner_anneal = DefineAnneal(enemy_config=enemy_config,
+        inner_anneal = DefineAnneal(initial_state=enemy_config,
                                     quantile=self._quantile,
                                     sut=self._sut,
                                     temp=self._max_temperature,
@@ -718,7 +719,7 @@ class Optimization:
 
     def inner_bo(self, enemy_config, kappa_val=6):
 
-        objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._socket)
+        objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._quantile, self._socket)
         config = enemy_config
 
         # Devide the evaluations for each core
@@ -742,7 +743,7 @@ class Optimization:
 
     def outer_random(self, enemy_config, inner_tune,  max_evaluations=30, max_time=600):
 
-        objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._socket)
+        objective_function = ObjectiveFunction(self._sut, self._max_temperature,self._quantile, self._socket)
 
         current_config = enemy_config
         objective_function(enemy_config)
@@ -775,7 +776,7 @@ class Optimization:
     def outer_anneal(self, enemy_config, inner_tune, max_evaluations=30, outer_temp=20, outer_alpha=0.6):
 
         # wrap the objective function (so we record the best)
-        objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._socket)
+        objective_function = ObjectiveFunction(self._sut, self._max_temperature,self._quantile, self._socket)
 
         # Initialise SA
         current_outer_config = enemy_config.random_set_all()
