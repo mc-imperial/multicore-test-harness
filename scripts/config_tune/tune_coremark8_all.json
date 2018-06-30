@@ -35,9 +35,9 @@
     "coremark_train4": {
     "sut": "../bin/sut/coremark.exe 0x0 0x0 0x66 50",
     "cores": 7,
-    "method": "sa_ran",
-    "log_file": "../results/coremark_sa_ran_600_log.txt",
-    "max_file": "../results/coremark_sa_ran_600_max.txt",
+    "method": "sa_bo",
+    "log_file": "../results/coremark_sa_bo_600_log.txt",
+    "max_file": "../results/coremark_sa_bo_600_max.txt",
     "quantile": 0.9,
     "training_time": 600,
     "inner_iterations": 100,
@@ -86,5 +86,5 @@
     "training_time": 600,
     "inner_iterations": 100,
     "max_temperature": 80
-  },
+  }
 }
