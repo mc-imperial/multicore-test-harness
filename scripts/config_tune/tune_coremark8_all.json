@@ -21,7 +21,7 @@
     "inner_iterations": 100,
     "max_temperature": 80
   },
-    "coremark_train3": {
+  "coremark_train3": {
     "sut": "../bin/sut/coremark.exe 0x0 0x0 0x66 50",
     "cores": 7,
     "method": "sa_sa",
@@ -32,7 +32,7 @@
     "inner_iterations": 100,
     "max_temperature": 80
   },
-    "coremark_train4": {
+  "coremark_train4": {
     "sut": "../bin/sut/coremark.exe 0x0 0x0 0x66 50",
     "cores": 7,
     "method": "sa_bo",
@@ -43,7 +43,7 @@
     "inner_iterations": 100,
     "max_temperature": 80
   },
-    "coremark_train5": {
+  "coremark_train5": {
     "sut": "../bin/sut/coremark.exe 0x0 0x0 0x66 50",
     "cores": 7,
     "method": "ran_ran",
@@ -54,7 +54,7 @@
     "inner_iterations": 100,
     "max_temperature": 80
   },
-    "coremark_train6": {
+  "coremark_train6": {
     "sut": "../bin/sut/coremark.exe 0x0 0x0 0x66 50",
     "cores": 7,
     "method": "ran_hc",
@@ -65,7 +65,7 @@
     "inner_iterations": 100,
     "max_temperature": 80
   },
-    "coremark_train7": {
+  "coremark_train7": {
     "sut": "../bin/sut/coremark.exe 0x0 0x0 0x66 50",
     "cores": 7,
     "method": "ran_sa",
@@ -76,7 +76,7 @@
     "inner_iterations": 100,
     "max_temperature": 80
   },
-    "coremark_train8": {
+  "coremark_train8": {
     "sut": "../bin/sut/coremark.exe 0x0 0x0 0x66 50",
     "cores": 7,
     "method": "ran_bo",
