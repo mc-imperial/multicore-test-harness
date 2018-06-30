@@ -593,7 +593,7 @@ class Optimization:
         else:
             return math.exp(-abs(next_score - prev_score) / temperature)
 
-    def inner_random(self, enemy_config, max_time=30):
+    def inner_random(self, enemy_config, max_time=60):
 
         objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._quantile, self._socket)
 
@@ -617,7 +617,7 @@ class Optimization:
 
         return best_mapping, best_score
 
-    def inner_hill_climb(self, enemy_config, max_time=30):
+    def inner_hill_climb(self, enemy_config, max_time=60):
 
         objective_function = ObjectiveFunction(self._sut, self._max_temperature,self._quantile,  self._socket)
 
@@ -670,53 +670,6 @@ class Optimization:
 
         return best_mapping, best_score
 
-    def inner_anneal2(self, enemy_config, inner_temp=50, inner_alpha=0.8):
-
-        # wrap the objective function (so we record the best)
-        objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._socket)
-
-        # Initialise SA
-        current_config = enemy_config
-        current_score = objective_function(enemy_config)
-        num_evaluations = 1
-
-        inner_cooling_schedule = self.kirkpatrick_cooling(inner_temp, inner_alpha)
-
-        for inner_temperature in inner_cooling_schedule:
-            done = False
-
-            while True:
-                next_config = current_config.neighbour_define()
-
-                if num_evaluations >= self._inner_iterations:
-                    done = True
-                    break
-
-                next_score = objective_function(next_config)
-                num_evaluations += 1
-
-                # probabilistically accept this solution
-                # always accepting better solutions
-                p = self.p_score(current_score, next_score, inner_temperature)
-                if random() < p:
-                    current_config = next_config
-                    current_score = next_score
-                    break
-
-                self._log_data(num_evaluations,
-                               int(time() - self._t_start),
-                               objective_function.best_score,
-                               next_score)
-
-            # see if completely finished
-            if done:
-                break
-
-        best_mapping = objective_function.best_mapping
-        best_score = objective_function.best_score
-
-        return best_mapping, best_score
-
     def inner_bo(self, enemy_config, kappa_val=6):
 
         objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._quantile, self._socket)
@@ -741,7 +694,7 @@ class Optimization:
 
         return config, best_score
 
-    def outer_random(self, enemy_config, inner_tune,  max_evaluations=30, max_time=600):
+    def outer_random(self, enemy_config, inner_tune,  max_evaluations=100, max_time=720):
 
         objective_function = ObjectiveFunction(self._sut, self._max_temperature,self._quantile, self._socket)
 
@@ -773,7 +726,7 @@ class Optimization:
 
         return best_score, best_mapping
 
-    def outer_anneal(self, enemy_config, inner_tune, max_evaluations=30, outer_temp=20, outer_alpha=0.6):
+    def outer_anneal(self, enemy_config, inner_tune, max_evaluations=100, max_time=720, outer_temp=100, outer_alpha=0.6):
 
         # wrap the objective function (so we record the best)
         objective_function = ObjectiveFunction(self._sut, self._max_temperature,self._quantile, self._socket)
@@ -781,7 +734,9 @@ class Optimization:
         # Initialise SA
         current_outer_config = enemy_config.random_set_all()
         current_outer_score = mquantiles(objective_function(enemy_config), self._quantile)[0]
+
         num_evaluations = 1
+        t_end = time() + 60 * max_time
 
         outer_cooling_schedule = self.kirkpatrick_cooling(outer_temp, outer_alpha)
 
@@ -789,7 +744,7 @@ class Optimization:
             done = False
 
             for next_outer_config in current_outer_config.neighbour_template():
-                if num_evaluations >= max_evaluations:
+                if num_evaluations >= max_evaluations and time() < t_end:
                     done = True
                     break
 
@@ -1015,12 +970,14 @@ class Tuning:
 
         if outer_tune_method == "ran":
             best_state, best_score = sa.outer_random(
-                self._enemy_config,
-                inner_tune=inner_tune_method)
+                enemy_config=self._enemy_config,
+                inner_tune=inner_tune_method,
+                max_time=self._training_time)
         elif outer_tune_method == "sa":
             best_state, best_score = sa.outer_anneal(
-                self._enemy_config,
-                inner_tune=inner_tune_method)
+                enemy_config=self._enemy_config,
+                inner_tune=inner_tune_method,
+                max_time=self._training_time)
         else:
             print("I do not know how to bilevel train that way")
             sys.exit(0)
