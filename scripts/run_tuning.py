@@ -684,7 +684,7 @@ class Optimization:
             objective_function.stored_mapping = config
             data_range = config.enemies[core].get_defines_range()
 
-            bo = BayesianOptimization(objective_function.bo_call, data_range)
+            bo = BayesianOptimization(objective_function.bo_call, data_range, verbose=0)
             bo.init(init_points=init_pts)
             bo.maximize(n_iter=iterations, kappa=kappa_val)
 
@@ -721,12 +721,13 @@ class Optimization:
 
             objective_function(config)
 
+
         best_score = objective_function.best_score
         best_mapping = objective_function.best_mapping
 
         return best_score, best_mapping
 
-    def outer_anneal(self, enemy_config, inner_tune, max_evaluations=100, max_time=720, outer_temp=100, outer_alpha=0.6):
+    def outer_anneal(self, enemy_config, inner_tune, max_evaluations=100, max_time=720, outer_temp=100, outer_alpha=0.8):
 
         # wrap the objective function (so we record the best)
         objective_function = ObjectiveFunction(self._sut, self._max_temperature,self._quantile, self._socket)
