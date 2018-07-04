@@ -707,19 +707,26 @@ class Optimization:
 
             # The inner tune part
             if inner_tune == "ran":
-                config, score = self.inner_random(current_config)
+                best_inner_config, score = self.inner_random(current_config)
             elif inner_tune == "hc":
-                config, score = self.inner_hill_climb(current_config)
+                best_inner_config, score = self.inner_hill_climb(current_config)
             elif inner_tune == "sa":
-                config, score = self.inner_anneal(current_config)
+                best_inner_config, score = self.inner_anneal(current_config)
             elif inner_tune == "bo":
-                config, score = self.inner_bo(current_config)
+                best_inner_config, score = self.inner_bo(current_config)
             else:
                 print("I do not know how to tune like that")
 
-            num_evaluations += 1
+            rechecked_times = objective_function(best_inner_config)
 
-            objective_function(config)
+            with open(self._log_file, 'a') as data_file:
+                d = "Finishing outer loop " + str(num_evaluations) + \
+                    " best score " + str(objective_function.best_score) + \
+                    " rechecked times " + str(rechecked_times) + "\n"
+                data_file.write(d)
+                data_file.write(str(best_inner_config))
+
+            num_evaluations += 1
 
 
         best_score = objective_function.best_score
