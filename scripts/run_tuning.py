@@ -463,7 +463,7 @@ class ObjectiveFunction:
 
 
 class DefineAnneal(Annealer):
-    def __init__(self, initial_state, sut, temp, quantile =.9, log_file=None, network_socket=None):
+    def __init__(self, initial_state, sut, temp, t_start, quantile =.9, log_file=None, network_socket=None):
         Annealer.__init__(self, initial_state)
         self.objective_function = ObjectiveFunction(sut, temp, quantile, network_socket)
         self._log_file = log_file
@@ -471,7 +471,7 @@ class DefineAnneal(Annealer):
         self._quantile = quantile
 
         self.iteration = 0  # Just for logging purposes
-        self.start = time()
+        self.t_start = t_start
 
     def move(self):
         self.state = self.state.neighbour_define()
@@ -484,7 +484,7 @@ class DefineAnneal(Annealer):
 
         if self._log_file:
             self._log_data(self.iteration,
-                           int(time() - self.start),
+                           int(time() - self.t_start),
                            self.objective_function.best_score,
                            mquantiles(times, self._quantile )[0],
                            times)
@@ -593,14 +593,13 @@ class Optimization:
         else:
             return math.exp(-abs(next_score - prev_score) / temperature)
 
-    def inner_random(self, enemy_config, max_time=60):
+    def inner_random(self, enemy_config):
 
         objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._quantile, self._socket)
 
         num_evaluations = 1
-        t_end = time() + 60 * max_time
 
-        while num_evaluations < self._inner_iterations and time() < t_end:
+        while num_evaluations < self._inner_iterations:
             enemy_config.random_set_all_defines()
             times = objective_function(enemy_config)
             next_inner_score = mquantiles(times, self._quantile)[0]
@@ -617,7 +616,7 @@ class Optimization:
 
         return best_mapping, best_score
 
-    def inner_hill_climb(self, enemy_config, max_time=60):
+    def inner_hill_climb(self, enemy_config):
 
         objective_function = ObjectiveFunction(self._sut, self._max_temperature,self._quantile,  self._socket)
 
@@ -625,12 +624,9 @@ class Optimization:
         current_score = mquantiles(objective_function(enemy_config), self._quantile)[0]
 
         num_evaluations = 1
-        t_end = time() + 60 * max_time
 
-        while num_evaluations < self._inner_iterations and time() < t_end:
-            # examine moves around our current position
-            if num_evaluations > self._inner_iterations:
-                break
+        while num_evaluations < self._inner_iterations:
+
             next_config = current_config.neighbour_define()
 
             # see if this move is better than the current
@@ -658,6 +654,7 @@ class Optimization:
                                     quantile=self._quantile,
                                     sut=self._sut,
                                     temp=self._max_temperature,
+                                    t_start=self._t_start,
                                     log_file= self._log_file,
                                     network_socket=self._socket
                                     )
@@ -696,13 +693,14 @@ class Optimization:
 
     def outer_random(self, enemy_config, inner_tune,  max_evaluations=100, max_time=720):
 
+        t_end = time() + 60 * max_time
+
         objective_function = ObjectiveFunction(self._sut, self._max_temperature,self._quantile, self._socket)
 
         current_config = enemy_config
         objective_function(enemy_config)
 
         num_evaluations = 1
-        t_end = time() + 60 * max_time
 
         while num_evaluations < max_evaluations and time() < t_end:
             current_config.random_set_all_templates()
@@ -719,6 +717,8 @@ class Optimization:
             else:
                 print("I do not know how to tune like that")
 
+            num_evaluations += 1
+
             objective_function(config)
 
 
@@ -729,6 +729,8 @@ class Optimization:
 
     def outer_anneal(self, enemy_config, inner_tune, max_evaluations=100, max_time=720, outer_temp=100, outer_alpha=0.8):
 
+        t_end = time() + 60 * max_time
+
         # wrap the objective function (so we record the best)
         objective_function = ObjectiveFunction(self._sut, self._max_temperature,self._quantile, self._socket)
 
@@ -737,12 +739,14 @@ class Optimization:
         current_outer_score = mquantiles(objective_function(enemy_config), self._quantile)[0]
 
         num_evaluations = 1
-        t_end = time() + 60 * max_time
 
         outer_cooling_schedule = self.kirkpatrick_cooling(outer_temp, outer_alpha)
 
         for outer_temperature in outer_cooling_schedule:
             done = False
+
+            if time() < t_end:
+                break
 
             for next_outer_config in current_outer_config.neighbour_template():
                 if num_evaluations >= max_evaluations and time() < t_end:
