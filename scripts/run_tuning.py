@@ -702,7 +702,7 @@ class Optimization:
 
         num_evaluations = 1
 
-        while num_evaluations < max_evaluations and time() < t_end:
+        while num_evaluations < max_evaluations or time() > t_end:
             current_config.random_set_all_templates()
 
             # The inner tune part
@@ -752,11 +752,11 @@ class Optimization:
         for outer_temperature in outer_cooling_schedule:
             done = False
 
-            if time() < t_end:
+            if time() > t_end:
                 break
 
             for next_outer_config in current_outer_config.neighbour_template():
-                if num_evaluations >= max_evaluations and time() < t_end:
+                if num_evaluations >= max_evaluations or time() > t_end:
                     done = True
                     break
 
