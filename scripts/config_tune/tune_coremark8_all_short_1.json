@@ -7,7 +7,7 @@
     "max_file": "../results/coremark_sa_ran_120_1_max.txt",
     "quantile": 0.9,
     "training_time": 120,
-    "inner_iterations": 50,
+    "inner_iterations": 25,
     "max_temperature": 80
   },
   "coremark_train2": {
@@ -18,7 +18,7 @@
     "max_file": "../results/coremark_sa_hc_120_1_max.txt",
     "quantile": 0.9,
     "training_time": 120,
-    "inner_iterations": 50,
+    "inner_iterations": 25,
     "max_temperature": 80
   },
   "coremark_train3": {
@@ -29,7 +29,7 @@
     "max_file": "../results/coremark_sa_sa_120_1_max.txt",
     "quantile": 0.9,
     "training_time": 120,
-    "inner_iterations": 50,
+    "inner_iterations": 25,
     "max_temperature": 80
   },
   "coremark_train4": {
@@ -40,7 +40,7 @@
     "max_file": "../results/coremark_sa_bo_120_1_max.txt",
     "quantile": 0.9,
     "training_time": 120,
-    "inner_iterations": 50,
+    "inner_iterations": 25,
     "max_temperature": 80
   },
   "coremark_train5": {
@@ -51,7 +51,7 @@
     "max_file": "../results/coremark_ran_ran_120_1_max.txt",
     "quantile": 0.9,
     "training_time": 120,
-    "inner_iterations": 50,
+    "inner_iterations": 25,
     "max_temperature": 80
   },
   "coremark_train6": {
@@ -62,7 +62,7 @@
     "max_file": "../results/coremark_ran_hc_120_1_max.txt",
     "quantile": 0.9,
     "training_time": 120,
-    "inner_iterations": 50,
+    "inner_iterations": 25,
     "max_temperature": 80
   },
   "coremark_train7": {
@@ -73,7 +73,7 @@
     "max_file": "../results/coremark_ran_sa_120_1_max.txt",
     "quantile": 0.9,
     "training_time": 120,
-    "inner_iterations": 50,
+    "inner_iterations": 25,
     "max_temperature": 80
   },
   "coremark_train8": {
@@ -84,7 +84,7 @@
     "max_file": "../results/coremark_ran_bo_120_1_max.txt",
     "quantile": 0.9,
     "training_time": 120,
-    "inner_iterations": 50,
+    "inner_iterations": 25,
     "max_temperature": 80
   },
   "coremark_train9": {
@@ -95,7 +95,7 @@
     "max_file": "../results/coremark_sa_ran_120_2_max.txt",
     "quantile": 0.9,
     "training_time": 120,
-    "inner_iterations": 50,
+    "inner_iterations": 25,
     "max_temperature": 80
   },
   "coremark_train10": {
@@ -106,7 +106,7 @@
     "max_file": "../results/coremark_sa_hc_120_2_max.txt",
     "quantile": 0.9,
     "training_time": 120,
-    "inner_iterations": 50,
+    "inner_iterations": 25,
     "max_temperature": 80
   },
   "coremark_train11": {
@@ -117,7 +117,7 @@
     "max_file": "../results/coremark_sa_sa_120_2_max.txt",
     "quantile": 0.9,
     "training_time": 120,
-    "inner_iterations": 50,
+    "inner_iterations": 25,
     "max_temperature": 80
   },
   "coremark_train12": {
@@ -128,7 +128,7 @@
     "max_file": "../results/coremark_sa_bo_120_2_max.txt",
     "quantile": 0.9,
     "training_time": 120,
-    "inner_iterations": 50,
+    "inner_iterations": 25,
     "max_temperature": 80
   },
   "coremark_train13": {
@@ -139,7 +139,7 @@
     "max_file": "../results/coremark_ran_ran_120_2_max.txt",
     "quantile": 0.9,
     "training_time": 120,
-    "inner_iterations": 50,
+    "inner_iterations": 25,
     "max_temperature": 80
   },
   "coremark_train14": {
@@ -150,7 +150,7 @@
     "max_file": "../results/coremark_ran_hc_120_2_max.txt",
     "quantile": 0.9,
     "training_time": 120,
-    "inner_iterations": 50,
+    "inner_iterations": 25,
     "max_temperature": 80
   },
   "coremark_train15": {
@@ -161,7 +161,7 @@
     "max_file": "../results/coremark_ran_sa_120_2_max.txt",
     "quantile": 0.9,
     "training_time": 120,
-    "inner_iterations": 50,
+    "inner_iterations": 25,
     "max_temperature": 80
   },
   "coremark_train16": {
@@ -172,7 +172,7 @@
     "max_file": "../results/coremark_ran_bo_120_2_max.txt",
     "quantile": 0.9,
     "training_time": 120,
-    "inner_iterations": 50,
+    "inner_iterations": 25,
     "max_temperature": 80
   },
   "coremark_train17": {
@@ -183,7 +183,7 @@
     "max_file": "../results/coremark_sa_ran_120_3_max.txt",
     "quantile": 0.9,
     "training_time": 120,
-    "inner_iterations": 50,
+    "inner_iterations": 25,
     "max_temperature": 80
   },
   "coremark_train18": {
@@ -194,7 +194,7 @@
     "max_file": "../results/coremark_sa_hc_120_3_max.txt",
     "quantile": 0.9,
     "training_time": 120,
-    "inner_iterations": 50,
+    "inner_iterations": 25,
     "max_temperature": 80
   },
   "coremark_train19": {
@@ -205,7 +205,7 @@
     "max_file": "../results/coremark_sa_sa_120_3_max.txt",
     "quantile": 0.9,
     "training_time": 120,
-    "inner_iterations": 50,
+    "inner_iterations": 25,
     "max_temperature": 80
   },
   "coremark_train20": {
@@ -216,7 +216,7 @@
     "max_file": "../results/coremark_sa_bo_120_3_max.txt",
     "quantile": 0.9,
     "training_time": 120,
-    "inner_iterations": 50,
+    "inner_iterations": 25,
     "max_temperature": 80
   },
   "coremark_train21": {
@@ -227,7 +227,7 @@
     "max_file": "../results/coremark_ran_ran_120_3_max.txt",
     "quantile": 0.9,
     "training_time": 120,
-    "inner_iterations": 50,
+    "inner_iterations": 25,
     "max_temperature": 80
   },
   "coremark_train22": {
@@ -238,7 +238,7 @@
     "max_file": "../results/coremark_ran_hc_120_3_max.txt",
     "quantile": 0.9,
     "training_time": 120,
-    "inner_iterations": 50,
+    "inner_iterations": 25,
     "max_temperature": 80
   },
   "coremark_train23": {
@@ -249,7 +249,7 @@
     "max_file": "../results/coremark_ran_sa_120_3_max.txt",
     "quantile": 0.9,
     "training_time": 120,
-    "inner_iterations": 50,
+    "inner_iterations": 25,
     "max_temperature": 80
   },
   "coremark_train24": {
@@ -260,7 +260,7 @@
     "max_file": "../results/coremark_ran_bo_120_3_max.txt",
     "quantile": 0.9,
     "training_time": 120,
-    "inner_iterations": 50,
+    "inner_iterations": 25,
     "max_temperature": 80
   }
 }

@@ -384,7 +384,7 @@ class ObjectiveFunction:
     Class to evaluate an enemy config
     """
 
-    def __init__(self, sut, max_temperature=70, quantile =.9, socket_connect=None):
+    def __init__(self, sut, log_file, max_temperature=70, quantile=.9, socket_connect=None):
         """
         :param sut: The system under test
         :param max_temperature: The maximum temperature before starting an evaluation
@@ -405,6 +405,11 @@ class ObjectiveFunction:
         self.stored_mapping = None
         self.optimized_core = None
 
+        # Logging information
+        self._log_file = log_file
+        self.iteration = 0
+        self._t_start = time()
+
         # Network connection
         self.socket = socket_connect
 
@@ -416,6 +421,19 @@ class ObjectiveFunction:
 
         self.stored_mapping.enemies[self.optimized_core] .set_defines(def_param)
         return mquantiles(self.__call__(self.stored_mapping), self._quantile)
+
+    def _log_data(self, times):
+        """
+        Log the maximum time found after time to determine "convergence" speed
+        :param times: A list of execution times that was received this time
+        """
+        with open(self._log_file, 'a') as data_file:
+            d = str(self.iteration) + "\t\t\t" + \
+                str(time() - self._t_start) + "\t\t\t" + \
+                str("{0:.4f}".format(self.best_score)) + "\t\t\t" + \
+                str("{0:.4f}".format(mquantiles(times, self._quantile)[0])) + "\t\t" + \
+                str(times) + "\n"
+            data_file.write(d)
 
     def __call__(self, enemy_config):
         """
@@ -447,6 +465,8 @@ class ObjectiveFunction:
             self.best_score = quantiles
             self.best_mapping = enemy_config
 
+        self._log_data(times)
+
         return times
 
     def __del__(self):
@@ -463,31 +483,24 @@ class ObjectiveFunction:
 
 
 class DefineAnneal(Annealer):
-    def __init__(self, initial_state, sut, temp, t_start, quantile =.9, log_file=None, network_socket=None):
+    def __init__(self, initial_state, sut, temp, quantile =.9, log_file=None, network_socket=None):
         Annealer.__init__(self, initial_state)
-        self.objective_function = ObjectiveFunction(sut, temp, quantile, network_socket)
+        self.objective_function = ObjectiveFunction(sut= sut,
+                                                    log_file=log_file,
+                                                    max_temperature=temp,
+                                                    quantile=quantile,
+                                                    socket_connect=network_socket)
         self._log_file = log_file
         self._write_log_header()
         self._quantile = quantile
-
-        self.iteration = 0  # Just for logging purposes
-        self.t_start = t_start
 
     def move(self):
         self.state = self.state.neighbour_define()
 
     def energy(self):
 
-        self.iteration += 1
         times = self.objective_function(self.state)
         score = 1/mquantiles(times, self._quantile)[0]
-
-        if self._log_file:
-            self._log_data(self.iteration,
-                           int(time() - self.t_start),
-                           self.objective_function.best_score,
-                           mquantiles(times, self._quantile )[0],
-                           times)
 
         return score
 
@@ -498,23 +511,6 @@ class DefineAnneal(Annealer):
         """
         with open(self._log_file, 'a') as data_file:
             d = "Iter\t\t\tTime\t\t\tMax\t\t\tCur\t\t\t\tTimes\n"
-            data_file.write(d)
-
-    def _log_data(self, iterations, tuning_time, max_value, cur_value, times):
-        """
-        Log the maximum time found after time to determine "convergence" speed
-        :param iterations: Total number of iterations so far
-        :param tuning_time: The time the record was made
-        :param max_value: The maximum value detected so far
-        :param cur_value: The value found with the current config
-        :param times: A list of execution times that was received this time
-        """
-        with open(self._log_file, 'a') as data_file:
-            d = str(iterations) + "\t\t\t" + \
-                str(tuning_time) + "\t\t\t" + \
-                str("{0:.4f}".format(max_value)) + "\t\t\t" + \
-                str("{0:.4f}".format(cur_value)) + "\t\t" + \
-                str(times) + "\n"
             data_file.write(d)
 
 
@@ -562,23 +558,6 @@ class Optimization:
             d = "Iter\t\t\tTime\t\t\tMax\t\t\tCur\t\t\n"
             data_file.write(d)
 
-    def _log_data(self, iterations, tuning_time, max_value, cur_value, times):
-        """
-        Log the maximum time found after time to determine "convergence" speed
-        :param iterations: Total number of iterations so far
-        :param tuning_time: The time the record was made
-        :param max_value: The maximum value detected so far
-        :param cur_value: The value found with the current config
-        :param times: A list of execution times that was received this time
-        """
-        with open(self._log_file, 'a') as data_file:
-            d = str(iterations) + "\t\t\t" + \
-                str(tuning_time) + "\t\t\t" + \
-                str("{0:.4f}".format(max_value)) + "\t\t\t" + \
-                str("{0:.4f}".format(cur_value)) + "\t\t" + \
-                str(times) + "\n"
-            data_file.write(d)
-
     @staticmethod
     def kirkpatrick_cooling(start_temp, alpha):
         temp = start_temp
@@ -595,21 +574,18 @@ class Optimization:
 
     def inner_random(self, enemy_config):
 
-        objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._quantile, self._socket)
+        objective_function = ObjectiveFunction(sut=self._sut,
+                                               log_file=self._log_file,
+                                               max_temperature=self._max_temperature,
+                                               quantile=self._quantile,
+                                               socket_connect=self._socket)
 
         num_evaluations = 1
 
         while num_evaluations < self._inner_iterations:
             enemy_config.random_set_all_defines()
-            times = objective_function(enemy_config)
-            next_inner_score = mquantiles(times, self._quantile)[0]
+            objective_function(enemy_config)
             num_evaluations += 1
-
-            self._log_data(num_evaluations,
-                           int(time() - self._t_start),
-                           objective_function.best_score,
-                           next_inner_score,
-                           times)
 
         best_mapping = objective_function.best_mapping
         best_score = objective_function.best_score
@@ -618,7 +594,11 @@ class Optimization:
 
     def inner_hill_climb(self, enemy_config):
 
-        objective_function = ObjectiveFunction(self._sut, self._max_temperature,self._quantile,  self._socket)
+        objective_function = ObjectiveFunction(sut=self._sut,
+                                               log_file=self._log_file,
+                                               max_temperature=self._max_temperature,
+                                               quantile=self._quantile,
+                                               socket_connect=self._socket)
 
         current_config = enemy_config
         current_score = mquantiles(objective_function(enemy_config), self._quantile)[0]
@@ -637,12 +617,6 @@ class Optimization:
                 current_config = next_config
                 current_score = next_score
 
-            self._log_data(num_evaluations,
-                           int(time() - self._t_start),
-                           objective_function.best_score,
-                           next_score,
-                           times)
-
         best_mapping = objective_function.best_mapping
         best_score = objective_function.best_score
 
@@ -654,7 +628,6 @@ class Optimization:
                                     quantile=self._quantile,
                                     sut=self._sut,
                                     temp=self._max_temperature,
-                                    t_start=self._t_start,
                                     log_file= self._log_file,
                                     network_socket=self._socket
                                     )
@@ -669,7 +642,11 @@ class Optimization:
 
     def inner_bo(self, enemy_config, kappa_val=6):
 
-        objective_function = ObjectiveFunction(self._sut, self._max_temperature, self._quantile, self._socket)
+        objective_function = ObjectiveFunction(sut=self._sut,
+                                               log_file=self._log_file,
+                                               max_temperature=self._max_temperature,
+                                               quantile=self._quantile,
+                                               socket_connect=self._socket)
         config = enemy_config
 
         # Devide the evaluations for each core
@@ -695,7 +672,11 @@ class Optimization:
 
         t_end = time() + 60 * max_time
 
-        objective_function = ObjectiveFunction(self._sut, self._max_temperature,self._quantile, self._socket)
+        objective_function = ObjectiveFunction(sut=self._sut,
+                                               log_file=self._log_file,
+                                               max_temperature=self._max_temperature,
+                                               quantile=self._quantile,
+                                               socket_connect=self._socket)
 
         current_config = enemy_config
         objective_function(enemy_config)
@@ -722,12 +703,12 @@ class Optimization:
             with open(self._log_file, 'a') as data_file:
                 d = "Finishing outer loop " + str(num_evaluations) + \
                     " best score " + str(objective_function.best_score) + \
-                    " rechecked times " + str(rechecked_times) + "\n"
+                    " rechecked times " + str(rechecked_times) + "\n" + \
+                    " Total time so far " + str(time()-self._t_start)
                 data_file.write(d)
                 data_file.write(str(best_inner_config))
 
             num_evaluations += 1
-
 
         best_score = objective_function.best_score
         best_mapping = objective_function.best_mapping
@@ -739,7 +720,11 @@ class Optimization:
         t_end = time() + 60 * max_time
 
         # wrap the objective function (so we record the best)
-        objective_function = ObjectiveFunction(self._sut, self._max_temperature,self._quantile, self._socket)
+        objective_function = ObjectiveFunction(sut=self._sut,
+                                               log_file=self._log_file,
+                                               max_temperature=self._max_temperature,
+                                               quantile=self._quantile,
+                                               socket_connect=self._socket)
 
         # Initialise SA
         current_outer_config = enemy_config.random_set_all()
@@ -778,7 +763,8 @@ class Optimization:
                 with open(self._log_file, 'a') as data_file:
                     d = "Finishing outer loop " + str(num_evaluations) +\
                         " best score " + str(objective_function.best_score) + \
-                        " rechecked times " + str(rechecked_times) + "\n"
+                        " rechecked times " + str(rechecked_times) + "\n" + \
+                        " Total time so far " + str(time()-self._t_start)
                     data_file.write(d)
                     data_file.write(str(best_inner_config))
 
