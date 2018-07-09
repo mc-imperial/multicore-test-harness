@@ -683,7 +683,7 @@ class Optimization:
 
         num_evaluations = 1
 
-        while num_evaluations < max_evaluations or time() > t_end:
+        while num_evaluations < max_evaluations and time() < t_end:
             current_config.random_set_all_templates()
 
             # The inner tune part
