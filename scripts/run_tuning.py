@@ -653,6 +653,8 @@ class Optimization:
         init_pts = 5
         iterations = int(self._inner_iterations/config.enemy_cores - init_pts)
 
+        assert iterations > 0, "Bayesian optimization needs more iterations to work"
+
         for core in range(config.enemy_cores):
             objective_function.optimized_core = core
             objective_function.stored_mapping = config
