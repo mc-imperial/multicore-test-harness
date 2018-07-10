@@ -483,7 +483,7 @@ class ObjectiveFunction:
 
 
 class DefineAnneal(Annealer):
-    def __init__(self, initial_state, sut, temp, quantile =.9, log_file=None, network_socket=None):
+    def __init__(self, initial_state, sut, temp, exit_time, quantile =.9, log_file=None, network_socket=None):
         Annealer.__init__(self, initial_state)
         self.objective_function = ObjectiveFunction(sut= sut,
                                                     log_file=log_file,
@@ -493,6 +493,7 @@ class DefineAnneal(Annealer):
         self._log_file = log_file
         self._write_log_header()
         self._quantile = quantile
+        self._exit_time = exit_time
 
     def move(self):
         self.state = self.state.neighbour_define()
@@ -501,6 +502,8 @@ class DefineAnneal(Annealer):
 
         times = self.objective_function(self.state)
         score = 1/mquantiles(times, self._quantile)[0]
+        if time > self._exit_time:
+            self.user_exit = True
 
         return score
 
@@ -524,6 +527,7 @@ class Optimization:
                  max_temperature=80,
                  quantile=.9,
                  inner_iterations=2000,
+                 max_time=60,
                  network_socket=None):
         """
         Create an Optimization object
@@ -536,9 +540,10 @@ class Optimization:
         self._max_temperature = max_temperature
         self._inner_iterations = inner_iterations
 
-        self._quantile=quantile
+        self._quantile = quantile
 
         self._t_start = time()
+        self._t_end = time() + 60 * max_time
 
         self._socket = network_socket
 
@@ -582,7 +587,7 @@ class Optimization:
 
         num_evaluations = 1
 
-        while num_evaluations < self._inner_iterations:
+        while num_evaluations < self._inner_iterations and time() < self._t_end:
             enemy_config.random_set_all_defines()
             objective_function(enemy_config)
             num_evaluations += 1
@@ -605,7 +610,7 @@ class Optimization:
 
         num_evaluations = 1
 
-        while num_evaluations < self._inner_iterations:
+        while num_evaluations < self._inner_iterations and time() < self._t_end:
 
             next_config = current_config.neighbour_define()
 
@@ -628,6 +633,7 @@ class Optimization:
                                     quantile=self._quantile,
                                     sut=self._sut,
                                     temp=self._max_temperature,
+                                    exit_time=self._t_end,
                                     log_file= self._log_file,
                                     network_socket=self._socket
                                     )
@@ -662,7 +668,10 @@ class Optimization:
 
             bo = BayesianOptimization(objective_function.bo_call, data_range, verbose=0)
             bo.init(init_points=init_pts)
-            bo.maximize(n_iter=iterations, kappa=kappa_val)
+            it = 1
+            while it < iterations and time() < self._t_end:
+                bo.maximize(n_iter=1, kappa=kappa_val)
+                it += 1
 
             config.enemies[core].set_defines(bo.res['max']['max_params'])
 
@@ -672,7 +681,7 @@ class Optimization:
 
     def outer_random(self, enemy_config, inner_tune,  max_evaluations=100, max_time=720):
 
-        t_end = time() + 60 * max_time
+
 
         objective_function = ObjectiveFunction(sut=self._sut,
                                                log_file=self._log_file,
@@ -685,7 +694,7 @@ class Optimization:
 
         num_evaluations = 1
 
-        while num_evaluations < max_evaluations and time() < t_end:
+        while num_evaluations < max_evaluations and time() < self._t_end:
             current_config.random_set_all_templates()
 
             # The inner tune part
@@ -717,9 +726,8 @@ class Optimization:
 
         return best_score, best_mapping
 
-    def outer_anneal(self, enemy_config, inner_tune, max_evaluations=100, max_time=720, outer_temp=100, outer_alpha=0.8):
+    def outer_anneal(self, enemy_config, inner_tune, max_evaluations=100, outer_temp=100, outer_alpha=0.8):
 
-        t_end = time() + 60 * max_time
 
         # wrap the objective function (so we record the best)
         objective_function = ObjectiveFunction(sut=self._sut,
@@ -739,11 +747,11 @@ class Optimization:
         for outer_temperature in outer_cooling_schedule:
             done = False
 
-            if time() > t_end:
+            if time() > self._t_end:
                 break
 
             for next_outer_config in current_outer_config.neighbour_template():
-                if num_evaluations >= max_evaluations or time() > t_end:
+                if num_evaluations >= max_evaluations or time() > self._t_end:
                     done = True
                     break
 
