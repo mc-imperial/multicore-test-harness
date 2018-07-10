@@ -502,7 +502,7 @@ class DefineAnneal(Annealer):
 
         times = self.objective_function(self.state)
         score = 1/mquantiles(times, self._quantile)[0]
-        if time > self._exit_time:
+        if time() > self._exit_time:
             self.user_exit = True
 
         return score
