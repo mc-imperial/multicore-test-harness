@@ -974,18 +974,17 @@ class Tuning:
                           max_temperature=self._max_temperature,
                           quantile=self._quantile,
                           inner_iterations=self._inner_iterations,
+                          max_time=self._training_time,
                           network_socket=self._socket)
 
         if outer_tune_method == "ran":
             best_state, best_score = sa.outer_random(
                 enemy_config=self._enemy_config,
-                inner_tune=inner_tune_method,
-                max_time=self._training_time)
+                inner_tune=inner_tune_method)
         elif outer_tune_method == "sa":
             best_state, best_score = sa.outer_anneal(
                 enemy_config=self._enemy_config,
-                inner_tune=inner_tune_method,
-                max_time=self._training_time)
+                inner_tune=inner_tune_method)
         else:
             print("I do not know how to bilevel train that way")
             sys.exit(0)
@@ -1009,6 +1008,7 @@ class Tuning:
                           max_temperature=self._max_temperature,
                           quantile=self._quantile,
                           inner_iterations=self._inner_iterations,
+                          max_time=self._training_time,
                           network_socket=self._socket)
         if tune_method == "ran":
             best_state, best_score = sa.inner_random(self._enemy_config)
