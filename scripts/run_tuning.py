@@ -509,7 +509,6 @@ class DefineAnneal(Annealer):
                                                     quantile=quantile,
                                                     socket_connect=network_socket)
         self._log_file = log_file
-        self._write_log_header()
         self._quantile = quantile
         self._exit_time = exit_time
 
