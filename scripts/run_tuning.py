@@ -447,7 +447,7 @@ class ObjectiveFunction:
 
         with open(self._log_file, 'a') as data_file:
             d = str(self.iteration) + "\t\t\t" + \
-                str(time() - self._t_start) + "\t\t\t" + \
+                str("{0:.0f}".format(time() - self._t_start)) + "\t\t\t" + \
                 str("{0:.4f}".format(self.best_score)) + "\t\t\t" + \
                 str("{0:.4f}".format(mquantiles(times, self._quantile)[0])) + "\t\t" + \
                 str(times) + "\n"
