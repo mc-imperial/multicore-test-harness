@@ -234,7 +234,7 @@ class EnemyConfiguration:
         # If this variable is true, the template across all enemies
         self.fixed_template = False
         # If this variable is true, all templates have the same parameters
-        self._same_defines = False
+        self.same_defines = False
 
         self.random_set_all()
 
@@ -263,7 +263,7 @@ class EnemyConfiguration:
         :param same_defines: Boolean variable
         :return:
         """
-        self._same_defines = same_defines
+        self.same_defines = same_defines
 
     def neighbour_template(self):
         """
@@ -287,9 +287,16 @@ class EnemyConfiguration:
         """
         A generator for configs with different defines
         """
-        enemy = randrange(self.enemy_cores)
-        temp = deepcopy(self)
-        temp.enemies[enemy] = self.enemies[enemy].neighbour()
+        if self.same_defines:
+            temp = deepcopy(self)
+            temp.enemies[0].neighbour()
+            defines = temp.enemies[0].get_defines()
+            for i in range(1, temp.enemy_cores):
+                temp.enemies[i].set_define(defines)
+        else:
+            enemy = randrange(self.enemy_cores)
+            temp = deepcopy(self)
+            temp.enemies[enemy] = self.enemies[enemy].neighbour()
         return temp
 
     def set_all_templates(self, t_file, t_data_file):
@@ -320,7 +327,7 @@ class EnemyConfiguration:
         Randomly instantiate the parameters of the enemy
         :return:
         """
-        if self._same_defines:
+        if self.same_defines:
             self.enemies[0].random_instantiate_defines()
             defines = self.enemies[0].get_defines()
             for i in range(1, self.enemy_cores):
@@ -419,7 +426,11 @@ class ObjectiveFunction:
         for key in kwargs:
             def_param[key] = kwargs[key]
 
-        self.stored_mapping.enemies[self.optimized_core] .set_defines(def_param)
+        if self.stored_mapping.same_defines:
+            for i in range(self.stored_mapping.enemy_cores):
+                self.stored_mapping.enemies[i].set_defines(def_param)
+        else:
+            self.stored_mapping.enemies[self.optimized_core].set_defines(def_param)
         return mquantiles(self.__call__(self.stored_mapping), self._quantile)
 
     def _log_data(self, times):
@@ -657,31 +668,43 @@ class Optimization:
 
         # Devide the evaluations for each core
         init_pts = 5
-        iterations = int(self._inner_iterations/config.enemy_cores - init_pts)
-
-        assert iterations > 0, "Bayesian optimization needs more iterations to work"
-
-        for core in range(config.enemy_cores):
-            objective_function.optimized_core = core
+        if config.same_defines:
+            iterations = self._inner_iterations
+            assert iterations > 0, "Bayesian optimization needs more iterations to work"
             objective_function.stored_mapping = config
-            data_range = config.enemies[core].get_defines_range()
-
+            data_range = config.enemies[0].get_defines_range()
             bo = BayesianOptimization(objective_function.bo_call, data_range, verbose=0)
             bo.init(init_points=init_pts)
+            bo.maximize(n_iter=1, kappa=kappa_val)
             it = 1
             while it < iterations and time() < self._t_end:
                 bo.maximize(n_iter=1, kappa=kappa_val)
                 it += 1
+            for core in range(config.enemy_cores):
+                config.enemies[core].set_defines(bo.res['max']['max_params'])
+        else:
+            iterations = int(self._inner_iterations/config.enemy_cores - init_pts)
+            assert iterations > 0, "Bayesian optimization needs more iterations to work"
 
-            config.enemies[core].set_defines(bo.res['max']['max_params'])
+            for core in range(config.enemy_cores):
+                objective_function.optimized_core = core
+                objective_function.stored_mapping = config
+                data_range = config.enemies[core].get_defines_range()
+
+                bo = BayesianOptimization(objective_function.bo_call, data_range, verbose=0)
+                bo.init(init_points=init_pts)
+                bo.maximize(n_iter=1, kappa=kappa_val)
+                it = 1
+                while it < iterations and time() < self._t_end:
+                    bo.maximize(n_iter=1, kappa=kappa_val)
+                    it += 1
+                config.enemies[core].set_defines(bo.res['max']['max_params'])
 
         best_score = objective_function.best_score
 
         return config, best_score
 
-    def outer_random(self, enemy_config, inner_tune,  max_evaluations=100, max_time=720):
-
-
+    def outer_random(self, enemy_config, inner_tune,  max_evaluations=100):
 
         objective_function = ObjectiveFunction(sut=self._sut,
                                                log_file=self._log_file,
@@ -900,6 +923,7 @@ class Tuning:
             enemy_template = str(json_object["enemy_template"])
             enemy_range = str(json_object["enemy_range"])
             self._enemy_config.set_all_templates(enemy_template, enemy_range)
+            self._enemy_config.set_same_defines(True)
         except KeyError:
             pass
 

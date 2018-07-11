@@ -1,14 +1,50 @@
 {
+  "mem_fuzz_train": {
+    "sut": "../bin/sut/mem_thrashing_test",
+    "template_data": "../templates/mem_thrashing/parameters.json",
+    "template_file": "../templates/mem_thrashing/template_mem_thrashing.c",
+    "cores": 3,
+    "method":"ran",
+    "log_file": "../results/mem_fuzz_log.txt",
+    "max_file": "../results/mem_fuzz_max.txt",
+    "training_time": 10,
+    "inner_iterations": 2000,
+    "max_temperature": 80
+  },
+  "mem_hc_train": {
+    "sut": "../bin/sut/mem_thrashing_test",
+    "template_data": "../templates/mem_thrashing/parameters.json",
+    "template_file": "../templates/mem_thrashing/template_mem_thrashing.c",
+    "cores": 3,
+    "method":"hc",
+    "log_file": "../results/mem_hc_log.txt",
+    "max_file": "../results/mem_hc_max.txt",
+    "training_time": 10,
+    "inner_iterations": 2000,
+    "max_temperature": 80
+  },
   "mem_sa_train": {
     "sut": "../bin/sut/mem_thrashing_test",
     "template_data": "../templates/mem_thrashing/parameters.json",
     "template_file": "../templates/mem_thrashing/template_mem_thrashing.c",
     "cores": 3,
     "method":"sa",
-    "log_file": "../results/mem_fuzz_log.txt",
-    "max_file": "../results/mem_fuzz_max.txt",
-    "training_time": 240,
+    "log_file": "../results/mem_sa_log.txt",
+    "max_file": "../results/mem_sa_max.txt",
+    "training_time": 10,
     "inner_iterations": 2000,
-    "max_temperature": 70
+    "max_temperature": 80
+  },
+  "mem_bo_train": {
+    "sut": "../bin/sut/mem_thrashing_test",
+    "template_data": "../templates/mem_thrashing/parameters.json",
+    "template_file": "../templates/mem_thrashing/template_mem_thrashing.c",
+    "cores": 3,
+    "method":"bo",
+    "log_file": "../results/mem_bo_log.txt",
+    "max_file": "../results/mem_bo_max.txt",
+    "training_time": 10,
+    "inner_iterations": 2000,
+    "max_temperature": 80
   }
 }
