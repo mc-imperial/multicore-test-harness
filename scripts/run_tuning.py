@@ -267,7 +267,7 @@ class EnemyConfiguration:
         if same_defines:
             defines = self.enemies[0].get_defines()
             for i in range(1, self.enemy_cores):
-                self.enemies[i].set_define(defines)
+                self.enemies[i].set_defines(defines)
 
     def neighbour_template(self):
         """
@@ -335,7 +335,7 @@ class EnemyConfiguration:
             self.enemies[0].random_instantiate_defines()
             defines = self.enemies[0].get_defines()
             for i in range(1, self.enemy_cores):
-                self.enemies[i].set_define(defines)
+                self.enemies[i].set_defines(defines)
         else:
             for i in range(self.enemy_cores):
                 self.enemies[i].random_instantiate_defines()
