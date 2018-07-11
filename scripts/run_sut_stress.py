@@ -165,7 +165,7 @@ class SutStress:
 
     def run_mapping(self, sut,
                     mapping,
-                    iterations=10,
+                    iterations=20,
                     max_temperature=50,
                     quantile=.9,
                     style=0,
