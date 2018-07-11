@@ -264,6 +264,10 @@ class EnemyConfiguration:
         :return:
         """
         self.same_defines = same_defines
+        if same_defines:
+            defines = self.enemies[0].get_defines()
+            for i in range(1, self.enemy_cores):
+                self.enemies[i].set_define(defines)
 
     def neighbour_template(self):
         """
