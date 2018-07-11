@@ -525,7 +525,6 @@ class DefineAnneal(Annealer):
         return score
 
 
-
 class Optimization:
     """
     Class for Optimization
@@ -556,7 +555,7 @@ class Optimization:
 
         self._socket = network_socket
 
-        self._write_log_header()
+
 
 
         # Delete old log files
@@ -564,6 +563,7 @@ class Optimization:
             os.remove(self._log_file)
         except OSError:
             pass
+        self._write_log_header()
 
     def _write_log_header(self):
         """
