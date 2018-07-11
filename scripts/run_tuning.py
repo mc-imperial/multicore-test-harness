@@ -292,7 +292,7 @@ class EnemyConfiguration:
             temp.enemies[0].neighbour()
             defines = temp.enemies[0].get_defines()
             for i in range(1, temp.enemy_cores):
-                temp.enemies[i].set_define(defines)
+                temp.enemies[i].set_defines(defines)
         else:
             enemy = randrange(self.enemy_cores)
             temp = deepcopy(self)
