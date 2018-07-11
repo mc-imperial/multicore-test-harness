@@ -7,6 +7,26 @@
     "PAGE_SIZE_BYTES": {
       "range" :[1,10000],
       "type": "int"
+    },
+    "INSTR1": {
+      "range" :[1,5],
+      "type": "int"
+    },
+    "INSTR2": {
+      "range" :[1,5],
+      "type": "int"
+    },
+    "INSTR3": {
+      "range" :[1,5],
+      "type": "int"
+    },
+    "INSTR4": {
+      "range" :[1,5],
+      "type": "int"
+    },
+    "INSTR5": {
+      "range": [1,5],
+      "type": "int"
     }
   }
 }

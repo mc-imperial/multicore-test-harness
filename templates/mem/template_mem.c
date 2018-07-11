@@ -45,6 +45,81 @@
 /** The total memory the it will try to allocate and thrash */
 #define MEM_SIZE        SIZE_MB * (MB)
 
+/** memset standard */
+#define MEMSET_NORMAL memset((void *)mem + offset, rand(), page_size)
+/** memset half page */
+#define MEMSET_HALF_PAGE memset((void *)mem + offset, rand(), page_size/2)
+/** memset half offset */
+#define MEMSET_HALF_OFFSET memset((void *)mem + offset/2, rand(), page_size/2)
+/** memset half */
+#define MEMSET_HALF memset((void *)mem + offset/2, rand(), page_size/2)
+
+/** 1st tunnable parameter */
+#if INSTR1 == 1
+#define INSTR1_V MEMSET_NORMAL 
+#elif INSTR1 == 2
+#define INSTR1_V MEMSET_HALF_PAGE
+#elif INSTR1 == 3
+#define INSTR1_V MEMSET_HALF_OFFSET
+#elif INSTR1 == 4
+#define INSTR1_V MEMSET_HALF
+#else
+#define INSTR1_V
+#endif
+
+
+/** 2st tunnable parameter */
+#if INSTR2 == 1
+#define INSTR2_V MEMSET_NORMAL 
+#elif INSTR2 == 2
+#define INSTR2_V MEMSET_HALF_PAGE
+#elif INSTR2 == 3
+#define INSTR2_V MEMSET_HALF_OFFSET
+#elif INSTR2 == 4
+#define INSTR2_V MEMSET_HALF
+#else
+#define INSTR2_V
+#endif
+
+/** 3st tunnable parameter */
+#if INSTR3 == 1
+#define INSTR3_V MEMSET_NORMAL 
+#elif INSTR3 == 2
+#define INSTR3_V MEMSET_HALF_PAGE
+#elif INSTR3 == 3
+#define INSTR3_V MEMSET_HALF_OFFSET
+#elif INSTR3 == 4
+#define INSTR3_V MEMSET_HALF
+#else
+#define INSTR3_V
+#endif
+
+
+/** 4st tunnable parameter */
+#if INSTR4 == 1
+#define INSTR4_V MEMSET_NORMAL 
+#elif INSTR4 == 2
+#define INSTR4_V MEMSET_HALF_PAGE
+#elif INSTR4 == 3
+#define INSTR4_V MEMSET_HALF_OFFSET
+#elif INSTR4 == 4
+#define INSTR4_V MEMSET_HALF
+#else
+#define INSTR4_V
+#endif
+
+/** 5st tunnable parameter */
+#if INSTR5 == 1
+#define INSTR5_V MEMSET_NORMAL 
+#elif INSTR5 == 2
+#define INSTR5_V MEMSET_HALF_PAGE
+#elif INSTR5 == 3
+#define INSTR5_V MEMSET_HALF_OFFSET
+#elif INSTR5 == 4
+#define INSTR5_V MEMSET_HALF
+#else
+#define INSTR5_V
+#endif
 
 /**
  @brief this main func
@@ -71,7 +146,12 @@ int main ()
 		size_t chunk = rand() % chunks;
 		size_t offset = chunk * page_size;
 
-		memset((void *)mem + offset, rand(), page_size);
+        INSTR1_V;
+        INSTR2_V;
+        INSTR3_V;
+        INSTR4_V;
+        INSTR5_V;
+
 
 	}
 
