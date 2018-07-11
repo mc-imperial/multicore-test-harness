@@ -6,8 +6,8 @@
     "cores": 3,
     "method":"ran",
     "quantile": 0.9,
-    "log_file": "../results/mem_fuzz_log.txt",
-    "max_file": "../results/mem_fuzz_max.txt",
+    "log_file": "../results_short/mem_fuzz_log.txt",
+    "max_file": "../results_short/mem_fuzz_max.txt",
     "training_time": 10,
     "inner_iterations": 2000,
     "max_temperature": 80
@@ -19,8 +19,8 @@
     "cores": 3,
     "method":"hc",
     "quantile": 0.9,
-    "log_file": "../results/mem_hc_log.txt",
-    "max_file": "../results/mem_hc_max.txt",
+    "log_file": "../results_short/mem_hc_log.txt",
+    "max_file": "../results_short/mem_hc_max.txt",
     "training_time": 10,
     "inner_iterations": 2000,
     "max_temperature": 80
@@ -32,8 +32,8 @@
     "cores": 3,
     "method":"sa",
     "quantile": 0.9,
-    "log_file": "../results/mem_sa_log.txt",
-    "max_file": "../results/mem_sa_max.txt",
+    "log_file": "../results_short/mem_sa_log.txt",
+    "max_file": "../results_short/mem_sa_max.txt",
     "training_time": 10,
     "inner_iterations": 2000,
     "max_temperature": 80
@@ -45,8 +45,8 @@
     "cores": 3,
     "method":"bo",
     "quantile": 0.9,
-    "log_file": "../results/mem_bo_log.txt",
-    "max_file": "../results/mem_bo_max.txt",
+    "log_file": "../results_short/mem_bo_log.txt",
+    "max_file": "../results_short/mem_bo_max.txt",
     "training_time": 10,
     "inner_iterations": 2000,
     "max_temperature": 80

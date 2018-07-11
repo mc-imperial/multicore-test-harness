@@ -442,6 +442,9 @@ class ObjectiveFunction:
         Log the maximum time found after time to determine "convergence" speed
         :param times: A list of execution times that was received this time
         """
+
+        self.iteration += 1
+
         with open(self._log_file, 'a') as data_file:
             d = str(self.iteration) + "\t\t\t" + \
                 str(time() - self._t_start) + "\t\t\t" + \
@@ -522,14 +525,6 @@ class DefineAnneal(Annealer):
 
         return score
 
-    def _write_log_header(self):
-        """
-        Write the log file header
-        :return:
-        """
-        with open(self._log_file, 'a') as data_file:
-            d = "Iter\t\t\tTime\t\t\tMax\t\t\tCur\t\t\t\tTimes\n"
-            data_file.write(d)
 
 
 class Optimization:
@@ -561,6 +556,8 @@ class Optimization:
         self._t_end = time() + 60 * max_time
 
         self._socket = network_socket
+
+        self._write_log_header()
 
 
         # Delete old log files
