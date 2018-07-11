@@ -2,7 +2,7 @@
   "mem_fuzz_train": {
     "sut": "../bin/sut/mem_thrashing_test",
     "enemy_range": "../templates/mem/parameters.json",
-    "enemy_template": "../templates/mem/template_mem_thrashing.c",
+    "enemy_template": "../templates/mem/template_mem.c",
     "cores": 3,
     "method":"ran",
     "quantile": 0.9,
@@ -15,7 +15,7 @@
   "mem_hc_train": {
     "sut": "../bin/sut/mem_thrashing_test",
     "enemy_range": "../templates/mem/parameters.json",
-    "enemy_template": "../templates/mem/template_mem_thrashing.c",
+    "enemy_template": "../templates/mem/template_mem.c",
     "cores": 3,
     "method":"hc",
     "quantile": 0.9,
@@ -28,7 +28,7 @@
   "mem_sa_train": {
     "sut": "../bin/sut/mem_thrashing_test",
     "enemy_range": "../templates/mem/parameters.json",
-    "enemy_template": "../templates/mem/template_mem_thrashing.c",
+    "enemy_template": "../templates/mem/template_mem.c",
     "cores": 3,
     "method":"sa",
     "quantile": 0.9,
@@ -41,7 +41,7 @@
   "mem_bo_train": {
     "sut": "../bin/sut/mem_thrashing_test",
     "enemy_range": "../templates/mem/parameters.json",
-    "enemy_template": "../templates/mem/template_mem_thrashing.c",
+    "enemy_template": "../templates/mem/template_mem.c",
     "cores": 3,
     "method":"bo",
     "quantile": 0.9,
