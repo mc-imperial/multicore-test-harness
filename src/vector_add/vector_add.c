@@ -32,7 +32,7 @@ int main() {
     end = clock();
     diffs = (end - start)/(double)CLOCKS_PER_SEC;
 
-    printf("time = %lf\n",diffs);
+    printf("time(ns)=%lf\n",diffs*1000000);
 
     free(a);
     free(b);
