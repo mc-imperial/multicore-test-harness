@@ -58,7 +58,10 @@ int main ()
     int32_t *mem2;
 
     srand(time(NULL));
-
+    mem1 = (int32_t*) malloc(MEM_SIZE);
+    DIE ( mem1 == NULL, "Unable to allocate memory\n");
+    mem2 = (int32_t*) malloc(MEM_SIZE);
+    DIE ( mem2 == NULL, "Unable to allocate memory\n");
 
     begin = get_current_time_us();
 
@@ -69,16 +72,13 @@ int main ()
     for(int i = 0; i < ITERATIONS; i++)
     {
 #endif
-        mem1 = (int32_t*) malloc(MEM_SIZE);
-        DIE ( mem1 == NULL, "Unable to allocate memory\n");
         memset((int32_t *)mem1, rand(), MEM_SIZE);
-        mem2 = (int32_t*) malloc(MEM_SIZE);
-        DIE ( mem2 == NULL, "Unable to allocate memory\n");
         memset((int32_t *)mem2, rand(), MEM_SIZE);
         for (int32_t i; i < MEM_SIZE/sizeof(int32_t); i++) mem2[i] = mem1[i] + rand();
-        free(mem1);
-        free(mem2);
+
     }
+    free(mem1);
+    free(mem2);
 
     end = get_current_time_us();
     printf("total time(us): %ld\n", end - begin);
