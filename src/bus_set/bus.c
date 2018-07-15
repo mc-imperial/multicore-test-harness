@@ -39,7 +39,7 @@
 #include "../common/common.h"
 
 /** Wrap the code in a loop consisting of ITERATIONS iterations */
-#define ITERATIONS      25
+#define ITERATIONS      1
 
 /** Helper defines for memory allocation */
 #define MB              ((1) << 10) << 10
