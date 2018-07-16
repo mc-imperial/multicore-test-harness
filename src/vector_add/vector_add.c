@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-static size_t MM = 90000000;
+static size_t MM = 900000;
 
 void add(double * restrict a, double * restrict b, double * restrict c, size_t n){
     size_t i;

@@ -1,0 +1,46 @@
+{
+  "L2_joule": {
+    "sut": "../bin/sut/vector_add_test" ,
+    "mapping": {
+      "1" : "../demo/L2_joule",
+      "2" : "../demo/L2_joule",
+      "3" : "../demo/L2_joule"
+    },
+    "cores": 3,
+    "iterations": 100,
+    "max_temperature": 80
+  },
+  "L2_pi": {
+    "sut": "../bin/sut/vector_add_test" ,
+    "mapping": {
+      "1" : "../demo/L2_rpi",
+      "2" : "../demo/L2_rpi",
+      "3" : "../demo/L2_rpi"
+    },
+    "cores": 3,
+    "iterations": 100,
+    "max_temperature": 80
+  },
+  "L2_joule_tuned": {
+    "sut": "../bin/sut/vector_add_test" ,
+    "mapping": {
+      "1" : "../demo/L2_joule_tuned",
+      "2" : "../demo/L2_joule_tuned",
+      "3" : "../demo/L2_joule_tuned"
+    },
+    "cores": 3,
+    "iterations": 100,
+    "max_temperature": 80
+  },
+    "L2_pi_tuned": {
+    "sut": "../bin/sut/vector_add_test" ,
+    "mapping": {
+      "1" : "../demo/L2_pi_tuned",
+      "2" : "../demo/L2_pi_tuned",
+      "3" : "../demo/L2_pi_tuned"
+    },
+    "cores": 3,
+    "iterations": 100,
+    "max_temperature": 80
+  }
+}
