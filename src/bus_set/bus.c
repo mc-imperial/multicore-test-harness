@@ -45,7 +45,7 @@
 #define MB              ((1) << 10) << 10
 
 /** The total memory the it will try to allocate and thrash */
-#define MEM_SIZE        50 * (MB)
+#define MEM_SIZE        5 * (MB)
 
 /**
  @brief this main func
