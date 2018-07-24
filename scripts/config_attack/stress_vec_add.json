@@ -35,9 +35,9 @@
     "L2_pi_tuned": {
     "sut": "../bin/sut/vector_add_test" ,
     "mapping": {
-      "1" : "../demo/L2_pi_tuned",
-      "2" : "../demo/L2_pi_tuned",
-      "3" : "../demo/L2_pi_tuned"
+      "1" : "../demo/L2_rpi_tuned",
+      "2" : "../demo/L2_rpi_tuned",
+      "3" : "../demo/L2_rpi_tuned"
     },
     "cores": 3,
     "iterations": 100,
