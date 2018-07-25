@@ -1,0 +1,15 @@
+{
+  "mem_bo_train": {
+    "sut": "../bin/sut/mem_thrashing_test",
+    "enemy_range": "../templates/mem/parameters.json",
+    "enemy_template": "../templates/mem/template_mem.c",
+    "cores": 3,
+    "method":"bo",
+    "quantile": 0.9,
+    "log_file": "../results_litmus/mem_bo_480_log.txt",
+    "max_file": "../results_litmus/mem_bo_480_max.txt",
+    "training_time": 480,
+    "inner_iterations": 200000,
+    "max_temperature": 80
+  }
+}
