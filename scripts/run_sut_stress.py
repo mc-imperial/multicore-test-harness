@@ -242,7 +242,7 @@ class SutStress:
                 break
 
             # It sometimes happens that we never get the desired confidence interval
-            if len(total_times) > 200:
+            if len(total_times) > 100:
                 break
 
         print(total_times)
