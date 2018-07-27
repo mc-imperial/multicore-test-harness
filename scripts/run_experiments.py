@@ -395,10 +395,12 @@ class Experiment(object):
                                                         max_temperature=self._max_temperature)
 
                 results = dict()
-                c = [p for p in itertools.product(self._ranked_list, repeat=self._cores[0])]
+                total_cores = self._cores[0]
+                c = [p for p in itertools.product(self._ranked_list, repeat=total_cores)]
                 conf_mapping = dict()
+
                 for conf in c:
-                    for core in range(1, self._cores + 1):
+                    for core in range(1, total_cores + 1):
                         conf_mapping[core] = conf[core - 1]
 
                     (time_list_enemy, _) = s.run_mapping(sut=self._sut[0],
@@ -410,7 +412,7 @@ class Experiment(object):
 
                 output[experiment] = self._log_data3(self._sut,
                                         str(self._ranked_list),
-                                        self._cores,
+                                        total_cores,
                                         time_list_baseline,
                                         results,
                                         )
