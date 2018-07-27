@@ -283,10 +283,8 @@ class Experiment(object):
         time_array = np.asarray(time_list_baseline)
         data['time_list_baseline_avg'] = time_array.mean()
 
-        sorted_by_value = sorted(dict_mappings.items(), key=lambda kv: kv[1])
+        sorted_by_value = sorted(dict_mappings.items(), key=lambda kv: kv[1], reverse=False)
         data['ranked_list'] = sorted_by_value
-
-
 
         return data
 
