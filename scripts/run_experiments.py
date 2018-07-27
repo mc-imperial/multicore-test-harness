@@ -30,6 +30,7 @@ import numpy as np
 import time
 import os
 from copy import deepcopy
+import itertools
 
 from run_sut_stress import SutStress
 
@@ -47,6 +48,7 @@ class Experiment(object):
         self._sut = []
         self._stress = []
         self._mapping = None
+        self._ranked_list = None
         self._cores = []
         self._iterations = None
         self._temp = None
@@ -86,6 +88,8 @@ class Experiment(object):
                 raise KeyError
         elif "mapping" in json_object:
             self._mapping = json_object['mapping']
+        elif "ranked_list" in json_object:
+            self._ranked_list = json_object['ranked_list']
         else:
             raise ValueError("No stress or mapping given")
 
@@ -258,6 +262,34 @@ class Experiment(object):
 
         return data
 
+    def _log_data3(self, sut, stress, cores, time_list_baseline, dict_mappings):
+        """
+        Stores the time list, temp list, average time, average temp and std time and std temp
+        in a dictionary
+        :param sut: System under stress
+        :param stress: Enemy process
+        :param cores: Number of enemy cores
+        :param time_list_baseline: A list with all the execution times
+        :param dict_mappings: Dict with enemies and averages
+        :return: A dictionary with all the data
+        """
+        data = dict()
+
+        data['sut'] = sut
+        data['stress'] = stress
+        data['cores'] = cores
+        data['iterations'] = self._iterations
+
+        time_array = np.asarray(time_list_baseline)
+        data['time_list_baseline_avg'] = time_array.mean()
+
+        sorted_by_value = sorted(dict_mappings.items(), key=lambda kv: kv[1])
+        data['ranked_list'] = sorted_by_value
+
+
+
+        return data
+
     def run(self, input_file, output_file):
         """
         Run the configured experiment
@@ -305,7 +337,7 @@ class Experiment(object):
                     json.dump(output, outfile, sort_keys=True, indent=4)
 
                 output.pop(experiment)
-            else:
+            elif self._stress:
 
                 gen = ((sut, stress, cores) for sut in self._sut
                                         for stress in self._stress
@@ -352,6 +384,41 @@ class Experiment(object):
                     output[experiment].pop(config_str)
 
                     config = config + 1
+                output.pop(experiment)
+
+            elif self._ranked_list:
+                s = SutStress()
+
+                (time_list_baseline, _) = s.run_mapping(sut=self._sut[0],
+                                                        mapping=dict(),
+                                                        iterations=self._iterations,
+                                                        max_temperature=self._max_temperature)
+
+                results = dict()
+                c = [p for p in itertools.product(self._ranked_list, repeat=self._cores[0])]
+                conf_mapping = dict()
+                for conf in c:
+                    for core in range(1, self._cores + 1):
+                        conf_mapping[core] = conf[core - 1]
+
+                    (time_list_enemy, _) = s.run_mapping(sut=self._sut[0],
+                                                         mapping=conf_mapping,
+                                                         iterations=self._iterations,
+                                                         max_temperature=self._max_temperature)
+
+                    results[conf_mapping] = np.asarray(time_list_enemy).mean()
+
+                output[experiment] = self._log_data3(self._sut,
+                                        str(self._ranked_list),
+                                        self._cores,
+                                        time_list_baseline,
+                                        results,
+                                        )
+                config_out_file = self._folder_name + experiment + ".json"
+
+                with open(config_out_file, 'w') as outfile:
+                    json.dump(output, outfile, sort_keys=True, indent=4)
+
                 output.pop(experiment)
 
         self.merge_docs(output_file)

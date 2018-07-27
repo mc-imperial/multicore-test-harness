@@ -1,0 +1,11 @@
+{
+  "cache_rank": {
+    "sut": "../bin/sut/L2_unified_test",
+    "ranked_list": ["../tuned_enemies/tuned_cache",
+                    "../tuned_enemies/tuned_bus",
+                    "../tuned_enemies/tuned_memory"],
+    "cores": 3,
+    "iterations": 10,
+    "max_temperature": 80
+  }
+}
