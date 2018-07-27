@@ -5,7 +5,7 @@
                     "../tuned_enemies/tuned_bus",
                     "../tuned_enemies/tuned_memory"],
     "cores": 3,
-    "iterations": 10,
+    "iterations": 20,
     "max_temperature": 80
   }
 }

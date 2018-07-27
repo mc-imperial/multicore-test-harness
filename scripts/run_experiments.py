@@ -408,7 +408,7 @@ class Experiment(object):
                                                          iterations=self._iterations,
                                                          max_temperature=self._max_temperature)
 
-                    results[conf_mapping] = np.asarray(time_list_enemy).mean()
+                    results[str(conf_mapping)] = np.asarray(time_list_enemy).mean()
 
                 output[experiment] = self._log_data3(self._sut,
                                         str(self._ranked_list),
