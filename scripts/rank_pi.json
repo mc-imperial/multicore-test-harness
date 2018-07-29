@@ -1,0 +1,359 @@
+{
+    "bus_rank": {
+        "cores": 3,
+        "iterations": 20,
+        "ranked_list": [
+            [
+                "{1: '../tuned_enemies/tuned_bus', 2: '../tuned_enemies/tuned_bus', 3: '../tuned_enemies/tuned_bus'}",
+                361896.825
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_bus', 2: '../tuned_enemies/tuned_cache', 3: '../tuned_enemies/tuned_bus'}",
+                392356.25
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_memory', 2: '../tuned_enemies/tuned_bus', 3: '../tuned_enemies/tuned_bus'}",
+                395610.95
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_bus', 2: '../tuned_enemies/tuned_bus', 3: '../tuned_enemies/tuned_memory'}",
+                396122.2
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_bus', 2: '../tuned_enemies/tuned_bus', 3: '../tuned_enemies/tuned_cache'}",
+                397952.1
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_bus', 2: '../tuned_enemies/tuned_memory', 3: '../tuned_enemies/tuned_bus'}",
+                400241.7
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_cache', 2: '../tuned_enemies/tuned_bus', 3: '../tuned_enemies/tuned_bus'}",
+                403219.55
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_memory', 2: '../tuned_enemies/tuned_bus', 3: '../tuned_enemies/tuned_memory'}",
+                438511.075
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_memory', 2: '../tuned_enemies/tuned_cache', 3: '../tuned_enemies/tuned_bus'}",
+                446671.55
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_memory', 2: '../tuned_enemies/tuned_bus', 3: '../tuned_enemies/tuned_cache'}",
+                447372.45
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_bus', 2: '../tuned_enemies/tuned_cache', 3: '../tuned_enemies/tuned_memory'}",
+                448192.55
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_bus', 2: '../tuned_enemies/tuned_memory', 3: '../tuned_enemies/tuned_memory'}",
+                449834.125
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_memory', 2: '../tuned_enemies/tuned_memory', 3: '../tuned_enemies/tuned_bus'}",
+                450862.325
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_bus', 2: '../tuned_enemies/tuned_memory', 3: '../tuned_enemies/tuned_cache'}",
+                462877.05
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_cache', 2: '../tuned_enemies/tuned_bus', 3: '../tuned_enemies/tuned_memory'}",
+                473065.35
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_cache', 2: '../tuned_enemies/tuned_memory', 3: '../tuned_enemies/tuned_bus'}",
+                482375.025
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_bus', 2: '../tuned_enemies/tuned_cache', 3: '../tuned_enemies/tuned_cache'}",
+                489764.4
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_cache', 2: '../tuned_enemies/tuned_cache', 3: '../tuned_enemies/tuned_bus'}",
+                497691.4
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_cache', 2: '../tuned_enemies/tuned_bus', 3: '../tuned_enemies/tuned_cache'}",
+                520777.825
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_memory', 2: '../tuned_enemies/tuned_memory', 3: '../tuned_enemies/tuned_memory'}",
+                548900.625
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_memory', 2: '../tuned_enemies/tuned_cache', 3: '../tuned_enemies/tuned_memory'}",
+                553356.375
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_memory', 2: '../tuned_enemies/tuned_memory', 3: '../tuned_enemies/tuned_cache'}",
+                573390.775
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_memory', 2: '../tuned_enemies/tuned_cache', 3: '../tuned_enemies/tuned_cache'}",
+                578784.925
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_cache', 2: '../tuned_enemies/tuned_memory', 3: '../tuned_enemies/tuned_memory'}",
+                647174.4
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_cache', 2: '../tuned_enemies/tuned_cache', 3: '../tuned_enemies/tuned_memory'}",
+                666027.375
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_cache', 2: '../tuned_enemies/tuned_memory', 3: '../tuned_enemies/tuned_cache'}",
+                821081.175
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_cache', 2: '../tuned_enemies/tuned_cache', 3: '../tuned_enemies/tuned_cache'}",
+                836745.3
+            ]
+        ],
+        "stress": "['../tuned_enemies/tuned_cache', '../tuned_enemies/tuned_bus', '../tuned_enemies/tuned_memory']",
+        "sut": [
+            "../bin/sut/bus_test"
+        ],
+        "time_list_baseline_avg": 272268.1
+    },
+    "cache_rank": {
+        "cores": 3,
+        "iterations": 20,
+        "ranked_list": [
+            [
+                "{1: '../tuned_enemies/tuned_bus', 2: '../tuned_enemies/tuned_bus', 3: '../tuned_enemies/tuned_bus'}",
+                575016.65
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_memory', 2: '../tuned_enemies/tuned_bus', 3: '../tuned_enemies/tuned_bus'}",
+                703961.95
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_bus', 2: '../tuned_enemies/tuned_bus', 3: '../tuned_enemies/tuned_memory'}",
+                709151.15
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_bus', 2: '../tuned_enemies/tuned_memory', 3: '../tuned_enemies/tuned_bus'}",
+                713331.175
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_cache', 2: '../tuned_enemies/tuned_bus', 3: '../tuned_enemies/tuned_bus'}",
+                790224.725
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_bus', 2: '../tuned_enemies/tuned_bus', 3: '../tuned_enemies/tuned_cache'}",
+                795652.175
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_memory', 2: '../tuned_enemies/tuned_bus', 3: '../tuned_enemies/tuned_memory'}",
+                800939.225
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_bus', 2: '../tuned_enemies/tuned_memory', 3: '../tuned_enemies/tuned_memory'}",
+                805693.5
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_bus', 2: '../tuned_enemies/tuned_cache', 3: '../tuned_enemies/tuned_bus'}",
+                808299.7
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_memory', 2: '../tuned_enemies/tuned_memory', 3: '../tuned_enemies/tuned_bus'}",
+                831479.6
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_memory', 2: '../tuned_enemies/tuned_bus', 3: '../tuned_enemies/tuned_cache'}",
+                885058.55
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_bus', 2: '../tuned_enemies/tuned_cache', 3: '../tuned_enemies/tuned_memory'}",
+                901767.2333333333
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_memory', 2: '../tuned_enemies/tuned_cache', 3: '../tuned_enemies/tuned_bus'}",
+                906327.5083333333
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_bus', 2: '../tuned_enemies/tuned_memory', 3: '../tuned_enemies/tuned_cache'}",
+                917979.7
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_cache', 2: '../tuned_enemies/tuned_bus', 3: '../tuned_enemies/tuned_memory'}",
+                918155.75
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_memory', 2: '../tuned_enemies/tuned_memory', 3: '../tuned_enemies/tuned_memory'}",
+                921574.325
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_cache', 2: '../tuned_enemies/tuned_memory', 3: '../tuned_enemies/tuned_bus'}",
+                943668.0833333334
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_memory', 2: '../tuned_enemies/tuned_cache', 3: '../tuned_enemies/tuned_memory'}",
+                1019805.725
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_memory', 2: '../tuned_enemies/tuned_memory', 3: '../tuned_enemies/tuned_cache'}",
+                1036557.675
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_cache', 2: '../tuned_enemies/tuned_cache', 3: '../tuned_enemies/tuned_bus'}",
+                1084266.25
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_cache', 2: '../tuned_enemies/tuned_memory', 3: '../tuned_enemies/tuned_memory'}",
+                1091740.45
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_bus', 2: '../tuned_enemies/tuned_cache', 3: '../tuned_enemies/tuned_cache'}",
+                1122604.825
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_cache', 2: '../tuned_enemies/tuned_bus', 3: '../tuned_enemies/tuned_cache'}",
+                1132853.4
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_memory', 2: '../tuned_enemies/tuned_cache', 3: '../tuned_enemies/tuned_cache'}",
+                1198902.15
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_cache', 2: '../tuned_enemies/tuned_cache', 3: '../tuned_enemies/tuned_memory'}",
+                1253836.675
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_cache', 2: '../tuned_enemies/tuned_memory', 3: '../tuned_enemies/tuned_cache'}",
+                1408132.575
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_cache', 2: '../tuned_enemies/tuned_cache', 3: '../tuned_enemies/tuned_cache'}",
+                1619215.675
+            ]
+        ],
+        "stress": "['../tuned_enemies/tuned_cache', '../tuned_enemies/tuned_bus', '../tuned_enemies/tuned_memory']",
+        "sut": [
+            "../bin/sut/L2_unified_test"
+        ],
+        "time_list_baseline_avg": 117510.4375
+    },
+    "mem_rank": {
+        "cores": 3,
+        "iterations": 20,
+        "ranked_list": [
+            [
+                "{1: '../tuned_enemies/tuned_bus', 2: '../tuned_enemies/tuned_bus', 3: '../tuned_enemies/tuned_bus'}",
+                50999.65555555555
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_bus', 2: '../tuned_enemies/tuned_cache', 3: '../tuned_enemies/tuned_bus'}",
+                65128.07
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_bus', 2: '../tuned_enemies/tuned_bus', 3: '../tuned_enemies/tuned_memory'}",
+                65696.1
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_bus', 2: '../tuned_enemies/tuned_bus', 3: '../tuned_enemies/tuned_cache'}",
+                67058.66666666667
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_bus', 2: '../tuned_enemies/tuned_memory', 3: '../tuned_enemies/tuned_bus'}",
+                67932.8875
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_cache', 2: '../tuned_enemies/tuned_bus', 3: '../tuned_enemies/tuned_bus'}",
+                68503.85
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_memory', 2: '../tuned_enemies/tuned_bus', 3: '../tuned_enemies/tuned_bus'}",
+                69186.1
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_memory', 2: '../tuned_enemies/tuned_bus', 3: '../tuned_enemies/tuned_memory'}",
+                87240.425
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_bus', 2: '../tuned_enemies/tuned_memory', 3: '../tuned_enemies/tuned_memory'}",
+                88559.025
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_memory', 2: '../tuned_enemies/tuned_memory', 3: '../tuned_enemies/tuned_bus'}",
+                90483.89
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_memory', 2: '../tuned_enemies/tuned_cache', 3: '../tuned_enemies/tuned_bus'}",
+                91143.125
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_bus', 2: '../tuned_enemies/tuned_cache', 3: '../tuned_enemies/tuned_memory'}",
+                91357.6
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_bus', 2: '../tuned_enemies/tuned_memory', 3: '../tuned_enemies/tuned_cache'}",
+                95285.275
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_cache', 2: '../tuned_enemies/tuned_bus', 3: '../tuned_enemies/tuned_memory'}",
+                95496.65
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_memory', 2: '../tuned_enemies/tuned_bus', 3: '../tuned_enemies/tuned_cache'}",
+                95771.77
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_cache', 2: '../tuned_enemies/tuned_memory', 3: '../tuned_enemies/tuned_bus'}",
+                101286.6375
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_cache', 2: '../tuned_enemies/tuned_cache', 3: '../tuned_enemies/tuned_bus'}",
+                112524.5
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_bus', 2: '../tuned_enemies/tuned_cache', 3: '../tuned_enemies/tuned_cache'}",
+                115348.75
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_cache', 2: '../tuned_enemies/tuned_bus', 3: '../tuned_enemies/tuned_cache'}",
+                124272.2625
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_memory', 2: '../tuned_enemies/tuned_memory', 3: '../tuned_enemies/tuned_memory'}",
+                128229.2
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_memory', 2: '../tuned_enemies/tuned_cache', 3: '../tuned_enemies/tuned_memory'}",
+                130071.64
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_memory', 2: '../tuned_enemies/tuned_memory', 3: '../tuned_enemies/tuned_cache'}",
+                140740.89
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_memory', 2: '../tuned_enemies/tuned_cache', 3: '../tuned_enemies/tuned_cache'}",
+                149568.8
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_cache', 2: '../tuned_enemies/tuned_memory', 3: '../tuned_enemies/tuned_memory'}",
+                162609.33
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_cache', 2: '../tuned_enemies/tuned_cache', 3: '../tuned_enemies/tuned_memory'}",
+                163973.6375
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_cache', 2: '../tuned_enemies/tuned_memory', 3: '../tuned_enemies/tuned_cache'}",
+                231925.04
+            ],
+            [
+                "{1: '../tuned_enemies/tuned_cache', 2: '../tuned_enemies/tuned_cache', 3: '../tuned_enemies/tuned_cache'}",
+                233984.6
+            ]
+        ],
+        "stress": "['../tuned_enemies/tuned_cache', '../tuned_enemies/tuned_bus', '../tuned_enemies/tuned_memory']",
+        "sut": [
+            "../bin/sut/mem_thrashing_test"
+        ],
+        "time_list_baseline_avg": 21189.15
+    }
+}
