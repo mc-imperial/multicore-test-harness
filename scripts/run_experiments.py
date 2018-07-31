@@ -31,6 +31,7 @@ import time
 import os
 from copy import deepcopy
 import itertools
+from scipy.stats.mstats import mquantiles
 
 from run_sut_stress import SutStress
 
@@ -242,6 +243,8 @@ class Experiment(object):
         time_array = np.asarray(time_list_baseline)
         data['time_list_baseline_avg'] = time_array.mean()
         data['time_list_baseline_std'] = time_array.std()
+        q_baseline = mquantiles(time_list_baseline, 0.9)[0]
+        data['time_list_baseline_quantile'] = q_baseline
 
         if temp_list_baseline:
             data['temp_list_baseline'] = temp_list_baseline
@@ -253,6 +256,8 @@ class Experiment(object):
         time_array = np.asarray(time_list_enemy)
         data['time_list_enemy_avg'] = time_array.mean()
         data['time_list_enemy_std'] = time_array.std()
+        q_enemy = mquantiles(time_list_enemy, 0.9)[0]
+        data['time_list_baseline_quantile'] = q_enemy
 
         if temp_list_enemy:
             data['temp_list_enemy'] = temp_list_enemy
@@ -281,6 +286,7 @@ class Experiment(object):
         data['iterations'] = self._iterations
 
         time_array = np.asarray(time_list_baseline)
+
         data['time_list_baseline_avg'] = time_array.mean()
 
         sorted_by_value = sorted(dict_mappings.items(), key=lambda kv: kv[1], reverse=False)
