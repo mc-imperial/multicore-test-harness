@@ -257,7 +257,7 @@ class Experiment(object):
         data['time_list_enemy_avg'] = time_array.mean()
         data['time_list_enemy_std'] = time_array.std()
         q_enemy = mquantiles(time_list_enemy, 0.9)[0]
-        data['time_list_baseline_quantile'] = q_enemy
+        data['time_list_enemy_quantile'] = q_enemy
 
         if temp_list_enemy:
             data['temp_list_enemy'] = temp_list_enemy
