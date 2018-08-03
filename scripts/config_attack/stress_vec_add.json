@@ -86,6 +86,6 @@
     "cores": 3,
     "iterations": 100,
     "max_temperature": 80
-  },
+  }
 
 }
