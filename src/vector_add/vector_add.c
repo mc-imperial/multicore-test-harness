@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 
+#define ITERATIONS  100
 static size_t MM = 32000;
 
 void add(float * restrict a, float * restrict b, float * restrict c, size_t n){
@@ -28,7 +29,9 @@ int main() {
     }
 
     start = clock();
-    add(a,b,c,MM);
+    for(i = 0; i < ITERATIONS; ++i){
+        add(a,b,c,MM);
+    }
     end = clock();
     diffs = (end - start)/(float)CLOCKS_PER_SEC;
 
