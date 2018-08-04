@@ -1,0 +1,123 @@
+{
+  "L2_joule": {
+    "sut": "../bin/sut/vector_add_test" ,
+    "mapping": {
+      "1" : "../demo/L2_joule",
+      "2" : "../demo/L2_joule",
+      "3" : "../demo/L2_joule",
+      "4" : "../demo/L2_joule",
+      "5" : "../demo/L2_joule",
+      "6" : "../demo/L2_joule",
+      "7" : "../demo/L2_joule"
+    },
+    "cores": 7,
+    "iterations": 100,
+    "max_temperature": 80
+  },
+  "L2_pi": {
+    "sut": "../bin/sut/vector_add_test" ,
+    "mapping": {
+      "1" : "../demo/L2_rpi",
+      "2" : "../demo/L2_rpi",
+      "3" : "../demo/L2_rpi",
+      "4" : "../demo/L2_rpi",
+      "5" : "../demo/L2_rpi",
+      "6" : "../demo/L2_rpi",
+      "7" : "../demo/L2_rpi"
+    },
+    "cores": 7,
+    "iterations": 100,
+    "max_temperature": 80
+  },
+  "L2_banana": {
+    "sut": "../bin/sut/vector_add_test" ,
+    "mapping": {
+      "1" : "../demo/L2_banana",
+      "2" : "../demo/L2_banana",
+      "3" : "../demo/L2_banana",
+      "4" : "../demo/L2_banana",
+      "5" : "../demo/L2_banana",
+      "6" : "../demo/L2_banana",
+      "7" : "../demo/L2_banana"
+    },
+    "cores": 7,
+    "iterations": 100,
+    "max_temperature": 80
+  },
+  "L2_dragon": {
+    "sut": "../bin/sut/vector_add_test" ,
+    "mapping": {
+      "1" : "../demo/L2_dragon",
+      "2" : "../demo/L2_dragon",
+      "3" : "../demo/L2_dragon",
+      "4" : "../demo/L2_dragon",
+      "5" : "../demo/L2_dragon",
+      "6" : "../demo/L2_dragon",
+      "7" : "../demo/L2_dragon"
+    },
+    "cores": 7,
+    "iterations": 100,
+    "max_temperature": 80
+  },
+  "L2_joule_tuned": {
+    "sut": "../bin/sut/vector_add_test" ,
+    "mapping": {
+      "1" : "../demo/L2_joule_tuned",
+      "2" : "../demo/L2_joule_tuned",
+      "3" : "../demo/L2_joule_tuned",
+      "4" : "../demo/L2_joule_tuned",
+      "5" : "../demo/L2_joule_tuned",
+      "6" : "../demo/L2_joule_tuned",
+      "7" : "../demo/L2_joule_tuned"
+    },
+    "cores": 7,
+    "iterations": 100,
+    "max_temperature": 80
+  },
+  "L2_pi_tuned": {
+    "sut": "../bin/sut/vector_add_test" ,
+    "mapping": {
+      "1" : "../demo/L2_rpi_tuned",
+      "2" : "../demo/L2_rpi_tuned",
+      "3" : "../demo/L2_rpi_tuned",
+      "4" : "../demo/L2_rpi_tuned",
+      "5" : "../demo/L2_rpi_tuned",
+      "6" : "../demo/L2_rpi_tuned",
+      "7" : "../demo/L2_rpi_tuned"
+    },
+    "cores": 7,
+    "iterations": 100,
+    "max_temperature": 80
+  },
+  "L2_banana_tuned": {
+    "sut": "../bin/sut/vector_add_test" ,
+    "mapping": {
+      "1" : "../demo/L2_banana_tuned",
+      "2" : "../demo/L2_banana_tuned",
+      "3" : "../demo/L2_banana_tuned",
+      "4" : "../demo/L2_banana_tuned",
+      "5" : "../demo/L2_banana_tuned",
+      "6" : "../demo/L2_banana_tuned",
+      "7" : "../demo/L2_banana_tuned"
+    },
+    "cores": 7,
+    "iterations": 100,
+    "max_temperature": 80
+  },
+  "L2_dragon_tuned": {
+    "sut": "../bin/sut/vector_add_test" ,
+    "mapping": {
+      "1" : "../demo/L2_dragon_tuned",
+      "2" : "../demo/L2_dragon_tuned",
+      "3" : "../demo/L2_dragon_tuned",
+      "4" : "../demo/L2_dragon_tuned",
+      "5" : "../demo/L2_dragon_tuned",
+      "6" : "../demo/L2_dragon_tuned",
+      "7" : "../demo/L2_dragon_tuned"
+    },
+    "cores": 7,
+    "iterations": 100,
+    "max_temperature": 80
+  }
+
+}
