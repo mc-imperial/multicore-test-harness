@@ -3,7 +3,7 @@ from pprint import pprint
 import json
 
 # Read the configuration in the JSON file
-with open("rank_dragon.json") as data_file:
+with open("rank_joule.json") as data_file:
     experiments_object = json.load(data_file)
 
 STRESSES = ['../tuned_enemies/tuned_cache', '../tuned_enemies/tuned_bus', '../tuned_enemies/tuned_memory']
@@ -24,11 +24,12 @@ for check in ALL_COMBOS:
     # print(check)
 
     str = "{1: '" + check[0] + "', 2: '" + check[1] + "', 3: '" + check[2] +"'}"
-    # print(str)
 
     bus_rank0 = [x[0] for x in experiments_object["bus_rank"]["ranked_list"]].index(str)
     cache_rank0 = [x[0] for x in experiments_object["cache_rank"]["ranked_list"]].index(str)
     memory_rank0 = [x[0] for x in experiments_object["mem_rank"]["ranked_list"]].index(str)
+    # print(str)
+    # print(bus_rank0, cache_rank0, memory_rank0)
 
     for check_prime in ALL_COMBOS:
         str2 = "{1: '" + check_prime[0] + "', 2: '" + check_prime[1] + "', 3: '" + check_prime[2] + "'}"
@@ -43,6 +44,6 @@ for check in ALL_COMBOS:
     if found_counter:
         continue
 
-    result.append((check, bus_rank0, cache_rank0, memory_rank0))
+    result.append((check, cache_rank0, memory_rank0, bus_rank0))
 
 pprint(result)

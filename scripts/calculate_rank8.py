@@ -3,7 +3,7 @@ from pprint import pprint
 import json
 
 # Read the configuration in the JSON file
-with open("rank_nano.json") as data_file:
+with open("rank_banana.json") as data_file:
     experiments_object = json.load(data_file)
 
 STRESSES = ['../tuned_enemies/tuned_cache', '../tuned_enemies/tuned_bus', '../tuned_enemies/tuned_memory']
