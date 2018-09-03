@@ -38,6 +38,8 @@ def get_event(data,field):
     # First try to find a float
     value = None
 
+    data = str(data)
+
     data = re.sub(' +',' ',data)
     try:
         line = re.findall(re.escape(field) + "\d+\.\d+", data)[0]
@@ -59,26 +61,33 @@ def get_temp():
     :return: The system temperature
     """
     c = ProcessManagement()
-    cmd = "cat /sys/class/thermal/thermal_zone*/temp"
-    command_output = c.system_call(cmd, True)[0]
-    try:
-        temp = float(command_output) / 1000
-    except ValueError:
-        print "\n\tWARNING: Unable to find temperature for this system. Using default temperature of 30C\n"
-        temp = 30
-    return temp
 
-def cooldown(temp_threshold):
-    """
-    If the temperature is above a certain threshold, this function will delay
-    the next experiment until the chip has cooled down.
-    """
-    temp = get_temp()
-    while (temp > temp_threshold):
-        print "Temperature " + str(temp) + " is too high! Cooling down"
-        time.sleep(5)
-        temp = get_temp()
-    print "Temperature " + str(temp) + " is ok. Running experiment"
+    # Try to get the time from multiple thermal zones
+    cmd = "cat /sys/class/thermal/thermal_zone*/temp"
+    command_output = c.system_call(cmd, True)[0].decode('ascii')
+
+    try:
+        temperatures = command_output.splitlines()
+        # print("Got the following temperatures", str(command_output))
+        # Check which of the values look realistic
+        temperature = 0
+        for temp in temperatures:
+            if float(temp)>1000:
+                value = float(temp) / 1000
+            else:
+                value = float(temp)
+            # A realistic value would be between 20 (room temperature) and 100 (this is the usual limit in the BIOS)
+            if 20 < value < 100:
+                temperature = value
+                break
+
+        return temperature
+    except ValueError:
+        print("\n\tWARNING: Unable to find temperature for this system\n")
+        return None
+
+    return None
+
 
 
 
@@ -87,7 +96,7 @@ class ProcessManagement:
     This class is designed to manage background classes and foreground processes
     and to be able to kill them efficiantly when necessary.
     """
-    def __init__(self, sleep_startup = 3, sleep_shutdown = 1):
+    def __init__(self, sleep_startup=0.01, sleep_shutdown=0.01):
         """
         :param sleep_startup:  Delay between starting tasks
         :param sleep_shutdown: Delay between killing tasks
@@ -107,25 +116,28 @@ class ProcessManagement:
         self.kill_stress()
         sys.exit(0)
 
-    def system_call(self, command, silent = False):
+    @staticmethod
+    def system_call(command, silent=False):
         """
         Call a background system command and wait for it to terminate
-        :param coomand: Shell command to run
+        :param command: Shell command to run
         :param silent: Surpress verbose
         :return: Call output and error
         """
-        if (silent  == False):
-            print "executing command: " + command
+        if not silent:
+            print("executing command: " + command)
 
         p = subprocess.Popen([command], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        return p.stdout.read(),p.stderr.read()
+
+        # return p.stdout.read(),p.stderr.read()
+        return p.communicate()
 
     def system_call_background(self, command):
         """
         Call a background system command and leave it in the background
         :param command: Shell command to run
         """
-        print "executing command: " + command + " in the background"
+        print("executing command: " + command + " in the background")
         self._background_procs.append(subprocess.Popen(command, shell = True, preexec_fn=os.setsid))
         time.sleep(self._sleep_startup)
 
@@ -133,7 +145,7 @@ class ProcessManagement:
         """
         Kill all the background stress commands
         """
-        print "killing stress"
+        print("killing stress")
         for b in self._background_procs:
             os.killpg(os.getpgid(b.pid), signal.SIGTERM)
             time.sleep(self._sleep_shutdown)

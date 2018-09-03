@@ -1,0 +1,48 @@
+{
+  "DEFINES": {
+    "A0": {
+      "range" :[-10, 10],
+      "type": "float"
+    },
+    "A1": {
+      "range" :[-10, 10],
+      "type": "float"
+    },
+    "A2": {
+      "range" :[-10, 10],
+      "type": "float"
+    },
+    "A3": {
+      "range" :[-10, 10],
+      "type": "float"
+    },
+    "A4": {
+      "range" :[-10, 10],
+      "type": "float"
+    },
+    "A5": {
+      "range" :[-10, 10],
+      "type": "float"
+    },
+    "A6": {
+      "range" :[-10, 10],
+      "type": "float"
+    },
+    "A7": {
+      "range" :[-10, 10],
+      "type": "float"
+    },
+    "INSTR1": {
+      "range" :[1, 3],
+      "type": "int"
+    },
+    "INSTR2": {
+      "range" :[1, 3],
+      "type": "int"
+    },
+    "INSTR3": {
+      "range" :[1, 3],
+      "type": "int"
+    }
+  }
+}

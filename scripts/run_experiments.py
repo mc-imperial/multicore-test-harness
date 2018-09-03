@@ -30,8 +30,9 @@ import numpy as np
 import time
 import os
 from copy import deepcopy
+import itertools
+from scipy.stats.mstats import mquantiles
 
-import common
 from run_sut_stress import SutStress
 
 
@@ -47,6 +48,8 @@ class Experiment(object):
         """
         self._sut = []
         self._stress = []
+        self._mapping = None
+        self._ranked_list = None
         self._cores = []
         self._iterations = None
         self._temp = None
@@ -67,25 +70,29 @@ class Experiment(object):
         # You can have a list for sut, stress and cores or a single object
         try:
             data = json_object['sut']
-            if isinstance(data, unicode):
+            if isinstance(data, str):
                 self._sut.append(json_object["sut"])
             elif isinstance(data, list):
                 self._sut.extend(json_object["sut"])
             else:
                 raise KeyError
         except KeyError:
-            print "Error processing sut filed in JSON"
+            print("Error processing sut filed in JSON")
 
-        try:
+        if "stress" in json_object:
             data = json_object['stress']
-            if isinstance(data, unicode):
+            if isinstance(data, str):
                 self._stress.append(json_object["stress"])
             elif isinstance(data, list):
                 self._stress.extend(json_object["stress"])
             else:
                 raise KeyError
-        except KeyError:
-            print "Error processing stress in JSON"
+        elif "mapping" in json_object:
+            self._mapping = json_object['mapping']
+        elif "ranked_list" in json_object:
+            self._ranked_list = json_object['ranked_list']
+        else:
+            raise ValueError("No stress or mapping given")
 
         try:
             data = json_object['cores']
@@ -96,24 +103,20 @@ class Experiment(object):
             else:
                 raise KeyError
         except KeyError:
-            print "Error processing cores in JSON"
+            print("Error processing cores in JSON")
 
         # You can not have a list for iterations, temperature, cooldown_time
         try:
             self._iterations = int(json_object["iterations"])
         except KeyError:
-            print "Unable to find iterations in JSON"
+            print("Unable to find iterations in JSON")
 
         try:
             self._max_temperature = int(json_object["max_temperature"])
         except KeyError:
-            print "Unable to find max_temperature in JSON"
+            print("Unable to find max_temperature in JSON")
 
-        try:
-            self._cooldown_time = int(json_object["cooldown_time"])
-        except KeyError:
-            print "Unable to find cooldown_time in JSON"
-
+    # Deprecated
     def run_config(self, experiment, config, sut, stress, cores):
         """
         Run a config experiment only once
@@ -128,14 +131,14 @@ class Experiment(object):
         temp_list = []
 
         for it in range(self._iterations):
-            common.cooldown(self._max_temperature)
+            # cool_down(self._max_temperature)
             s = SutStress()
-            print "\nStarting " + str(experiment) +", " + \
+            print("\nStarting " + str(experiment) +", " + \
                   str(config) +                           \
-                  ", iteration " + str(it) + " with:"
-            print "SUT:\t\t" + sut + "\n" + \
+                  ", iteration " + str(it) + " with:")
+            print("SUT:\t\t" + sut + "\n" + \
                   "Stress:\t\t" + stress + "\n" + \
-                  "Cores:\t\t" + str(cores) + "\n"
+                  "Cores:\t\t" + str(cores) + "\n")
             ex_time, ex_temp = s.run_sut_stress(sut, stress, cores, 0)
 
             time_list.append(ex_time)
@@ -185,14 +188,13 @@ class Experiment(object):
 
         os.rmdir(self._folder_name)
 
-    def _log_data(self, sut, stress, cores, time_list, temp_list, suffix=""):
+    def _log_data(self, sut, stress, cores, time_list, temp_list = None, suffix=""):
         """
         Stores the time list, temp list, average time, average temp and std time and std temp
         in a dictionary
         :param sut: System under stress
         :param stress: Enemy process
         :param cores: Number of enemy cores
-        :param iterations: Total number of iterations
         :param time_list: A list with all the execution times
         :param temp_list: A list with all the temperatures
         :param suffix: Suffix tha cna be added to all keys
@@ -210,10 +212,85 @@ class Experiment(object):
         data['time_avg' + suffix] = time_array.mean()
         data['time_std' + suffix] = time_array.std()
 
-        data['temp_list' + suffix] = temp_list
-        temp_array = np.asarray(temp_list)
-        data['temp_avg' + suffix] = temp_array.mean()
-        data['temp_std' + suffix] = temp_array.std()
+        if temp_list:
+            data['temp_list' + suffix] = temp_list
+            temp_array = np.asarray(temp_list)
+            data['temp_avg' + suffix] = temp_array.mean()
+            data['temp_std' + suffix] = temp_array.std()
+
+        return data
+
+    def _log_data2(self, sut, stress, cores, time_list_baseline, time_list_enemy,
+                   temp_list_baseline=None, temp_list_enemy=None):
+        """
+        Stores the time list, temp list, average time, average temp and std time and std temp
+        in a dictionary
+        :param sut: System under stress
+        :param stress: Enemy process
+        :param cores: Number of enemy cores
+        :param time_list_baseline: A list with all the execution times
+        :param time_list_enemy: A list with all the execution times
+        :return: A dictionary with all the data
+        """
+        data = dict()
+
+        data['sut'] = sut
+        data['stress'] = stress
+        data['cores'] = cores
+        data['iterations'] = self._iterations
+
+        data['time_list_baseline'] = time_list_baseline
+        time_array = np.asarray(time_list_baseline)
+        data['time_list_baseline_avg'] = time_array.mean()
+        data['time_list_baseline_std'] = time_array.std()
+        q_baseline = mquantiles(time_list_baseline, 0.9)[0]
+        data['time_list_baseline_quantile'] = q_baseline
+
+        if temp_list_baseline:
+            data['temp_list_baseline'] = temp_list_baseline
+            temp_array = np.asarray(temp_list_baseline)
+            data['temp_list_baseline_avg'] = temp_array.mean()
+            data['temp_list_baseline_std'] = temp_array.std()
+
+        data['time_list_enemy'] = time_list_enemy
+        time_array = np.asarray(time_list_enemy)
+        data['time_list_enemy_avg'] = time_array.mean()
+        data['time_list_enemy_std'] = time_array.std()
+        q_enemy = mquantiles(time_list_enemy, 0.9)[0]
+        data['time_list_enemy_quantile'] = q_enemy
+
+        if temp_list_enemy:
+            data['temp_list_enemy'] = temp_list_enemy
+            temp_array = np.asarray(temp_list_enemy)
+            data['temp_list_enemy_avg'] = temp_array.mean()
+            data['temp_list_enemy_std'] = temp_array.std()
+
+        return data
+
+    def _log_data3(self, sut, stress, cores, time_list_baseline, dict_mappings):
+        """
+        Stores the time list, temp list, average time, average temp and std time and std temp
+        in a dictionary
+        :param sut: System under stress
+        :param stress: Enemy process
+        :param cores: Number of enemy cores
+        :param time_list_baseline: A list with all the execution times
+        :param dict_mappings: Dict with enemies and averages
+        :return: A dictionary with all the data
+        """
+        data = dict()
+
+        data['sut'] = sut
+        data['stress'] = stress
+        data['cores'] = cores
+        data['iterations'] = self._iterations
+
+        time_array = np.asarray(time_list_baseline)
+
+        data['time_list_baseline_avg'] = time_array.mean()
+
+        sorted_by_value = sorted(dict_mappings.items(), key=lambda kv: kv[1], reverse=False)
+        data['ranked_list'] = sorted_by_value
 
         return data
 
@@ -236,52 +313,119 @@ class Experiment(object):
         for experiment in experiments_object:
             output[experiment] = dict()
             self.read_json_object(experiments_object[experiment])
-            gen = ((sut, stress, cores) for sut in self._sut
+
+            if self._mapping:
+                s = SutStress()
+
+                (time_list_baseline, temp_list_baseline) = s.run_mapping(sut=self._sut[0],
+                                                                         mapping=dict(),
+                                                                         iterations=self._iterations,
+                                                                         max_temperature=self._max_temperature)
+
+                (time_list_enemy, temp_list_enemy) = s.run_mapping(sut=self._sut[0],
+                                                                   mapping=self._mapping,
+                                                                   iterations=self._iterations,
+                                                                   max_temperature=self._max_temperature)
+                output[experiment] = self._log_data2(self._sut,
+                                        str(self._mapping),
+                                        self._cores,
+                                        time_list_baseline,
+                                        time_list_enemy,
+                                        temp_list_baseline,
+                                        temp_list_enemy
+                                        )
+
+                config_out_file = self._folder_name + experiment + ".json"
+
+                with open(config_out_file, 'w') as outfile:
+                    json.dump(output, outfile, sort_keys=True, indent=4)
+
+                output.pop(experiment)
+            elif self._stress:
+
+                gen = ((sut, stress, cores) for sut in self._sut
                                         for stress in self._stress
                                         for cores in self._cores)
-            config = 1
+                config = 1
 
-            for sut, stress, cores in gen:
+                for sut, stress, cores in gen:
 
-                # Log test conditions
-                config_str = "config_" + str(config)
+                    # Log test conditions
+                    config_str = "config_" + str(config)
 
-                # Run baseline with zero enemies and store results
-                (time_list , temp_list ) = self.run_config(experiment,
+                    # Run baseline with zero enemies and store results
+                    (time_list , temp_list ) = self.run_config(experiment,
                                                            "baseline",
                                                            sut,
                                                            stress,
                                                            0)
-                output[experiment][config_str] = self._log_data(sut,
+                    output[experiment][config_str] = self._log_data(sut,
                                                                 stress,
                                                                 cores,
                                                                 time_list,
                                                                 temp_list,
                                                                 "_baseline")
 
-                # Run actual config and store results
-                (time_list , temp_list ) = self.run_config(experiment,
+                    # Run actual config and store results
+                    (time_list , temp_list ) = self.run_config(experiment,
                                                            config_str,
                                                            sut,
                                                            stress,
                                                            cores)
 
-                output[experiment][config_str].update(self._log_data(sut,
+                    output[experiment][config_str].update(self._log_data(sut,
                                                                 stress,
                                                                 cores,
                                                                 time_list,
                                                                 temp_list)
                                                       )
 
-                config_out_file = self._folder_name + experiment + "_" + \
-                    config_str + ".json"
+                    config_out_file = self._folder_name + experiment + "_" + \
+                        config_str + ".json"
+
+                    with open(config_out_file, 'w') as outfile:
+                        json.dump(output, outfile, sort_keys=True, indent=4)
+                    output[experiment].pop(config_str)
+
+                    config = config + 1
+                output.pop(experiment)
+
+            elif self._ranked_list:
+                s = SutStress()
+
+                (time_list_baseline, _) = s.run_mapping(sut=self._sut[0],
+                                                        mapping=dict(),
+                                                        iterations=self._iterations,
+                                                        max_temperature=self._max_temperature)
+
+                results = dict()
+                total_cores = self._cores[0]
+                c = [p for p in itertools.product(self._ranked_list, repeat=total_cores)]
+                conf_mapping = dict()
+
+                for conf in c:
+                    for core in range(1, total_cores + 1):
+                        conf_mapping[core] = conf[core - 1]
+
+                    (time_list_enemy, _) = s.run_mapping(sut=self._sut[0],
+                                                         mapping=conf_mapping,
+                                                         iterations=self._iterations,
+                                                         max_temperature=self._max_temperature)
+
+                    results[str(conf_mapping)] = np.asarray(time_list_enemy).mean()
+
+                output[experiment] = self._log_data3(self._sut,
+                                        str(self._ranked_list),
+                                        total_cores,
+                                        time_list_baseline,
+                                        results,
+                                        )
+                config_out_file = self._folder_name + experiment + ".json"
 
                 with open(config_out_file, 'w') as outfile:
                     json.dump(output, outfile, sort_keys=True, indent=4)
-                output[experiment].pop(config_str)
 
-                config = config + 1
-            output.pop(experiment)
+                output.pop(experiment)
 
         self.merge_docs(output_file)
         self._cleanup()
@@ -289,7 +433,7 @@ class Experiment(object):
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print "usage: " + sys.argv[0] + " <experments_file>.json  <results>.json \n"
+        print("usage: " + sys.argv[0] + " <experments_file>.json  <results>.json \n")
         exit(1)
 
     exp = Experiment()

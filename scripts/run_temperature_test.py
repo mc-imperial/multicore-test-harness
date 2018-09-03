@@ -38,14 +38,14 @@ s = sched.scheduler(time.time, time.sleep)
 
 
 def system_call(command, silent = False):
-    if (silent  == False):
-        print "executing command: " + command
+    if not silent:
+        print("executing command: " + command)
     p = subprocess.Popen([command], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     return p.stdout.read(),p.stderr.read()
 
 def system_call_background(command):
     global BACKGROUND_PROCS
-    print "executing command: " + command + " in the background"
+    print("executing command: " + command + " in the background")
     BACKGROUND_PROCS.append(subprocess.Popen(command, shell = True, preexec_fn=os.setsid))
     time.sleep(SLEEP_AMOUNT_STARTUP)
 
@@ -95,7 +95,7 @@ def run_raspberry_stress(stress, processors):
 
 if __name__ == "__main__":
     if len(sys.argv) != 4:
-        print "usage: stress_exe num_stress_cores governor"
+        print("usage: stress_exe num_stress_cores governor")
         exit(1)
 
     # Set the governor
@@ -103,12 +103,12 @@ if __name__ == "__main__":
         " > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "
     s_out,s_err = system_call(cmd)
     if s_out:
-        print "stdout:" + s_out
+        print("stdout:" + s_out)
     if s_err:
-        print "stderr:" + s_err
+        print("stderr:" + s_err)
 
     s_out, s_err = run_raspberry_stress(sys.argv[1], int(sys.argv[2]))
     if s_out:
-        print "stdout:" + s_out
+        print("stdout:" + s_out)
     if s_err:
-        print "stderr:" + s_err
+        print("stderr:" + s_err)

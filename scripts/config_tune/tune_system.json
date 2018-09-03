@@ -1,28 +1,14 @@
 {
-  "system_fuzz_train": {
+  "system_sa_train": {
     "sut": "../bin/sut/system_calls_test",
     "template_data": "../templates/system_calls/parameters.json",
     "template_file": "../templates/system_calls/template_system_calls.c",
     "cores": 3,
-    "method":"fuzz",
-    "kappa": 0,
-    "log_file": "system_fuzz_log.txt",
-    "max_file": "system_fuzz_max.txt",
+    "method":"sa",
+    "log_file": "../results/system_fuzz_log.txt",
+    "max_file": "../results/system_fuzz_max.txt",
     "training_time": 240,
-    "max_temperature": 70,
-    "cooldown_time": 10
-  },
-  "system_baysian_train": {
-    "sut": "../bin/sut/system_calls_test",
-    "template_data": "../templates/system_calls/parameters.json",
-    "template_file": "../templates/system_calls/template_system_calls.c",
-    "cores": 3,
-    "method":"bayesian",
-    "kappa": 5,
-    "log_file": "system_baysian_log.txt",
-    "max_file": "system_baysian_max.txt",
-    "training_time": 240,
-    "max_temperature": 70,
-    "cooldown_time": 10
+    "inner_iterations": 2000,
+    "max_temperature": 70
   }
 }

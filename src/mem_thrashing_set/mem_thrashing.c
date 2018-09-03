@@ -41,7 +41,7 @@
 #include "../common/common.h"
 
 /** Wrap the code in a loop consisting of ITERATIONS iterations */
-#define ITERATIONS      100000
+#define ITERATIONS      1000
 
 /** Helper defines for memory allocation */
 #define MB              ((1) << 10) << 10

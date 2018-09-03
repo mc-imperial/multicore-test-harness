@@ -2,6 +2,7 @@ CACHE_FILE = raspberry_cache.json
 COREMARK_PORT_DIR = linux64
 
 
+BUS_DIR = ./src/bus_set
 CACHE_DIR = ./src/cache_set
 MEM_DIR = ./src/mem_thrashing_set
 SYS_DIR = ./src/system_calls_set
@@ -11,8 +12,10 @@ RT_TESTS_DIR = ./src/rt-tests
 
 WCET_DIR = ./src/wcet
 
-all: cache_set mem_set sys_set pipeline_set wcet_sut coremark_sut cyclictest
+all: bus_set cache_set mem_set sys_set pipeline_set wcet_sut coremark_sut cyclictest
 
+bus_set:
+	(cd $(BUS_DIR); make all)
 cache_set:
 	(cd $(CACHE_DIR); python gen.py ./cache_info/$(CACHE_FILE))
 mem_set:
@@ -31,7 +34,8 @@ cyclictest:
 
 .PHONY: clean
 clean:
-	(cd $(CACHE_DIR); python -c 'import gen; gen.clean()')
+	(cd $(CACHE_DIR); python3 -c 'import gen; gen.clean()')
+	(cd $(BUS_DIR); make clean)
 	(cd $(MEM_DIR); make clean)
 	(cd $(SYS_DIR); make clean)
 	(cd $(PIPE_DIR); make clean)

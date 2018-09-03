@@ -1,11 +1,24 @@
 {
-  "coremark_stress": {
-    "sut": "../bin/sut/coremark.exe 0x0 0x0 0x66",
-    "stress": ["../bin/cache_stress/L1_data_stress", "../bin/cache_stress/L1_instr_stress", "../bin/cache_stress/L2_unified_stress", "../bin/mem_thrashing_stress/mem_thrashing_stress", "../bin/system_stress/system_calls_stress", "../bin/system_stress/simple.sh", "../bin/pipeline_stress/buble_pipeline_stress", "../bin/pipeline_stress/full_pipeline_stress"
-    ],
-    "cores": [1,2,3],
-    "iterations": 50,
-    "max_temperature": 70,
-    "cooldown_time": 10
+  "coremark_stress_various": {
+    "sut": "../bin/sut/coremark.exe 0x0 0x0 0x66 50",
+    "mapping": {
+      "1" : "1_enemy.out",
+      "2" : "2_enemy.out",
+      "3" : "3_enemy.out"
+    },
+    "cores": 3,
+    "iterations": 10000,
+    "max_temperature": 80
+  },
+  "coremark_stress_L1": {
+    "sut": "../bin/sut/coremark.exe 0x0 0x0 0x66 50",
+    "mapping": {
+      "1" : "../bin/cache_stress/L1_data_stress",
+      "2" : "../bin/cache_stress/L1_data_stress",
+      "3" : "../bin/cache_stress/L1_data_stress"
+    },
+    "cores": 3,
+    "iterations": 10000,
+    "max_temperature": 80
   }
 }

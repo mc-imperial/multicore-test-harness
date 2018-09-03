@@ -5,7 +5,6 @@
     ],
     "cores": [1,2,3],
     "iterations": 50,
-    "max_temperature": 70,
-    "cooldown_time": 10
+    "max_temperature": 70
   }
 }

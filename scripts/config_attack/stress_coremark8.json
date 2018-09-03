@@ -1,0 +1,32 @@
+{
+  "coremark_stress_various": {
+    "sut": "../bin/sut/coremark.exe 0x0 0x0 0x66 50",
+    "mapping": {
+      "1" : "1_enemy.out",
+      "2" : "2_enemy.out",
+      "3" : "3_enemy.out",
+      "4" : "4_enemy.out",
+      "5" : "5_enemy.out",
+      "6" : "6_enemy.out",
+      "7" : "7_enemy.out"
+    },
+    "cores": 7,
+    "iterations": 10000,
+    "max_temperature": 80
+  },
+  "coremark_stress_L1": {
+    "sut": "../bin/sut/coremark.exe 0x0 0x0 0x66 50",
+    "mapping": {
+      "1" : "../bin/cache_stress/L1_data_stress",
+      "2" : "../bin/cache_stress/L1_data_stress",
+      "3" : "../bin/cache_stress/L1_data_stress",
+      "4" : "../bin/cache_stress/L1_data_stress",
+      "5" : "../bin/cache_stress/L1_data_stress",
+      "6" : "../bin/cache_stress/L1_data_stress",
+      "7" : "../bin/cache_stress/L1_data_stress"
+    },
+    "cores": 7,
+    "iterations": 10000,
+    "max_temperature": 80
+  }
+}

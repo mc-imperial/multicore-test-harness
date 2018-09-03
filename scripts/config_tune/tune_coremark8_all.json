@@ -1,0 +1,90 @@
+{
+  "coremark_train1": {
+    "sut": "../bin/sut/coremark.exe 0x0 0x0 0x66 50",
+    "cores": 7,
+    "method": "sa_ran",
+    "log_file": "../results/coremark_sa_ran_600_log.txt",
+    "max_file": "../results/coremark_sa_ran_600_max.txt",
+    "quantile": 0.8,
+    "training_time": 600,
+    "inner_iterations": 100,
+    "max_temperature": 80
+  },
+  "coremark_train2": {
+    "sut": "../bin/sut/coremark.exe 0x0 0x0 0x66 50",
+    "cores": 7,
+    "method": "sa_hc",
+    "log_file": "../results/coremark_sa_hc_600_log.txt",
+    "max_file": "../results/coremark_sa_hc_600_max.txt",
+    "quantile": 0.8,
+    "training_time": 600,
+    "inner_iterations": 100,
+    "max_temperature": 80
+  },
+  "coremark_train3": {
+    "sut": "../bin/sut/coremark.exe 0x0 0x0 0x66 50",
+    "cores": 7,
+    "method": "sa_sa",
+    "log_file": "../results/coremark_sa_sa_600_log.txt",
+    "max_file": "../results/coremark_sa_sa_600_max.txt",
+    "quantile": 0.8,
+    "training_time": 600,
+    "inner_iterations": 100,
+    "max_temperature": 80
+  },
+  "coremark_train4": {
+    "sut": "../bin/sut/coremark.exe 0x0 0x0 0x66 50",
+    "cores": 7,
+    "method": "sa_bo",
+    "log_file": "../results/coremark_sa_bo_600_log.txt",
+    "max_file": "../results/coremark_sa_bo_600_max.txt",
+    "quantile": 0.8,
+    "training_time": 600,
+    "inner_iterations": 100,
+    "max_temperature": 80
+  },
+  "coremark_train5": {
+    "sut": "../bin/sut/coremark.exe 0x0 0x0 0x66 50",
+    "cores": 7,
+    "method": "ran_ran",
+    "log_file": "../results/coremark_ran_ran_600_log.txt",
+    "max_file": "../results/coremark_ran_ran_600_max.txt",
+    "quantile": 0.8,
+    "training_time": 600,
+    "inner_iterations": 100,
+    "max_temperature": 80
+  },
+  "coremark_train6": {
+    "sut": "../bin/sut/coremark.exe 0x0 0x0 0x66 50",
+    "cores": 7,
+    "method": "ran_hc",
+    "log_file": "../results/coremark_ran_hc_600_log.txt",
+    "max_file": "../results/coremark_ran_hc_600_max.txt",
+    "quantile": 0.8,
+    "training_time": 600,
+    "inner_iterations": 100,
+    "max_temperature": 80
+  },
+  "coremark_train7": {
+    "sut": "../bin/sut/coremark.exe 0x0 0x0 0x66 50",
+    "cores": 7,
+    "method": "ran_sa",
+    "log_file": "../results/coremark_ran_sa_600_log.txt",
+    "max_file": "../results/coremark_ran_sa_600_max.txt",
+    "quantile": 0.8,
+    "training_time": 600,
+    "inner_iterations": 100,
+    "max_temperature": 80
+  },
+  "coremark_train8": {
+    "sut": "../bin/sut/coremark.exe 0x0 0x0 0x66 50",
+    "cores": 7,
+    "method": "ran_bo",
+    "log_file": "../results/coremark_ran_bo_600_log.txt",
+    "max_file": "../results/coremark_ran_bo_600_max.txt",
+    "quantile": 0.8,
+    "training_time": 600,
+    "inner_iterations": 100,
+    "max_temperature": 80
+  }
+}

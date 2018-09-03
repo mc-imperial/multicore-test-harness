@@ -1,0 +1,12 @@
+{
+  "ndes_train": {
+    "sut": "../bin/sut/ndes_wcet",
+    "cores": 3,
+    "method":"sa_sa",
+    "log_file": "../results/ndes_wcet_sa_sa_log.txt",
+    "max_file": "../results/ndes_wcet_sa_sa_max.txt",
+    "training_time": 10,
+    "inner_iterations": 2000,
+    "max_temperature": 100
+  }
+}
