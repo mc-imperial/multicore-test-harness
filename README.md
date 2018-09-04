@@ -123,7 +123,7 @@ There are three possibilities to train an enemy process to cause as much interfe
 
 ```
     cd scripts
-    python run_tuning <train_config>.json
+    python3 run_tuning.py <train_config>.json
 ```
 
 3\. A file describing all the iterations **log_file** and a file describing the parameters for the maximum interference **max_file** will be created. This parameters can be used as defines to compile the template file.
@@ -156,7 +156,7 @@ This will run experiments with the cross product of all the applications in the 
 
 ```
     cd scripts
-    python run_experiments.py <test_config>.json <output>.json
+    python3 run_experiments.py <test_config>.json <output>.json
 ```
 
 3\. Inspect the JSON output, which has the following form:
@@ -177,7 +177,7 @@ This will run experiments with the cross product of all the applications in the 
 4\. Furthermore, the plot script can be used on the JSON file for a graphical representation.
 
 ```
-    python plot.py <output>.json
+    python3 plot.py <output>.json
 ```
 
 #### Demo scripts ###

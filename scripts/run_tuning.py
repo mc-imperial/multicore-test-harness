@@ -935,6 +935,14 @@ class Tuning:
             sys.exit(1)
 
         try:
+            self._output_binary = str(json_object["output_binary"])
+            if not os.path.exists(self._output_binary):
+                os.makedirs(self._output_binary)
+        except KeyError:
+            print("Unable to find output_binary in JSON")
+            sys.exit(1)
+
+        try:
             self._log_file = str(json_object["log_file"])
             # Delete the file contents
             open(self._log_file, 'w').close()
@@ -948,14 +956,6 @@ class Tuning:
             open(self._max_file, 'w').close()
         except KeyError:
             print("Unable to find max_file in JSON")
-            sys.exit(1)
-
-        try:
-            self._output_binary = str(json_object["output_binary"])
-            if not os.path.exists(self._output_binary):
-                os.makedirs(self._output_binary)
-        except KeyError:
-            print("Unable to find output_binary in JSON")
             sys.exit(1)
 
         try:
