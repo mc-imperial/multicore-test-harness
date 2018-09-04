@@ -6,27 +6,25 @@ This software is a black-box testing technique with the capability of provoking 
 
 The enemy processes are divided into four categories and are meant to target individual shared resources.
 
-1\. Cache stress
+1\. Bus stress
+
+We have designed the enemy with the aim of hindering data transfers between the CPU and main memory. It reads a series of numbers from a main memory data buffer and increments their value.
+
+2\. Cache stress
 
 This enemy process causes interference in the shared cache. It executes operations that cause as many evictions as possible.
 
-2\. Memory thrashing stress
+3\. Memory thrashing stress
 
 This enemy process causes interference in the shared bus and shared RAM controller. Memory thrashing enemy processes that make frequent RAM accesses and thus cause a lot of bus traffic and keep the RAM controller busy.
 
-3\. System calls stress
 
-This enemy process causes interference by causing software interrupts. System calls enemy process that cause a lot of software interrupts and therefore force the processor to switch between user mode and privileged mode.
-
-4\. Pipeline stress
-
-This enemy process causes interference by heating up the processor and causing energy throttling. The pipeline stress enemy process that keeps the ALU of the processor busy by performing a lot of computational intensive operations.
 
 ## Systems under test ##
 
 The systems under stress are divided into 4 categories and range from synthetic tests designed to be especially vulnerable to interference, to actual benchmarks.  
 
-1\. Litmus tests.
+1\. Victim Programs.
 
 Basic tests designed to test a single feature. There is a litmus test corresponding to every single enemy process
 
@@ -45,8 +43,8 @@ A benchmark suite to test the latency of real-time threads. It is based on lunch
 *Note*: If you plan to use one of the external SUTs, it is your responsibility to check the license associated with that SUT
 
 
-## Structure
-The enemy processes are written in C and the experiments are driven by scripts written in python 2.
+## Structure ##
+The enemy processes are written in C and the experiments are driven by scripts written in python 3.
 
 * **src** : C source folder for the enemy processes
 * **bin** : Default folder where the SUTs and enemy processes are built
@@ -56,7 +54,7 @@ The enemy processes are written in C and the experiments are driven by scripts w
 * **scripts/config_attack** : Example JSON files for the interference experiments
 
 
-## Building
+## Building ##
 
 The system has been tested on Ubuntu 16.04 and on an Raspberry Pi 3 running Raspbian Jessie. We make the assumption that the system has a gcc compiler for that architecture on which the harness will be run.
 
@@ -90,7 +88,7 @@ For result plotting:
   make all
 ```
 
-## Tuning the enemy processes
+## Tuning the enemy processes ##
 
 There are two possibilities to train an enemy process to cause as much interference as possible
 
@@ -122,7 +120,7 @@ There are two possibilities to train an enemy process to cause as much interfere
 
 3\. A file describing all the iterations **log_file** and a file describing the parameters for the maximum interference **max_file** will be created. This parameters can be used as defines to compile the template file.
 
-#### Demo scripts
+#### Demo scripts ###
 
 * **config_tune/tune_cache.json** : This script will try to find the optimal parameters for the cache stress. It will try to this by fuzzing and by Bayesian Optimisation.
 * **config_tune/tune_mem.json** : This script will try to find the optimal parameters for the memory stress. It will try to this by fuzzing and by Bayesian Optimisation.
@@ -131,7 +129,7 @@ There are two possibilities to train an enemy process to cause as much interfere
 *Note:* All scripts will run for 8 hours and will record the detected parameters in .txt files.
 
 
-## Running the SUT in the precedence of enemy processes
+## Running the SUT in the precedence of enemy processes ##
 
 1\. Create a JSON file that defines the experiment that needs to be run with the following parameters:
 
@@ -174,7 +172,7 @@ This will run experiments with the cross product of all the applications in the 
     python plot.py <output>.json
 ```
 
-#### Demo scripts
+#### Demo scripts ###
 
 * **config_attack/stress_cache.json** : This script will stress the cache intensive applications with the untrained enemy processes.
 * **config_attack/stress_coremark.json** : This script will stress the coremark benchmark with the untrained enemy processes.
@@ -188,7 +186,7 @@ This will run experiments with the cross product of all the applications in the 
 *Note 2:* Compile and add the tuned enemy processes to the **stress** list in for your specific platform.
 
 
-## Doxygen (Doxygen)
+## Doxygen (Doxygen) ##
 
 Doxygen is used to generate documentation from annotated source files. It will generate HTML and Latex documentation in the /doc folder.
 
@@ -205,13 +203,13 @@ Doxygen is used to generate documentation from annotated source files. It will g
   doxygen Doxyfile
 ```
 
-## Raspberry Pi 3 Results
+## Raspberry Pi 3 Results ##
 
 In this section, we provide the results of the the multicore test harness on the Raspberry Pi 3 with a Real-Time Kernel.
 
 The Raspberry Pi, was configured by flashing an SD cared with [Raspbian Jessie](http://downloads.raspberrypi.org/raspbian/images/raspbian-2017-07-05/) and replacing the kernel with a RT as instructed [here](http://www.frank-durr.de/?p=203).
 
-### Tuning
+### Tuning ###
 
 **Cache enemy**
 
@@ -243,7 +241,7 @@ The Raspberry Pi, was configured by flashing an SD cared with [Raspbian Jessie](
 | INSTR4        | 2             | 3                      |
 | INSTR5        | 5             | 4                      |
 
-## Interference
+## Interference ##
 
 Legend:
 
