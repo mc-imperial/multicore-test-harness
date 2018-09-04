@@ -374,19 +374,18 @@ class EnemyConfiguration:
 
         return defines
 
-    def get_file_mapping(self, suffix = None, output_folder = None):
+    def get_file_mapping(self, prefix="", output_folder=""):
         """
         Generated enemy files
-        :param sufix: The suffix added to the filename
+        :param prefix: The prefix added to the filename
         :param output_folder: The output folder of the enemies
         :return: A dict representing a mapping of enemy files to cores
         """
         enemy_mapping = dict()
-        
-        def xstr(s): s: s or ""
+
 
         for i in range(self.enemy_cores):
-            filename = xstr(output_folder) + str(i+1) + "_enemy" + xstr(suffix)
+            filename = output_folder + prefix + str(i+1) + "_enemy"
             self.enemies[i].create_bin(filename)
             # Start mapping the enemies from core 1
             enemy_mapping[i + 1] = filename
@@ -1058,7 +1057,7 @@ class Tuning:
             print("I do not know how to simple train that way")
             sys.exit(0)
 
-        best_state.get_file_mapping(suffix=exp_suffix, output_folder=self._output_binary)
+        best_state.get_file_mapping(suffix=str(exp_suffix) + "_", output_folder=str(self._output_binary))
 
         f = open(self._max_file, 'w')
         f.write("Max time " + str(best_score) + "\n" + str(best_state))
