@@ -384,7 +384,7 @@ class EnemyConfiguration:
         enemy_mapping = dict()
 
         for i in range(self.enemy_cores):
-            filename = output_folder + str(i+1) + "_enemy" + suffix
+            filename = str(output_folder) + str(i+1) + "_enemy" + str(suffix)
             self.enemies[i].create_bin(filename)
             # Start mapping the enemies from core 1
             enemy_mapping[i + 1] = filename
