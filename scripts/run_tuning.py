@@ -382,9 +382,11 @@ class EnemyConfiguration:
         :return: A dict representing a mapping of enemy files to cores
         """
         enemy_mapping = dict()
+        
+        def xstr(s): s: s or ""
 
         for i in range(self.enemy_cores):
-            filename = str(output_folder) + str(i+1) + "_enemy" + str(suffix)
+            filename = xstr(output_folder) + str(i+1) + "_enemy" + xstr(suffix)
             self.enemies[i].create_bin(filename)
             # Start mapping the enemies from core 1
             enemy_mapping[i + 1] = filename
