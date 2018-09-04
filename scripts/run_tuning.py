@@ -952,6 +952,8 @@ class Tuning:
 
         try:
             self._output_binary = str(json_object["output_binary"])
+            if not os.path.exists(self._output_binary):
+                os.makedirs(self._output_binary)
         except KeyError:
             print("Unable to find output_binary in JSON")
             sys.exit(1)

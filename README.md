@@ -111,7 +111,7 @@ There are three possibilities to train an enemy process to cause as much interfe
 * **method** : The training method to use. Either **ran**, **sa** or **bo**
 * **quantile** : When taking multiple measurements, what quantile to use.
 * **log_file** : The log files where all the training iterations
-* **output_binary** : Output folder where the best enemy binaries are sored
+* **output_binary** : Output folder where the best enemy binaries are sored 
 * **max_file** : The files where the maximum interference is recorded and the parameters that caused it
 * **max_tuning_time** : The time (in minutes) after which the tuning process is stopped
 * **max_inner_iterations** : The number of iterations after which the tuning process is stopped.
