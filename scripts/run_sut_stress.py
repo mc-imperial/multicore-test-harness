@@ -189,15 +189,6 @@ class SutStress:
         total_times = []
         total_temps = []
 
-        # print(sut)
-        # print(mapping)
-        # print(iterations)
-        # print(max_temperature)
-        # print(quantile)
-        # print(style)
-        # print(max_confidence_variation)
-        # print(governor)
-
         while True:
             it = 0
 

@@ -2,25 +2,7 @@
 
 This software is a black-box testing technique with the capability of provoking interference behaviour in multi-core chips, enabling an assessment of the extent to which interference affects execution of a piece of Software Under Test (SUT).  Interference is analysed by having an “enemy” process run a configurable test harness that is designed, through a combination of manual and automated tuning, to maximize the degree of certain types of interference. The black-box nature of this technique makes it applicable to any multi-core microprocessor running any operating system, so long as compilation and execution of ANSI-C programs is supported.
 
-## Enemy processes ##
-
-The enemy processes are divided into four categories and are meant to target individual shared resources.
-
-1\. Bus stress
-
-We have designed the enemy with the aim of hindering data transfers between the CPU and main memory. It reads a series of numbers from a main memory data buffer and increments their value.
-
-2\. Cache stress
-
-This enemy process causes interference in the shared cache. It executes operations that cause as many evictions as possible.
-
-3\. Memory thrashing stress
-
-This enemy process causes interference in the shared bus and shared RAM controller. Memory thrashing enemy processes that make frequent RAM accesses and thus cause a lot of bus traffic and keep the RAM controller busy.
-
-
-
-## Systems under test ##
+## Benchmarks ##
 
 The systems under stress are divided into 4 categories and range from synthetic tests designed to be especially vulnerable to interference, to actual benchmarks.  
 
@@ -88,28 +70,54 @@ For result plotting:
   make all
 ```
 
-## Tuning the enemy processes ##
+## Framework steps ##
 
-There are two possibilities to train an enemy process to cause as much interference as possible
+1. For each sared resource, create an enemy process and victim program pair.
+2. Tune the enemy process with their corresponding victim program
+3. Create the ranked list of hostile environments
+4. Determine the Paretto Optimal hostile environment
+5. Run benchmarks in the hostile environment
 
-* **Fuzzing**. Tries different possible configurations of the enemy process and record which one causes the highest impact on the SUT
+### 1. Enemy processes ###
+
+We used the following enemy processes to stress individual resources. It is easy to extend the framework and stress different shared resources that we have not included and that might be particular to specific platforms.
+
+1\. Bus stress
+
+We have designed the enemy with the aim of hindering data transfers between the CPU and main memory. It reads a series of numbers from a main memory data buffer and increments their value.
+
+2\. Cache stress
+
+This enemy process causes interference in the shared cache. It executes operations that cause as many evictions as possible.
+
+3\. Memory thrashing stress
+
+This enemy process causes interference in the shared bus and shared RAM controller. Memory thrashing enemy processes that make frequent RAM accesses and thus cause a lot of bus traffic and keep the RAM controller busy.
+
+### 2. Tuning the enemy processes ###
+
+There are three possibilities to train an enemy process to cause as much interference as possible
+
+* **Fuzzing**. samples different configurations and remembers the best values. This approach has the advantage of being lightweight and providing a baseline for the more complicated techniques.
+* **Simulated Annealing** is a metaheuristic to approximate global optimisation in a large search space. It is often used when the search space is discrete (e.g., all tours that visit a given set of cities). For problems where finding an approximate global optimum is more important than finding a precise local optimum in a fixed amount of time, simulated annealing may be preferable.
 * **Bayesian Optimisation**. Bayesian optimization works by constructing an approximation of the interference caused by enemy process with various tuning parameters. This approximation is improved with every new observation of a new set of parameters.
 
 1\. Create a JSON file that defines the type of training process, with the following parameters:
 
-* **sut** : The SUT to which you want to train against
-* **template_data** : The JSON files that describes the parameters and the ranges of the tunable enemy process.
-* **template_file** : The template file of the enemy process. This files can be found in th templates folder
-* **cores** : The number of cores on which to lunch the enemy process.
-* **method** : The training method to use. Either **fuzz** or **baysian**
-* **kappa** : If Bayesian optimization is used as a trainning method, this parameter allows setting the exploitation/exploration trade-off. A lower parameter encourages exploitation and a higher parameter encourages exploration.
-* **log_file** : The log files where all the training iterations.
-* **max_file** : The files where the maximum interference is recorded and the parameters that caused it.
-* **training_time** : The total training time, in minutes
-* **max_temperature** : The maximum temperature allowed before starting a training iteration
-* **cooldown_time** : Cooldown time to be used between iterations, if no maximum temperature is defined
+* **sut** : The victim program used for tuning
+* **enemy_range** : The JSON files that describes the parameters and the ranges of the tunable enemy process
+* **enemy_template** : The template file of the enemy process. This files can be found in th templates folder
+* **cores** : The number of cores on which to lunch the enemy process
+* **method** : The training method to use. Either **ran**, **sa** or **bo**
+* **quantile** : When taking multiple measurements, what quantile to use.
+* **log_file** : The log files where all the training iterations
+* **output_binary** : Output folder where the best enemy binaries are sored
+* **max_file** : The files where the maximum interference is recorded and the parameters that caused it
+* **max_tuning_time** : The time (in minutes) after which the tuning process is stopped
+* **max_inner_iterations** : The number of iterations after which the tuning process is stopped.
+* **max_temperature** : The maximum temperature allowed for a measurement to be considered valid.
 
-*Note:* An example of such JSON files can be found in scripts/config_tune
+*Note:* Examples of such JSON files can be found in scripts/config_tune
 
 2\. Run the python script to start training:
 
@@ -122,11 +130,11 @@ There are two possibilities to train an enemy process to cause as much interfere
 
 #### Demo scripts ###
 
-* **config_tune/tune_cache.json** : This script will try to find the optimal parameters for the cache stress. It will try to this by fuzzing and by Bayesian Optimisation.
-* **config_tune/tune_mem.json** : This script will try to find the optimal parameters for the memory stress. It will try to this by fuzzing and by Bayesian Optimisation.
-* **config_tune/tune_system.json** : This script will try to find the optimal parameters for the system stress. It will try to this by fuzzing and by Bayesian Optimisation.
+* **config_tune/tune_cache.json** : This script will try to find the optimal parameters for the cache stress using **ran**, **sa** and **bo**
+* **config_tune/tune_mem.json** : This script will try to find the optimal parameters for the memory stress using **ran**, **sa** and **bo**
+* **config_tune/tune_bus.json** : This script will try to find the optimal parameters for the system stress using **ran**, **sa** and **bo**
 
-*Note:* All scripts will run for 8 hours and will record the detected parameters in .txt files.
+*Note:* All scripts will run for 2 hours, record the detected parameters in .txt files and create the binary files.
 
 
 ## Running the SUT in the precedence of enemy processes ##

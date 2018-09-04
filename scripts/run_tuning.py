@@ -374,15 +374,17 @@ class EnemyConfiguration:
 
         return defines
 
-    def get_file_mapping(self):
+    def get_file_mapping(self, suffix = None, output_folder = None):
         """
         Generated enemy files
+        :param sufix: The suffix added to the filename
+        :param output_folder: The output folder of the enemies
         :return: A dict representing a mapping of enemy files to cores
         """
         enemy_mapping = dict()
 
         for i in range(self.enemy_cores):
-            filename = str(i+1) + "_enemy.out"
+            filename = output_folder + str(i+1) + "_enemy" + suffix
             self.enemies[i].create_bin(filename)
             # Start mapping the enemies from core 1
             enemy_mapping[i + 1] = filename
@@ -554,8 +556,6 @@ class Optimization:
         self._t_end = time() + 60 * max_time
 
         self._socket = network_socket
-
-
 
 
         # Delete old log files
@@ -882,6 +882,7 @@ class Tuning:
 
         self._log_file = None
         self._max_file = None
+        self._output_binary = None
 
         # For network connection
         self._socket = None
@@ -950,13 +951,19 @@ class Tuning:
             sys.exit(1)
 
         try:
-            self._training_time = int(json_object["training_time"])
+            self._output_binary = str(json_object["output_binary"])
+        except KeyError:
+            print("Unable to find output_binary in JSON")
+            sys.exit(1)
+
+        try:
+            self._training_time = int(json_object["max_tuning_time"])
         except KeyError:
             print("Unable to find training_time in JSON")
             sys.exit(1)
 
         try:
-            self._inner_iterations = int(json_object["inner_iterations"])
+            self._inner_iterations = int(json_object["max_inner_iterations"])
         except KeyError:
             print("Unable to find inner_iterations in JSON")
             sys.exit(1)
@@ -1019,10 +1026,11 @@ class Tuning:
                 "\n" + "Total time " + str(time()-start_time))
         f.close()
 
-    def simple_tune(self, tune_method):
+    def simple_tune(self, tune_method, exp_suffix):
         """
         This method can be used only if the template is fixed and we only need to determine the parameters
         :param tune_method: Optimization method
+        :param exp_suffix: The suffix used to identify the output binary
         :return:
         """
         assert self._enemy_config.fixed_template, "Can not train this way if the template is not given"
@@ -1045,6 +1053,8 @@ class Tuning:
         else:
             print("I do not know how to simple train that way")
             sys.exit(0)
+
+        best_state.get_file_mapping(suffix=exp_suffix, output_folder=self._output_binary)
 
         f = open(self._max_file, 'w')
         f.write("Max time " + str(best_score) + "\n" + str(best_state))
@@ -1097,16 +1107,16 @@ class Tuning:
                 self.bilevel_tune("ran", "bo")
             elif self._method == "ran":
                 print("Tuning by randomising with a fixed template")
-                self.simple_tune("ran")
+                self.simple_tune("ran", tuning_session)
             elif self._method == "hc":
                 print("Tuning by hillclimbing with a fixed template")
-                self.simple_tune("hc")
+                self.simple_tune("hc", tuning_session)
             elif self._method == "sa":
                 print("Tuning by simulated annealing with a fixed template")
-                self.simple_tune("sa")
+                self.simple_tune("sa", tuning_session)
             elif self._method == "bo":
                 print("Tuning with bayesian optimization with a fixed template")
-                self.simple_tune("bo")
+                self.simple_tune("bo", tuning_session)
             else:
                 print("I do not know how to train that way")
                 sys.exit(0)

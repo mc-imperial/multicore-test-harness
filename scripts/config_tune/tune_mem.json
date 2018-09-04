@@ -1,5 +1,5 @@
 {
-  "mem_fuzz_train1": {
+  "mem_fuzz_tune1": {
     "sut": "../bin/sut/mem_thrashing_test",
     "enemy_range": "../templates/mem/parameters.json",
     "enemy_template": "../templates/mem/template_mem.c",
@@ -8,11 +8,12 @@
     "quantile": 0.9,
     "log_file": "../results_litmus/mem_fuzz_120_log_1.txt",
     "max_file": "../results_litmus/mem_fuzz_120_max_1.txt",
-    "training_time": 120,
-    "inner_iterations": 200000,
+    "output_binary": "../results_litmus/",
+    "max_tuning_time": 120,
+    "max_inner_iterations": 200000,
     "max_temperature": 80
   },
-  "mem_fuzz_train2": {
+  "mem_fuzz_tune2": {
     "sut": "../bin/sut/mem_thrashing_test",
     "enemy_range": "../templates/mem/parameters.json",
     "enemy_template": "../templates/mem/template_mem.c",
@@ -21,11 +22,12 @@
     "quantile": 0.9,
     "log_file": "../results_litmus/mem_fuzz_120_log_2.txt",
     "max_file": "../results_litmus/mem_fuzz_120_max_2.txt",
-    "training_time": 120,
-    "inner_iterations": 200000,
+    "output_binary": "../results_litmus/",
+    "max_tuning_time": 120,
+    "max_inner_iterations": 200000,
     "max_temperature": 80
   },
-  "mem_fuzz_train3": {
+  "mem_fuzz_tune3": {
     "sut": "../bin/sut/mem_thrashing_test",
     "enemy_range": "../templates/mem/parameters.json",
     "enemy_template": "../templates/mem/template_mem.c",
@@ -34,11 +36,12 @@
     "quantile": 0.9,
     "log_file": "../results_litmus/mem_fuzz_120_log_3.txt",
     "max_file": "../results_litmus/mem_fuzz_120_max_3.txt",
-    "training_time": 120,
-    "inner_iterations": 200000,
+    "output_binary": "../results_litmus/",
+    "max_tuning_time": 120,
+    "max_inner_iterations": 200000,
     "max_temperature": 80
   },
-  "mem_sa_train1": {
+  "mem_sa_tune1": {
     "sut": "../bin/sut/mem_thrashing_test",
     "enemy_range": "../templates/mem/parameters.json",
     "enemy_template": "../templates/mem/template_mem.c",
@@ -47,11 +50,12 @@
     "quantile": 0.9,
     "log_file": "../results_litmus/mem_sa_120_log_1.txt",
     "max_file": "../results_litmus/mem_sa_120_max_1.txt",
-    "training_time": 120,
-    "inner_iterations": 200000,
+    "output_binary": "../results_litmus/",
+    "max_tuning_time": 120,
+    "max_inner_iterations": 200000,
     "max_temperature": 80
   },
-    "mem_sa_train2": {
+  "mem_sa_tune2": {
     "sut": "../bin/sut/mem_thrashing_test",
     "enemy_range": "../templates/mem/parameters.json",
     "enemy_template": "../templates/mem/template_mem.c",
@@ -60,11 +64,12 @@
     "quantile": 0.9,
     "log_file": "../results_litmus/mem_sa_120_log_2.txt",
     "max_file": "../results_litmus/mem_sa_120_max_2.txt",
-    "training_time": 120,
-    "inner_iterations": 200000,
+    "output_binary": "../results_litmus/",
+    "max_tuning_time": 120,
+    "max_inner_iterations": 200000,
     "max_temperature": 80
   },
-    "mem_sa_train3": {
+  "mem_sa_tune3": {
     "sut": "../bin/sut/mem_thrashing_test",
     "enemy_range": "../templates/mem/parameters.json",
     "enemy_template": "../templates/mem/template_mem.c",
@@ -73,11 +78,12 @@
     "quantile": 0.9,
     "log_file": "../results_litmus/mem_sa_120_log_3.txt",
     "max_file": "../results_litmus/mem_sa_120_max_3.txt",
-    "training_time": 120,
-    "inner_iterations": 200000,
+    "output_binary": "../results_litmus/",
+    "max_tuning_time": 120,
+    "max_inner_iterations": 200000,
     "max_temperature": 80
   },
-  "mem_bo_train1": {
+  "mem_bo_tune1": {
     "sut": "../bin/sut/mem_thrashing_test",
     "enemy_range": "../templates/mem/parameters.json",
     "enemy_template": "../templates/mem/template_mem.c",
@@ -86,11 +92,12 @@
     "quantile": 0.9,
     "log_file": "../results_litmus/mem_bo_120_log_1.txt",
     "max_file": "../results_litmus/mem_bo_120_max_1.txt",
-    "training_time": 120,
-    "inner_iterations": 200000,
+    "output_binary": "../results_litmus/",
+    "max_tuning_time": 120,
+    "max_inner_iterations": 200000,
     "max_temperature": 80
   },
-    "mem_bo_train2": {
+  "mem_bo_tune2": {
     "sut": "../bin/sut/mem_thrashing_test",
     "enemy_range": "../templates/mem/parameters.json",
     "enemy_template": "../templates/mem/template_mem.c",
@@ -99,11 +106,12 @@
     "quantile": 0.9,
     "log_file": "../results_litmus/mem_bo_120_log_2.txt",
     "max_file": "../results_litmus/mem_bo_120_max_2.txt",
-    "training_time": 120,
-    "inner_iterations": 200000,
+    "output_binary": "../results_litmus/",
+    "max_tuning_time": 120,
+    "max_inner_iterations": 200000,
     "max_temperature": 80
   },
-    "mem_bo_train3": {
+  "mem_bo_tune3": {
     "sut": "../bin/sut/mem_thrashing_test",
     "enemy_range": "../templates/mem/parameters.json",
     "enemy_template": "../templates/mem/template_mem.c",
@@ -112,8 +120,9 @@
     "quantile": 0.9,
     "log_file": "../results_litmus/mem_bo_120_log_3.txt",
     "max_file": "../results_litmus/mem_bo_120_max_3.txt",
-    "training_time": 120,
-    "inner_iterations": 200000,
+    "output_binary": "../results_litmus/",
+    "max_tuning_time": 120,
+    "max_inner_iterations": 200000,
     "max_temperature": 80
   }
 }

@@ -1,5 +1,5 @@
 {
-  "bus_fuzz_train1": {
+  "bus_fuzz_tune1": {
     "sut": "../bin/sut/bus_test",
     "enemy_range": "../templates/bus/parameters.json",
     "enemy_template": "../templates/bus/template_bus.c",
@@ -8,11 +8,11 @@
     "quantile": 0.9,
     "log_file": "../results_litmus/bus_fuzz_120_log_1.txt",
     "max_file": "../results_litmus/bus_fuzz_120_max_1.txt",
-    "training_time": 120,
-    "inner_iterations": 200000,
+    "max_tuning_time": 120,
+    "max_inner_iterations": 200000,
     "max_temperature": 80
   },
-  "bus_fuzz_train2": {
+  "bus_fuzz_tune2": {
     "sut": "../bin/sut/bus_test",
     "enemy_range": "../templates/bus/parameters.json",
     "enemy_template": "../templates/bus/template_bus.c",
@@ -21,11 +21,11 @@
     "quantile": 0.9,
     "log_file": "../results_litmus/bus_fuzz_120_log_2.txt",
     "max_file": "../results_litmus/bus_fuzz_120_max_2.txt",
-    "training_time": 120,
-    "inner_iterations": 200000,
+    "max_tuning_time": 120,
+    "max_inner_iterations": 200000,
     "max_temperature": 80
   },
-  "bus_fuzz_train3": {
+  "bus_fuzz_tune3": {
     "sut": "../bin/sut/bus_test",
     "enemy_range": "../templates/bus/parameters.json",
     "enemy_template": "../templates/bus/template_bus.c",
@@ -34,11 +34,11 @@
     "quantile": 0.9,
     "log_file": "../results_litmus/bus_fuzz_120_log_3.txt",
     "max_file": "../results_litmus/bus_fuzz_120_max_3.txt",
-    "training_time": 120,
-    "inner_iterations": 200000,
+    "max_tuning_time": 120,
+    "max_inner_iterations": 200000,
     "max_temperature": 80
   },
-  "bus_sa_train1": {
+  "bus_sa_tune1": {
     "sut": "../bin/sut/bus_test",
     "enemy_range": "../templates/bus/parameters.json",
     "enemy_template": "../templates/bus/template_bus.c",
@@ -47,11 +47,11 @@
     "quantile": 0.9,
     "log_file": "../results_litmus/bus_sa_120_log_1.txt",
     "max_file": "../results_litmus/bus_sa_120_max_1.txt",
-    "training_time": 120,
-    "inner_iterations": 200000,
+    "max_tuning_time": 120,
+    "max_inner_iterations": 200000,
     "max_temperature": 80
   },
-    "bus_sa_train2": {
+    "bus_sa_tune2": {
     "sut": "../bin/sut/bus_test",
     "enemy_range": "../templates/bus/parameters.json",
     "enemy_template": "../templates/bus/template_bus.c",
@@ -60,11 +60,11 @@
     "quantile": 0.9,
     "log_file": "../results_litmus/bus_sa_120_log_2.txt",
     "max_file": "../results_litmus/bus_sa_120_max_2.txt",
-    "training_time": 120,
-    "inner_iterations": 200000,
+    "max_tuning_time": 120,
+    "max_inner_iterations": 200000,
     "max_temperature": 80
   },
-    "bus_sa_train3": {
+    "bus_sa_tune3": {
     "sut": "../bin/sut/bus_test",
     "enemy_range": "../templates/bus/parameters.json",
     "enemy_template": "../templates/bus/template_bus.c",
@@ -73,11 +73,11 @@
     "quantile": 0.9,
     "log_file": "../results_litmus/bus_sa_120_log_3.txt",
     "max_file": "../results_litmus/bus_sa_120_max_3.txt",
-    "training_time": 120,
-    "inner_iterations": 200000,
+    "max_tuning_time": 120,
+    "max_inner_iterations": 200000,
     "max_temperature": 80
   },
-  "bus_bo_train1": {
+  "bus_bo_tune1": {
     "sut": "../bin/sut/bus_test",
     "enemy_range": "../templates/bus/parameters.json",
     "enemy_template": "../templates/bus/template_bus.c",
@@ -86,11 +86,11 @@
     "quantile": 0.9,
     "log_file": "../results_litmus/bus_bo_120_log_1.txt",
     "max_file": "../results_litmus/bus_bo_120_max_1.txt",
-    "training_time": 120,
-    "inner_iterations": 200000,
+    "max_tuning_time": 120,
+    "max_inner_iterations": 200000,
     "max_temperature": 80
   },
-    "bus_bo_train2": {
+    "bus_bo_tune2": {
     "sut": "../bin/sut/bus_test",
     "enemy_range": "../templates/bus/parameters.json",
     "enemy_template": "../templates/bus/template_bus.c",
@@ -99,11 +99,11 @@
     "quantile": 0.9,
     "log_file": "../results_litmus/bus_bo_120_log_2.txt",
     "max_file": "../results_litmus/bus_bo_120_max_2.txt",
-    "training_time": 120,
-    "inner_iterations": 200000,
+    "max_tuning_time": 120,
+    "max_inner_iterations": 200000,
     "max_temperature": 80
   },
-    "bus_bo_train3": {
+    "bus_bo_tune3": {
     "sut": "../bin/sut/bus_test",
     "enemy_range": "../templates/bus/parameters.json",
     "enemy_template": "../templates/bus/template_bus.c",
@@ -112,8 +112,8 @@
     "quantile": 0.9,
     "log_file": "../results_litmus/bus_bo_120_log_3.txt",
     "max_file": "../results_litmus/bus_bo_120_max_3.txt",
-    "training_time": 120,
-    "inner_iterations": 200000,
+    "max_tuning_time": 120,
+    "max_inner_iterations": 200000,
     "max_temperature": 80
   }
 }
