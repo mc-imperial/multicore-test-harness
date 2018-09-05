@@ -164,7 +164,8 @@ class SutStress:
 
         return metric
 
-    def run_mapping(self, sut,
+    def run_mapping(self,
+                    sut,
                     mapping,
                     iterations=20,
                     max_temperature=50,
@@ -178,7 +179,10 @@ class SutStress:
         :param mapping: A mapping of enemies o cores
         :param iterations: The total number of times to repeat the experiment
         :param max_temperature: If the temperature is above this, discard the result
+        :param quantile: When running multiple measurements, what quantile to choose
         :param style: Run the SUT with perf or some similar instrument
+        :param max_confidence_variation: How much variation should be allow before stopping measurements
+        :param governor: The governor for power scaling
         """
 
         # Make sure the governor is correctly

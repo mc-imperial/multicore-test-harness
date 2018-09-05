@@ -1029,11 +1029,11 @@ class Tuning:
                 "\n" + "Total time " + str(time()-start_time))
         f.close()
 
-    def simple_tune(self, tune_method, exp_suffix):
+    def simple_tune(self, tune_method, exp_prefix):
         """
         This method can be used only if the template is fixed and we only need to determine the parameters
         :param tune_method: Optimization method
-        :param exp_suffix: The suffix used to identify the output binary
+        :param exp_prefix: The suffix used to identify the output binary
         :return:
         """
         assert self._enemy_config.fixed_template, "Can not train this way if the template is not given"
@@ -1057,7 +1057,7 @@ class Tuning:
             print("I do not know how to simple train that way")
             sys.exit(0)
 
-        best_state.get_file_mapping(suffix=str(exp_suffix) + "_", output_folder=str(self._output_binary))
+        best_state.get_file_mapping(prefix=str(exp_prefix) + "_", output_folder=str(self._output_binary))
 
         f = open(self._max_file, 'w')
         f.write("Max time " + str(best_score) + "\n" + str(best_state))

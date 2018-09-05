@@ -55,6 +55,7 @@ class Experiment(object):
         self._temp = None
         self._max_temperature = None
         self._cooldown_time = None
+        self._quantile = None
         self._folder_name = self._TEMP_FOLDER_PREFIX + time.strftime("%H%M%S") + "/"
 
     def read_json_object(self, json_object):
@@ -105,11 +106,16 @@ class Experiment(object):
         except KeyError:
             print("Error processing cores in JSON")
 
-        # You can not have a list for iterations, temperature, cooldown_time
+        # You can not have a list for iterations, temperature
         try:
             self._iterations = int(json_object["iterations"])
         except KeyError:
             print("Unable to find iterations in JSON")
+
+        try:
+            self._quantile = int(json_object["quantile"])
+        except KeyError:
+            print("Unable to find quantile in JSON")
 
         try:
             self._max_temperature = int(json_object["max_temperature"])
@@ -267,15 +273,15 @@ class Experiment(object):
 
         return data
 
-    def _log_data3(self, sut, stress, cores, time_list_baseline, dict_mappings):
+    def _log_data3(self, sut, stress, cores, baseline_score, results):
         """
         Stores the time list, temp list, average time, average temp and std time and std temp
         in a dictionary
         :param sut: System under stress
         :param stress: Enemy process
         :param cores: Number of enemy cores
-        :param time_list_baseline: A list with all the execution times
-        :param dict_mappings: Dict with enemies and averages
+        :param baseline_score: The score with the baseline
+        :param results: Dict with the environment and the score
         :return: A dictionary with all the data
         """
         data = dict()
@@ -285,12 +291,9 @@ class Experiment(object):
         data['cores'] = cores
         data['iterations'] = self._iterations
 
-        time_array = np.asarray(time_list_baseline)
+        data['time_list_baseline_avg'] = baseline_score
 
-        data['time_list_baseline_avg'] = time_array.mean()
-
-        sorted_by_value = sorted(dict_mappings.items(), key=lambda kv: kv[1], reverse=False)
-        data['ranked_list'] = sorted_by_value
+        data['ranked_list'] = results
 
         return data
 
@@ -398,11 +401,14 @@ class Experiment(object):
                                                         iterations=self._iterations,
                                                         max_temperature=self._max_temperature)
 
+                baseline_score = mquantiles(time_list_baseline, self._quantile)[0]
+
                 results = dict()
                 total_cores = self._cores[0]
                 c = [p for p in itertools.product(self._ranked_list, repeat=total_cores)]
                 conf_mapping = dict()
 
+                i = 0
                 for conf in c:
                     for core in range(1, total_cores + 1):
                         conf_mapping[core] = conf[core - 1]
@@ -411,13 +417,15 @@ class Experiment(object):
                                                          mapping=conf_mapping,
                                                          iterations=self._iterations,
                                                          max_temperature=self._max_temperature)
-
-                    results[str(conf_mapping)] = np.asarray(time_list_enemy).mean()
+                    config_name = "config_" + "1"
+                    results[config_name] = dict()
+                    results[config_name]["env"] = conf_mapping
+                    results[config_name]["score"] = mquantiles(time_list_enemy, self._quantile)[0]
 
                 output[experiment] = self._log_data3(self._sut,
                                         str(self._ranked_list),
                                         total_cores,
-                                        time_list_baseline,
+                                        baseline_score,
                                         results,
                                         )
                 config_out_file = self._folder_name + experiment + ".json"

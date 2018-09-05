@@ -44,19 +44,23 @@ The system has been tested on Ubuntu 16.04 and on an Raspberry Pi 3 running Rasp
 
 For Bayesian optimization:
 ```
-  sudo apt install python-pip
-  sudo pip install --upgrade pip
-  sudo apt-get install python-numpy python-scipy
-  sudo pip install setuptools
-  sudo pip install bayesian-optimization
+  sudo apt install python3-pip
+  sudo apt-get install python3-numpy python3-scipy
+  sudo pip3 install bayesian-optimization
 ```
 For RT-tests:
 ```
   sudo apt-get install libnuma-dev
 ```
+
+For Simulated Annealing:
+```
+sudo pip3 install simanneal 
+```
+
 For result plotting:
 ```
-  sudo apt-get install python-matplotlib
+  sudo apt-get install python3-matplotlib
 ```
 
 2\. If desired, change the following parameters in the makefile:
@@ -72,7 +76,7 @@ For result plotting:
 
 ## Framework steps ##
 
-1. For each sared resource, create an enemy process and victim program pair.
+1. For each shared resource, create an enemy process and victim program pair.
 2. Tune the enemy process with their corresponding victim program
 3. Create the ranked list of hostile environments
 4. Determine the Paretto Optimal hostile environment
@@ -82,25 +86,21 @@ For result plotting:
 
 We used the following enemy processes to stress individual resources. It is easy to extend the framework and stress different shared resources that we have not included and that might be particular to specific platforms.
 
-1\. Bus stress
+a) **Bus stress**. We have designed the enemy with the aim of hindering data transfers between the CPU and main memory. It reads a series of numbers from a main memory data buffer and increments their value.
 
-We have designed the enemy with the aim of hindering data transfers between the CPU and main memory. It reads a series of numbers from a main memory data buffer and increments their value.
+b) **Cache stress**. This enemy process causes interference in the shared cache. It executes operations that cause as many evictions as possible.
 
-2\. Cache stress
-
-This enemy process causes interference in the shared cache. It executes operations that cause as many evictions as possible.
-
-3\. Memory thrashing stress
-
-This enemy process causes interference in the shared bus and shared RAM controller. Memory thrashing enemy processes that make frequent RAM accesses and thus cause a lot of bus traffic and keep the RAM controller busy.
+c) **Memory thrashing stress**. This enemy process causes interference in the shared bus and shared RAM controller. Memory thrashing enemy processes that make frequent RAM accesses and thus cause a lot of bus traffic and keep the RAM controller busy.
 
 ### 2. Tuning the enemy processes ###
 
 There are three possibilities to train an enemy process to cause as much interference as possible
 
-* **Fuzzing**. samples different configurations and remembers the best values. This approach has the advantage of being lightweight and providing a baseline for the more complicated techniques.
-* **Simulated Annealing** is a metaheuristic to approximate global optimisation in a large search space. It is often used when the search space is discrete (e.g., all tours that visit a given set of cities). For problems where finding an approximate global optimum is more important than finding a precise local optimum in a fixed amount of time, simulated annealing may be preferable.
-* **Bayesian Optimisation**. Bayesian optimization works by constructing an approximation of the interference caused by enemy process with various tuning parameters. This approximation is improved with every new observation of a new set of parameters.
+a) **Fuzzing** samples different configurations and remembers the best values. This approach has the advantage of being lightweight and providing a baseline for the more complicated techniques.
+
+b) **Simulated Annealing** is a metaheuristic to approximate global optimisation in a large search space. It is often used when the search space is discrete (e.g., all tours that visit a given set of cities). For problems where finding an approximate global optimum is more important than finding a precise local optimum in a fixed amount of time, simulated annealing may be preferable.
+
+c) **Bayesian Optimisation**. Bayesian optimization works by constructing an approximation of the interference caused by enemy process with various tuning parameters. This approximation is improved with every new observation of a new set of parameters.
 
 1\. Create a JSON file that defines the type of training process, with the following parameters:
 
@@ -136,8 +136,12 @@ There are three possibilities to train an enemy process to cause as much interfe
 
 *Note:* All scripts will run for 2 hours, record the detected parameters in .txt files and create the binary files.
 
+### 3. Creating the ranked list ###
 
-## Running the SUT in the precedence of enemy processes ##
+### 4. Determining the Paretto Optimal hostile environment ###
+
+
+### 5. Evaluating the hostile environment ###
 
 1\. Create a JSON file that defines the experiment that needs to be run with the following parameters:
 
@@ -210,65 +214,3 @@ Doxygen is used to generate documentation from annotated source files. It will g
 ```
   doxygen Doxyfile
 ```
-
-## Raspberry Pi 3 Results ##
-
-In this section, we provide the results of the the multicore test harness on the Raspberry Pi 3 with a Real-Time Kernel.
-
-The Raspberry Pi, was configured by flashing an SD cared with [Raspbian Jessie](http://downloads.raspberrypi.org/raspbian/images/raspbian-2017-07-05/) and replacing the kernel with a RT as instructed [here](http://www.frank-durr.de/?p=203).
-
-### Tuning ###
-
-**Cache enemy**
-
-| *Parameters*  | *Values detected by <br /> fuzzing* | *Values detected by <br />  bayesian optimization*|
-| ------------- |:-------------:|:----------------------:|
-| ASSOCIATIVITY | 154           | 113                    |
-| INSTR1        | 1             | 1                      |
-| INSTR2        | 1             | 3                      |
-| INSTR3        | 1             | 2                      |
-| INSTR4        | 1             | 4                      |
-| CACHE_LINE    | 82            | 70                     |
-| MY_FACTOR     | 4             | 3                      |
-| INSTR5        | 1             | 4                      |
-
-**Memory enemy**
-
-| *Parameters*  | *Values detected by <br /> fuzzing* | *Values detected by <br />  bayesian optimization*|
-| ---------------- |:-------------:|:----------------------:|
-| SIZE_MB          | 29            | 95                     |
-| PAGE_SIZE_BYTES  | 9853          | 8907                   |
-
-**System enemy**
-
-| *Parameters*  | *Values detected by <br /> fuzzing* | *Values detected by <br />  bayesian optimization*|
-| ------------- |:-------------:|:----------------------:|
-| INSTR1        | 2             | 2                      |
-| INSTR2        | 3             | 4                      |
-| INSTR3        | 4             | 5                      |
-| INSTR4        | 2             | 3                      |
-| INSTR5        | 5             | 4                      |
-
-## Interference ##
-
-Legend:
-
-U - not tuned
-
-F - tuned using Fuzzing
-
-B - Tuned using Bayesian optimization
-
-|  *Enemy process* | *Cache litmus time(us)*  | *Memory litmus time(us)* | *System litmus time(us)* | *Pipeline litmus time(us)* | *Coremark time(us)* |
-| ---------------- |:------------:|:-------------:|:-------------:|:--------------:|:--------:|
-| baseline         | 605113       | 800807        | 1608829       | 3543630        | 12490000 |
-| U cache          | 3345717      | 1079123       | 1945448       | 3594554        | 12720000 |
-| F cache          | 9480042      | 4192268       | 32056466      | 3615523        | 13200000 |
-| B cache          | 9844489      | 4685625       | 37882536      | 3843269        | 15900000 |
-| U memory         | 5744788      | 1649468       | 22460072      | 3646462        | 13180000 |
-| F memory         | 5811896      | 4031728       | 27482135      | 3759266        | 13380000 |
-| B memory         | 5745578      | 3456403       | 26076934      | 3639061        | 12870000 |
-| U system         | 1200801      | 777247        | 11759146      | 3611831        | 12580000 |
-| F system         | 668841       | 831726        | 74241977      | 3631331        | 12590000 |
-| B system         | 750045       | 845161        | 65560406      | 3613417        | 12510000 |
-| U pipeline       | 684527       | 804182        | 1613253       | 3512416        | 12480000 |

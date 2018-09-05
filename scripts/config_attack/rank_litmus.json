@@ -5,6 +5,7 @@
                     "../tuned_enemies/tuned_bus",
                     "../tuned_enemies/tuned_memory"],
     "cores": 3,
+    "quantile": 0.9,
     "iterations": 20,
     "max_temperature": 80
   },
@@ -14,6 +15,7 @@
                     "../tuned_enemies/tuned_bus",
                     "../tuned_enemies/tuned_memory"],
     "cores": 3,
+    "quantile": 0.9,
     "iterations": 20,
     "max_temperature": 80
   },
@@ -23,6 +25,7 @@
                     "../tuned_enemies/tuned_bus",
                     "../tuned_enemies/tuned_memory"],
     "cores": 3,
+    "quantile": 0.9,
     "iterations": 20,
     "max_temperature": 80
   }
