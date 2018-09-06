@@ -32,8 +32,9 @@ The enemy processes are written in C and the experiments are driven by scripts w
 * **bin** : Default folder where the SUTs and enemy processes are built
 * **templates** : C sources for the configurable templates used for tuning
 * **scripts** : Python scripts used to drive the experiments
-* **scripts/config_tune** : Example JSON files for the tuning process
-* **scripts/config_attack** : Example JSON files for the interference experiments
+* **scripts/enemy_tune** : Example JSON files for the tuning enemies
+* **scripts/env_rank** : Example JSON files for ranking the environments
+* **scripts/eval_env** : Example JSON files for testing the benchmarks in the hostile environments
 
 
 ## Building ##
@@ -65,7 +66,7 @@ For result plotting:
 
 2\. If desired, change the following parameters in the makefile:
 
-* **CACHE_FILE** : JASON file describing the system cache structure
+* **CACHE_FILE** : JSON file describing the system cache structure
 * **COREMARK_PORT_DIR** : Can be either cygwin, linux or linux64
 
 3\. Build
@@ -94,7 +95,7 @@ c) **Memory thrashing stress**. This enemy process causes interference in the sh
 
 ### 2. Tuning the enemy processes ###
 
-There are three possibilities to train an enemy process to cause as much interference as possible
+There are three possibilities to tune an enemy process to cause as much interference as possible
 
 a) **Fuzzing** samples different configurations and remembers the best values. This approach has the advantage of being lightweight and providing a baseline for the more complicated techniques.
 
@@ -102,15 +103,15 @@ b) **Simulated Annealing** is a metaheuristic to approximate global optimisation
 
 c) **Bayesian Optimisation**. Bayesian optimization works by constructing an approximation of the interference caused by enemy process with various tuning parameters. This approximation is improved with every new observation of a new set of parameters.
 
-1\. Create a JSON file that defines the type of training process, with the following parameters:
+1\. Create a JSON file that defines the type of tuning process, with the following parameters:
 
 * **sut** : The victim program used for tuning
 * **enemy_range** : The JSON files that describes the parameters and the ranges of the tunable enemy process
 * **enemy_template** : The template file of the enemy process. This files can be found in th templates folder
 * **cores** : The number of cores on which to lunch the enemy process
-* **method** : The training method to use. Either **ran**, **sa** or **bo**
+* **method** : The tuning method to use. Either **ran**, **sa** or **bo**
 * **quantile** : When taking multiple measurements, what quantile to use.
-* **log_file** : The log files where all the training iterations
+* **log_file** : The log files where all the tuning iterations
 * **output_binary** : Output folder where the best enemy binaries are sored 
 * **max_file** : The files where the maximum interference is recorded and the parameters that caused it
 * **max_tuning_time** : The time (in minutes) after which the tuning process is stopped
@@ -119,26 +120,56 @@ c) **Bayesian Optimisation**. Bayesian optimization works by constructing an app
 
 *Note:* Examples of such JSON files can be found in scripts/config_tune
 
-2\. Run the python script to start training:
+2\. Run the python script to start tuning:
 
 ```
     cd scripts
-    python3 run_tuning.py <train_config>.json
+    python3 run_tuning.py <enemy_tune>.json
 ```
 
 3\. A file describing all the iterations **log_file** and a file describing the parameters for the maximum interference **max_file** will be created. This parameters can be used as defines to compile the template file.
 
 #### Demo scripts ###
 
-* **config_tune/tune_cache.json** : This script will try to find the optimal parameters for the cache stress using **ran**, **sa** and **bo**
-* **config_tune/tune_mem.json** : This script will try to find the optimal parameters for the memory stress using **ran**, **sa** and **bo**
-* **config_tune/tune_bus.json** : This script will try to find the optimal parameters for the system stress using **ran**, **sa** and **bo**
+* **enemy_tune/tune_cache.json** : This script will try to find the optimal parameters for the cache stress using **ran**, **sa** and **bo**
+* **enemy_tune/tune_mem.json** : This script will try to find the optimal parameters for the memory stress using **ran**, **sa** and **bo**
+* **enemy_tune/tune_bus.json** : This script will try to find the optimal parameters for the system stress using **ran**, **sa** and **bo**
 
 *Note:* All scripts will run for 2 hours, record the detected parameters in .txt files and create the binary files.
 
 ### 3. Creating the ranked list ###
 
+We want to determine which combination of tuned enemy processes are the most effective at causing interference to a generic SUT. 
+
+1\. Create a JSON file that defines for which victim programs we need to rank the environments, with the following parameters:
+
+* **sut** : The victim program 
+* **ranked_list** : The list of tuned enemy processes
+* **cores** : The number of cores on which enemy processes will run
+* **quantile** : What quantile will be used for measurement
+* **iterations** : Minimum number of iterations to run
+* **max_temperature** : The maximum temperature allowed for a measurement to be considered valid.
+
+2\. Run the python script the ranked list:
+
+```
+    python3 run_experiments <env_rank>.json <output>.json
+```
+
+3\. The output JSON file will contain ranked list of hostile environments fr each victim. Each environment will also contain a score.
+
+
+#### Demo scripts ####
+
+* **env_rank/rank_litmus** : This script will rank all possible environments, for each one of the victim programs used by us 
+
 ### 4. Determining the Paretto Optimal hostile environment ###
+
+The next step involves running the script to determine the Paretto Optimal hostile environment for all the victim programs we have tried 
+
+```
+    python3 calculate_rank.json
+```
 
 
 ### 5. Evaluating the hostile environment ###

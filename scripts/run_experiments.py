@@ -417,7 +417,7 @@ class Experiment(object):
                                                          mapping=conf_mapping,
                                                          iterations=self._iterations,
                                                          max_temperature=self._max_temperature)
-                    config_name = "config_" + "1"
+                    config_name = "config_" + str(i)
                     results[config_name] = dict()
                     results[config_name]["env"] = conf_mapping
                     results[config_name]["score"] = mquantiles(time_list_enemy, self._quantile)[0]
