@@ -406,10 +406,11 @@ class Experiment(object):
                 results = dict()
                 total_cores = self._cores[0]
                 c = [p for p in itertools.product(self._ranked_list, repeat=total_cores)]
-                conf_mapping = dict()
+
 
                 i = 0
                 for conf in c:
+                    conf_mapping = dict()
                     for core in range(1, total_cores + 1):
                         conf_mapping[core] = conf[core - 1]
 

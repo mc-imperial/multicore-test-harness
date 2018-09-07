@@ -49,20 +49,23 @@ For Bayesian optimization:
   sudo apt-get install python3-numpy python3-scipy
   sudo pip3 install bayesian-optimization
 ```
-For RT-tests:
-```
-  sudo apt-get install libnuma-dev
-```
 
 For Simulated Annealing:
 ```
 sudo pip3 install simanneal 
 ```
 
-For result plotting:
+For quantile:
 ```
-  sudo apt-get install python3-matplotlib
+sudo pip3 install scipy 
 ```
+
+
+For RT-tests:
+```
+  sudo apt-get install libnuma-dev
+```
+
 
 2\. If desired, change the following parameters in the makefile:
 
