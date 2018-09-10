@@ -2,11 +2,11 @@
   "coremark": {
     "sut": "../bin/sut/coremark.exe 0x0 0x0 0x66 1000",
     "mapping": {
-      "1" : "../tuned_enemies/tuned_memory",
-      "2" : "../tuned_enemies/tuned_cache",
-      "3" : "../tuned_enemies/tuned_memory",
-      "4" : "../tuned_enemies/tuned_memory",
-      "5" : "../tuned_enemies/tuned_memory",
+      "1" : "../tuned_enemies/tuned_bus",
+      "2" : "../tuned_enemies/tuned_bus",
+      "3" : "../tuned_enemies/tuned_bus",
+      "4" : "../tuned_enemies/tuned_cache",
+      "5" : "../tuned_enemies/tuned_cache",
       "6" : "../tuned_enemies/tuned_memory",
       "7" : "../tuned_enemies/tuned_memory"
     },

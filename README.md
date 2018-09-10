@@ -34,7 +34,7 @@ The enemy processes are written in C and the experiments are driven by scripts w
 * **scripts** : Python scripts used to drive the experiments
 * **scripts/enemy_tune** : Example JSON files for the tuning enemies
 * **scripts/env_rank** : Example JSON files for ranking the environments
-* **scripts/eval_env** : Example JSON files for testing the benchmarks in the hostile environments
+* **scripts/eval_env** : Example JSON files for testing the benchmarks in hostile environments
 
 
 ## Building ##
@@ -112,7 +112,7 @@ c) **Bayesian Optimisation**. Bayesian optimization works by constructing an app
 * **enemy_range** : The JSON files that describes the parameters and the ranges of the tunable enemy process
 * **enemy_template** : The template file of the enemy process. This files can be found in th templates folder
 * **cores** : The number of cores on which to lunch the enemy process
-* **method** : The tuning method to use. Either **ran**, **sa** or **bo**
+* **method** : The tuning method to use (**ran**, **sa** or **bo**)
 * **quantile** : When taking multiple measurements, what quantile to use.
 * **log_file** : The log files where all the tuning iterations
 * **output_binary** : Output folder where the best enemy binaries are sored 
@@ -121,7 +121,7 @@ c) **Bayesian Optimisation**. Bayesian optimization works by constructing an app
 * **max_inner_iterations** : The number of iterations after which the tuning process is stopped.
 * **max_temperature** : The maximum temperature allowed for a measurement to be considered valid.
 
-*Note:* Examples of such JSON files can be found in scripts/config_tune
+*Note:* Examples of such JSON files can be found in scripts/enemy_tune
 
 2\. Run the python script to start tuning:
 
@@ -130,7 +130,7 @@ c) **Bayesian Optimisation**. Bayesian optimization works by constructing an app
     python3 run_tuning.py <enemy_tune>.json
 ```
 
-3\. A file describing all the iterations **log_file** and a file describing the parameters for the maximum interference **max_file** will be created. This parameters can be used as defines to compile the template file.
+3\. A file describing all the iterations **log_file** and a file describing the parameters for the maximum interference **max_file** will be created. The best enemy files are stored in  **output_binary**
 
 #### Demo scripts ###
 
@@ -156,7 +156,7 @@ We want to determine which combination of tuned enemy processes are the most eff
 2\. Run the python script the ranked list:
 
 ```
-    python3 run_experiments <env_rank>.json <output>.json
+    python3 run_experiments <env_rank>.json <ranked_list>.json
 ```
 
 3\. The output JSON file will contain ranked list of hostile environments fr each victim. Each environment will also contain a score.
@@ -168,10 +168,10 @@ We want to determine which combination of tuned enemy processes are the most eff
 
 ### 4. Determining the Paretto Optimal hostile environment ###
 
-The next step involves running the script to determine the Paretto Optimal hostile environment for all the victim programs we have tried 
+The next step involves running the script to determine the Paretto Optimal hostile environment for all the victim programs we have tried. As input , we used the ranked list from the previous step
 
 ```
-    python3 calculate_rank.json
+    python3 <ranked_list>.json
 ```
 
 
@@ -180,15 +180,12 @@ The next step involves running the script to determine the Paretto Optimal hosti
 1\. Create a JSON file that defines the experiment that needs to be run with the following parameters:
 
 * **sut** : Can be either a single system under test or a list of systems under stress.
-* **stress** : Can be either a single enemy process or a list of enemy processes
-* **cores** : Number of cores to run the stress o
-* **iterations** : Number of times to run a configuration
-* **max_temperature** : The maximum temperature allowed before starting an experiment
-* **cooldown_time** : Cooldown time to be used between experiments, if no maximum temperature is defined
+* **mapping** : A dictionary of cores and their assigned enemy file
+* **cores** : Number of cores to run the stress on
+* **iterations** : Minimal number of iterations to run
+* **max_temperature** : The maximum temperature allowed for a measurement to be considered valid.
 
-This will run experiments with the cross product of all the applications in the sut and stress
-
-*Note:* Examples of such JSON files can be found in scripts/config_attack
+*Note:* Examples of such JSON files can be found in scripts/eval_env
 
 2\. Run the python script to launch the experiments:
 
@@ -199,52 +196,19 @@ This will run experiments with the cross product of all the applications in the 
 
 3\. Inspect the JSON output, which has the following form:
 
-* **temp_list_baseline** : A list of temp
+* **temp_list_baseline** : A list of baseline temperatures
 * **temp_avg_baseline** : Average temperature for baseline
 * **temp_std_baseline** : Standard temperature deviation for baseline
-* **temp_list** : All the temperatures for the configuration
-* **temp_avg** : Average temperature for the configuration
-* **temp_std** : Standard temperature deviation for the configuration
 * **time_list_baseline** : All the execution times for the baseline
 * **time_avg_baseline** : Average execution time for the baseline
 * **time_std_baseline** : Standard deviation of the execution time of the baseline
-* **time_list** : All the execution times for the configuration
-* **time_avg** : Average execution time for the configuration
-* **time_std** : Standard deviation of the execution time of the configuration
+* **time_list_baseline_quantile** : The quantile for the baseline times
 
-4\. Furthermore, the plot script can be used on the JSON file for a graphical representation.
+* **temp_list_enemy** : All the temperatures for the hostile environment
+* **temp_list_enemy_avg** : Average temperature for the hostile environment
+* **temp_list_enemy_std** : Standard temperature deviation for the hostile environment
+* **time_list_enemy** : All the execution times for the hostile environment
+* **time_list_enemy_avg** : Average execution time for the hostile environment
+* **time_list_enemy_std** : Standard deviation of the execution time of the hostile environment
+* **time_list_enemy_quantile** : Quantile of the execution time of the hostile environment
 
-```
-    python3 plot.py <output>.json
-```
-
-#### Demo scripts ###
-
-* **config_attack/stress_cache.json** : This script will stress the cache intensive applications with the untrained enemy processes.
-* **config_attack/stress_coremark.json** : This script will stress the coremark benchmark with the untrained enemy processes.
-* **config_attack/stress_memory.json** : This script will stress the memory intensive application by running all alongside the untrained enemy processes.
-* **config_attack/stress_RT.json** : This script will stress the real-time capabilities of the system by running with the untrained enemy processes. The benchmark will ask for sudo permission.
-* **config_attack/stress_system_calls.json** : This script will stress a system calls intensive application with the untrained enemy processes.
-* **config_attack/stress_wcet.json** : This script will stress the Malardalen WCET benchmarks with the untrained enemy processes.
-
-*Note 1:* All the demo scripts are configured to run with enemy processes on 1, 2 and 3 cores. Each configuration will run a number of 50 times and will only start if the temperature is below 70C.
-
-*Note 2:* Compile and add the tuned enemy processes to the **stress** list in for your specific platform.
-
-
-## Doxygen (Doxygen) ##
-
-Doxygen is used to generate documentation from annotated source files. It will generate HTML and Latex documentation in the /doc folder.
-
-1\. Installation
-
-```
-  sudo apt-get install doxygen
-  sudo apt-get install graphviz
-```
-
-2\. Running
-
-```
-  doxygen Doxyfile
-```
