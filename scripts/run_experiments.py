@@ -322,12 +322,16 @@ class Experiment(object):
 
                 (time_list_baseline, temp_list_baseline) = s.run_mapping(sut=self._sut[0],
                                                                          mapping=dict(),
-                                                                         iterations=self._iterations,
+                                                                         iterations_step=self._iterations,
+                                                                         iterations_max=1000000,
+                                                                         fixed_iteration=True,
                                                                          max_temperature=self._max_temperature)
 
                 (time_list_enemy, temp_list_enemy) = s.run_mapping(sut=self._sut[0],
                                                                    mapping=self._mapping,
-                                                                   iterations=self._iterations,
+                                                                   iterations_step=self._iterations,
+                                                                   iterations_max=1000000,
+                                                                   fixed_iteration=True,
                                                                    max_temperature=self._max_temperature)
                 output[experiment] = self._log_data2(self._sut,
                                         str(self._mapping),
@@ -398,7 +402,7 @@ class Experiment(object):
 
                 (time_list_baseline, _) = s.run_mapping(sut=self._sut[0],
                                                         mapping=dict(),
-                                                        iterations=self._iterations,
+                                                        iterations_step=self._iterations,
                                                         max_temperature=self._max_temperature)
 
                 baseline_score = mquantiles(time_list_baseline, self._quantile)[0]
@@ -416,7 +420,7 @@ class Experiment(object):
 
                     (time_list_enemy, _) = s.run_mapping(sut=self._sut[0],
                                                          mapping=conf_mapping,
-                                                         iterations=self._iterations,
+                                                         iterations_step=self._iterations,
                                                          max_temperature=self._max_temperature)
                     config_name = "config_" + str(i)
                     i += 1

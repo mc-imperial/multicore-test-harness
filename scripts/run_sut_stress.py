@@ -167,21 +167,26 @@ class SutStress:
     def run_mapping(self,
                     sut,
                     mapping,
-                    iterations=20,
+                    iterations_step=20,
+                    iterations_max=200,
                     max_temperature=50,
                     quantile=.9,
                     style=0,
                     max_confidence_variation=5,
+                    fixed_iteration=False,
                     governor="powersave"
                     ):
         """
         :param sut: System under stress
         :param mapping: A mapping of enemies o cores
-        :param iterations: The total number of times to repeat the experiment
+        :param iterations_step: The number of iterations to do before checking confidence
+        :param iterations_max: The absolute maximum number of iterations
         :param max_temperature: If the temperature is above this, discard the result
         :param quantile: When running multiple measurements, what quantile to choose
         :param style: Run the SUT with perf or some similar instrument
         :param max_confidence_variation: How much variation should be allow before stopping measurements
+        :param fixed_iteration: If this is set to true, the confidence variation is ignored and we just
+        do a set number of iterations
         :param governor: The governor for power scaling
         """
 
@@ -200,7 +205,7 @@ class SutStress:
             for core in mapping:
                 self.start_stress(mapping[core], core)
 
-            while it < iterations:
+            while it < iterations_step:
                 if self.cool_down(max_temperature - delta_temp, mapping):
                     for core in mapping:
                         self.start_stress(mapping[core], core)
@@ -230,14 +235,15 @@ class SutStress:
             if len(mapping) > 0:
                 self._processes.kill_stress()
 
-            conf_var = confidence_variation(total_times, quantile)
-            print("The confidence variation is ", conf_var)
+            if not fixed_iteration:
+                conf_var = confidence_variation(total_times, quantile)
+                print("The confidence variation is ", conf_var)
 
-            if conf_var < max_confidence_variation:
-                break
+                if conf_var < max_confidence_variation:
+                    break
 
             # It sometimes happens that we never get the desired confidence interval
-            if len(total_times) > 200:
+            if len(total_times) > iterations_max:
                 break
 
         print(total_times)
