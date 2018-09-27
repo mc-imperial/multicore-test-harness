@@ -86,10 +86,6 @@ def get_temp():
         print("\n\tWARNING: Unable to find temperature for this system\n")
         return None
 
-    return None
-
-
-
 
 class ProcessManagement:
     """A class used to manage processes
@@ -104,17 +100,6 @@ class ProcessManagement:
         self._background_procs = []
         self._sleep_startup = sleep_startup
         self._sleep_shutdown = sleep_shutdown
-        signal.signal(signal.SIGINT, self._signal_handler)
-
-    def _signal_handler(self,signal, frame):
-        """
-        To prevent any backround processes from remaining in memory
-        when Ctrl+C is pressed.
-        """
-        print('\n\nYou pressed Ctrl+C!')
-        print("Cleaning background processes before exit")
-        self.kill_stress()
-        sys.exit(0)
 
     @staticmethod
     def system_call(command, silent=False):
@@ -138,16 +123,17 @@ class ProcessManagement:
         :param command: Shell command to run
         """
         print("executing command: " + command + " in the background")
-        self._background_procs.append(subprocess.Popen(command, shell = True, preexec_fn=os.setsid))
+        self._background_procs.append(subprocess.Popen(command, shell=True))
         time.sleep(self._sleep_startup)
 
     def kill_stress(self):
         """
         Kill all the background stress commands
         """
-        print("killing stress")
-        for b in self._background_procs:
-            os.killpg(os.getpgid(b.pid), signal.SIGTERM)
+
+        print("killing stress ")
+        for p in self._background_procs:
+            p.terminate()
             time.sleep(self._sleep_shutdown)
 
         self._background_procs = []
