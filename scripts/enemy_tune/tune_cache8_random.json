@@ -1,0 +1,16 @@
+{
+  "cache_fuzz_long": {
+    "sut": "../bin/sut/L2_unified_test",
+    "enemy_range": "../templates/cache/parameters.json",
+    "enemy_template": "../templates/cache/template_cache.c",
+    "cores": 7,
+    "method":"ran",
+    "quantile": 0.9,
+    "log_file": "../results_litmus/cache_fuzz_120_log_1.txt",
+    "max_file": "../results_litmus/cache_fuzz_120_max_1.txt",
+    "output_binary": "../results_litmus/",
+    "max_tuning_time": 120,
+    "max_inner_iterations": 200000,
+    "max_temperature": 80
+  }
+}

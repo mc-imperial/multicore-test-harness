@@ -25,7 +25,7 @@ Runs individual tests.
 """
 
 import sys
-from common import ProcessManagement, get_event, get_temp
+from common import ProcessManagement, ExperimentInfo, get_event, get_temp, MappingResult
 from scipy.stats.mstats import mquantiles
 from scipy.stats import binom
 from time import sleep
@@ -62,10 +62,11 @@ def confidence_variation(x, quantile, desired_confidence=.9):
 
 
 class SutStress:
-    """A class used to run individual SUT tests
+    """
+    A class used to run individual SUT tests
     Used to run an SUT together with enemy processes
     """
-    ## Profiling tools options for the SUT
+    # Profiling tools options for the SUT
     INSTRUMENT_CMDS = ["", "bash my_perf_script.sh", "bash my_perf.sh", "strace -c"]
 
     def __init__(self):
@@ -164,49 +165,38 @@ class SutStress:
 
         return metric
 
-    def run_mapping(self,
-                    sut,
-                    mapping,
-                    iterations_step=20,
-                    iterations_max=200,
-                    max_temperature=50,
-                    quantile=.9,
-                    style=0,
-                    max_confidence_variation=5,
-                    fixed_iteration=False,
-                    governor="powersave"
-                    ):
+    def run_mapping(self, experiment_info, mapping, style=0):
         """
-        :param sut: System under stress
-        :param mapping: A mapping of enemies o cores
-        :param iterations_step: The number of iterations to do before checking confidence
-        :param iterations_max: The absolute maximum number of iterations
-        :param max_temperature: If the temperature is above this, discard the result
-        :param quantile: When running multiple measurements, what quantile to choose
-        :param style: Run the SUT with perf or some similar instrument
-        :param max_confidence_variation: How much variation should be allow before stopping measurements
-        :param fixed_iteration: If this is set to true, the confidence variation is ignored and we just
-        do a set number of iterations
-        :param governor: The governor for power scaling
+        Run a mapping described by a mapping object
+        :param experiment_info: An ExperimentInfo object
+        :param mapping: A dict of core mappings
+        :param style: In case you need to run with perf
+        :return:
         """
 
+        assert isinstance(experiment_info, ExperimentInfo)
+
         # Make sure the governor is correctly
-        cmd = "echo " + governor + " | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor"
+        cmd = "echo " + experiment_info.governor + \
+              " | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor"
         self._processes.system_call(cmd)
 
         delta_temp = 5
         total_times = []
         total_temps = []
 
-        while True:
+        candidate_quantiles = [90, 85, 80, 75, 70, 65, 60, 55, 50]
+        result = MappingResult(mapping)
+
+        while len(total_temps) < experiment_info.measurement_iterations_max:
             it = 0
 
             # start up the stress in accordance with the mapping
             for core in mapping:
                 self.start_stress(mapping[core], core)
 
-            while it < iterations_step:
-                if self.cool_down(max_temperature - delta_temp, mapping):
+            while it < experiment_info.measurement_iterations_step:
+                if self.cool_down(experiment_info.max_temperature - delta_temp, mapping):
                     for core in mapping:
                         self.start_stress(mapping[core], core)
 
@@ -216,11 +206,11 @@ class SutStress:
                 self._check_error(s_err)
 
                 # Run the program on core 0
-                s_out,s_err = self.run_program_single(sut, 0, style)
+                s_out,s_err = self.run_program_single(experiment_info.sut, 0, style)
                 self._check_error(s_err)
 
                 final_temp = get_temp()
-                if final_temp < max_temperature:
+                if final_temp < experiment_info.max_temperature:
                     total_times.append(self.get_metric(s_out))
                     total_temps.append(final_temp)
                     it = it + 1
@@ -235,35 +225,62 @@ class SutStress:
             if len(mapping) > 0:
                 self._processes.kill_stress()
 
-            if not fixed_iteration:
-                conf_var = confidence_variation(total_times, quantile)
+            # This part runs if we have variable iterations based on confidence interval
+            # and can stop early
+            if experiment_info.stopping  == "no_decrease" :
+                conf_var = confidence_variation(total_times, experiment_info.quantile)
                 print("The confidence variation is ", conf_var)
+                if conf_var < experiment_info.max_confidence_variation:
 
-                if conf_var < max_confidence_variation:
-                    break
+                    result.times = total_times
+                    result.temps = total_temps
+                    result.stable_q = experiment_info.quantile
+                    result.q_value = mquantiles(total_times, experiment_info.quantile)
+                    result.success = True
+                    return result
+            elif experiment_info.stopping == "pessimistic":
+                for q in candidate_quantiles:
+                    if confidence_variation(total_times, q) < experiment_info.max_confidence_variation:
+                        result.times = total_times
+                        result.temps = total_temps
+                        result.stable_q = q
+                        result.q_value = mquantiles(total_times, q)
+                        result.success = True
+                        return result
 
-            # It sometimes happens that we never get the desired confidence interval
-            if len(total_times) > iterations_max:
-                break
+        # At this point we know that we have hit max iterations
+        if experiment_info.stopping == "optimistic":
+            for q in candidate_quantiles:
+                if confidence_variation(total_times, q) < experiment_info.max_confidence_variation:
+                    result.times = total_times
+                    result.temps = total_temps
+                    result.stable_q = q
+                    result.q_value = mquantiles(total_times, q)
+                    result.success = True
+                    return result
 
-        print(total_times)
+        # If we hit this and we did not intend to (not using "fixed"), we failed
+        # to get a stable quantile basically
+        result.times = total_times
+        result.temps = total_temps
+        result.stable_q = experiment_info.quantile
+        result.q_value = mquantiles(total_times, experiment_info.quantile)
+        result.success = True if experiment_info.stopping == "fixed" else False
+        return result
 
-        return total_times, total_temps
-
-    def run_sut_stress(self, sut, stress, cores, style = 0):
+    def run_sut_stress(self, sut, stress, cores, style=0):
         """
         :param sut: System under stress
         :param stress: Enemy process
         :param cores: Number of cores to start the enemy on
         :param style: Run the SUT with perf or some similar instrument
         """
-        #start up the stress on cores 1-cores+1
+        # start up the stress on cores 1-cores+1
         if (cores > 0):
             for i in range(1, cores + 1):
                 self.start_stress(stress, i)
 
-
-        #Run the program on core 0
+        # Run the program on core 0
         s_out,s_err = self.run_program_single(sut,0, style)
         self._check_error(s_err)
 

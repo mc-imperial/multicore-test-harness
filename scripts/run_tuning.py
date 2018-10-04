@@ -32,10 +32,9 @@ import socket
 import pickle
 
 from time import time
-from random import randrange, uniform, choice, random, shuffle
+from random import randrange, uniform, choice, random, shuffle, seed
 from collections import OrderedDict
 from copy import deepcopy
-from scipy.stats.mstats import mquantiles
 
 # optimization packages
 from bayes_opt import BayesianOptimization
@@ -43,6 +42,7 @@ from simanneal import Annealer
 
 # my packages
 from run_sut_stress import SutStress
+from common import ExperimentInfo, DataLog
 
 
 class ConfigurableEnemy:
@@ -383,7 +383,6 @@ class EnemyConfiguration:
         """
         enemy_mapping = dict()
 
-
         for i in range(self.enemy_cores):
             filename = output_folder + prefix + str(i+1) + "_enemy"
             self.enemies[i].create_bin(filename)
@@ -398,18 +397,21 @@ class ObjectiveFunction:
     Class to evaluate an enemy config
     """
 
-    def __init__(self, sut, log_file, max_temperature=70, quantile=.9, socket_connect=None):
+    def __init__(self, experiment_info, log, socket_connect=None):
         """
-        :param sut: The system under test
-        :param max_temperature: The maximum temperature before starting an evaluation
+        :param experiment_info: An experiment info object
+        :param log: A data log object
+        :param socket_connect: Socket if the network approach is desired
         """
-        self._sut = sut
-        self._max_temperature = max_temperature
-        self._quantile = quantile
 
+        assert isinstance(experiment_info, ExperimentInfo)
+        self._experiment_info = experiment_info
 
-        # Keep the created files for cleanup
-        self._enemy_files = None
+        assert isinstance(log, DataLog)
+        self._log = log
+
+        # Keep the created file names for cleanup
+        self._enemy_mapping = None
 
         # Keep track of the best evaluation
         self.best_mapping = None
@@ -420,14 +422,20 @@ class ObjectiveFunction:
         self.optimized_core = None
 
         # Logging information
-        self._log_file = log_file
         self.iteration = 0
+        self._log = DataLog()
         self._t_start = time()
+        self._log.experiment_info(experiment_info)
 
         # Network connection
         self.socket = socket_connect
 
     def bo_call(self, **kwargs):
+        """
+        Wrapper for __call__ so that is compatible with BO
+        :param kwargs: Parameters for the mapping
+        :return:
+        """
 
         def_param = dict()
         for key in kwargs:
@@ -438,57 +446,39 @@ class ObjectiveFunction:
                 self.stored_mapping.enemies[i].set_defines(def_param)
         else:
             self.stored_mapping.enemies[self.optimized_core].set_defines(def_param)
-        return mquantiles(self.__call__(self.stored_mapping), self._quantile)
-
-    def _log_data(self, times):
-        """
-        Log the maximum time found after time to determine "convergence" speed
-        :param times: A list of execution times that was received this time
-        """
-
-        self.iteration += 1
-
-        with open(self._log_file, 'a') as data_file:
-            d = str(self.iteration) + "\t\t\t" + \
-                str("{0:.0f}".format(time() - self._t_start)) + "\t\t\t" + \
-                str("{0:.4f}".format(self.best_score)) + "\t\t\t" + \
-                str("{0:.4f}".format(mquantiles(times, self._quantile)[0])) + "\t\t" + \
-                str(times) + "\n"
-            data_file.write(d)
+        return self.__call__(self.stored_mapping)
 
     def __call__(self, enemy_config):
         """
         :param enemy_config: An EnemyConfiguration object
-        :return: Execution time (latency)
+        :return: The quantile value
         """
 
-        if self.socket:
-            pickled_enemy_config = pickle.dumps(enemy_config)
+        # if self.socket:
+            # Dissable the networking thing for the moment
+            # pickled_enemy_config = pickle.dumps(enemy_config)
 
             # Then send actual enemy config + delim
-            self.socket.sendall(pickled_enemy_config + b'data_end')
+            # self.socket.sendall(pickled_enemy_config + b'data_end')
 
             # Receive the execution time
-            pickled_ex_time = self.socket.recv(1024)
-            times = pickle.loads(pickled_ex_time)
-        else:
-            self._enemy_files = enemy_config.get_file_mapping()
-            s = SutStress()
-            times, temps = s.run_mapping(sut=self._sut,
-                                         mapping=self._enemy_files,
-                                         quantile=self._quantile,
-                                         max_temperature=self._max_temperature)
+            # pickled_ex_time = self.socket.recv(1024)
+            # times = pickle.loads(pickled_ex_time)
+        # else:
+        self._enemy_mapping = enemy_config.get_file_mapping()
+        s = SutStress()
 
-        quantiles = mquantiles(times, self._quantile)[0]
-        print(quantiles)
+        result = s.run_mapping(experiment_info= self._experiment_info,
+                               mapping=self._enemy_mapping)
 
-        if self.best_score is None or quantiles > self.best_score:
-            self.best_score = quantiles
+        if self.best_score is None or result.q_value > self.best_score:
+            self.best_score = result.q_value
             self.best_mapping = enemy_config
 
-        self._log_data(times)
+        self._log.log_data_mapping(mapping_result=result, iteration=self.iteration)
+        self.iteration += 1
 
-        return times
+        return result.q_value
 
     def __del__(self):
         """
@@ -496,23 +486,37 @@ class ObjectiveFunction:
         :return:
         """
 
-        if self._enemy_files:
-            for key in self._enemy_files:
-                cmd = "rm " + self._enemy_files[key]
+        if self._enemy_mapping:
+            for key in self._enemy_mapping:
+                cmd = "rm " + self._enemy_mapping[key]
                 print("Deleting:", cmd)
                 os.system(cmd)
 
 
 class DefineAnneal(Annealer):
-    def __init__(self, initial_state, sut, temp, exit_time, quantile =.9, log_file=None, network_socket=None):
+    """
+    A wrapper class for the python annealer class
+    """
+    def __init__(self, experiment_info, initial_state, exit_time, log=None, network_socket=None):
+        """
+        :param experiment_info: ExperimentInfo object
+        :param initial_state: EnemyConfig object
+        :param exit_time: Exit time
+        :param log: A log object
+        :param network_socket: For future network connection
+        """
+        assert isinstance(experiment_info, ExperimentInfo)
+        self._experiment_info = experiment_info
+        assert isinstance(log, DataLog)
+        self._experiment_info = experiment_info
+
+        assert isinstance(initial_state, EnemyConfiguration)
         Annealer.__init__(self, initial_state)
-        self.objective_function = ObjectiveFunction(sut= sut,
-                                                    log_file=log_file,
-                                                    max_temperature=temp,
-                                                    quantile=quantile,
+        self.steps = experiment_info.tuning_max_iterations
+
+        self.objective_function = ObjectiveFunction(experiment_info=experiment_info,
+                                                    log=log,
                                                     socket_connect=network_socket)
-        self._log_file = log_file
-        self._quantile = quantile
         self._exit_time = exit_time
 
     def move(self):
@@ -520,8 +524,8 @@ class DefineAnneal(Annealer):
 
     def energy(self):
 
-        times = self.objective_function(self.state)
-        score = 1/mquantiles(times, self._quantile)[0]
+        q_value = self.objective_function(self.state)
+        score = 1/q_value
         if time() > self._exit_time:
             self.user_exit = True
 
@@ -533,47 +537,24 @@ class Optimization:
     Class for Optimization
     """
 
-    def __init__(self, sut,
-                 log_file,
-                 max_temperature=80,
-                 quantile=.9,
-                 inner_iterations=2000,
-                 max_time=60,
-                 network_socket=None):
+    def __init__(self, experiment_info, log, network_socket=None):
         """
         Create an Optimization object
-        :param sut: The system under test
-        :param max_temperature: The maximum temperature allowed before an experiment starts
+        :param experiment_info: ExperimentInfo object
+        :param log: A data log object
+        :param network_socket: In case we want to go for networking
         """
 
-        self._sut = sut
-        self._log_file = log_file
-        self._max_temperature = max_temperature
-        self._inner_iterations = inner_iterations
+        assert isinstance(experiment_info, ExperimentInfo)
+        self._experiment_info = experiment_info
 
-        self._quantile = quantile
+        assert isinstance(log, DataLog)
+        self._log = log
 
         self._t_start = time()
-        self._t_end = time() + 60 * max_time
+        self._t_end = time() + 60 * experiment_info.tuning_max_time
 
         self._socket = network_socket
-
-
-        # Delete old log files
-        try:
-            os.remove(self._log_file)
-        except OSError:
-            pass
-        self._write_log_header()
-
-    def _write_log_header(self):
-        """
-        Write the log file header
-        :return:
-        """
-        with open(self._log_file, 'a') as data_file:
-            d = "Iter\t\t\tTime\t\t\tMax\t\t\tCur\t\t\n"
-            data_file.write(d)
 
     @staticmethod
     def kirkpatrick_cooling(start_temp, alpha):
@@ -590,19 +571,22 @@ class Optimization:
             return math.exp(-abs(next_score - prev_score) / temperature)
 
     def inner_random(self, enemy_config):
+        """
+        Use RAN to determine the best configuration, given the template
+        :param enemy_config: An enemy mapping object
+        :return: Best mapping and its corresponding result
+        """
 
-        objective_function = ObjectiveFunction(sut=self._sut,
-                                               log_file=self._log_file,
-                                               max_temperature=self._max_temperature,
-                                               quantile=self._quantile,
+        assert isinstance(enemy_config, EnemyConfiguration)
+
+        objective_function = ObjectiveFunction(experiment_info=self._experiment_info,
+                                               log=self._log,
                                                socket_connect=self._socket)
 
-        num_evaluations = 1
-
-        while num_evaluations < self._inner_iterations and time() < self._t_end:
+        while objective_function.iteration < self._experiment_info.tuning_max_time and \
+                time() < self._t_end:
             enemy_config.random_set_all_defines()
             objective_function(enemy_config)
-            num_evaluations += 1
 
         best_mapping = objective_function.best_mapping
         best_score = objective_function.best_score
@@ -610,29 +594,32 @@ class Optimization:
         return best_mapping, best_score
 
     def inner_hill_climb(self, enemy_config):
+        """
+        Use HC to determine the best configuration, given the template
+        :param enemy_config: An enemy mapping object
+        :return: Best mapping and its corresponding result
+        """
 
-        objective_function = ObjectiveFunction(sut=self._sut,
-                                               log_file=self._log_file,
-                                               max_temperature=self._max_temperature,
-                                               quantile=self._quantile,
+        assert isinstance(enemy_config, EnemyConfiguration)
+
+        objective_function = ObjectiveFunction(experiment_info=self._experiment_info,
+                                               log=self._log,
                                                socket_connect=self._socket)
 
         current_config = enemy_config
-        current_score = mquantiles(objective_function(enemy_config), self._quantile)[0]
+        current_score = 0
 
-        num_evaluations = 1
-
-        while num_evaluations < self._inner_iterations and time() < self._t_end:
+        while objective_function.iteration < self._experiment_info.tuning_max_time and \
+                time() < self._t_end:
 
             next_config = current_config.neighbour_define()
 
             # see if this move is better than the current
-            times = objective_function(next_config)
-            next_score = mquantiles(times, self._quantile)[0]
-            num_evaluations += 1
-            if next_score > current_score:
+            q_value = objective_function(next_config)
+
+            if q_value > current_score:
                 current_config = next_config
-                current_score = next_score
+                current_score = q_value
 
         best_mapping = objective_function.best_mapping
         best_score = objective_function.best_score
@@ -640,17 +627,19 @@ class Optimization:
         return best_mapping, best_score
 
     def inner_anneal(self, enemy_config):
+        """
+        Use SA to determine the best configuration, given the template
+        :param enemy_config: An enemy mapping object
+        :return: Best mapping and its corresponding result
+        """
 
         inner_anneal = DefineAnneal(initial_state=enemy_config,
-                                    quantile=self._quantile,
-                                    sut=self._sut,
-                                    temp=self._max_temperature,
+                                    experiment_info=self._experiment_info,
                                     exit_time=self._t_end,
-                                    log_file= self._log_file,
+                                    log= self._log,
                                     network_socket=self._socket
                                     )
 
-        inner_anneal.steps = self._inner_iterations
         inner_anneal.anneal()
 
         best_mapping = inner_anneal.objective_function.best_mapping
@@ -659,18 +648,21 @@ class Optimization:
         return best_mapping, best_score
 
     def inner_bo(self, enemy_config, kappa_val=6):
+        """
+        Use BO to determine the best configuration, given the template
+        :param enemy_config: An enemy mapping object
+        :return: Best mapping and its corresponding result
+        """
 
-        objective_function = ObjectiveFunction(sut=self._sut,
-                                               log_file=self._log_file,
-                                               max_temperature=self._max_temperature,
-                                               quantile=self._quantile,
+        objective_function = ObjectiveFunction(experiment_info=self._experiment_info,
+                                               log=self._log,
                                                socket_connect=self._socket)
         config = enemy_config
 
         # Devide the evaluations for each core
         init_pts = 5
         if config.same_defines:
-            iterations = self._inner_iterations
+            iterations = self._experiment_info.tuning_max_iterations
             assert iterations > 0, "Bayesian optimization needs more iterations to work"
             objective_function.stored_mapping = config
             data_range = config.enemies[0].get_defines_range()
@@ -684,7 +676,7 @@ class Optimization:
             for core in range(config.enemy_cores):
                 config.enemies[core].set_defines(bo.res['max']['max_params'])
         else:
-            iterations = int(self._inner_iterations/config.enemy_cores - init_pts)
+            iterations = int(self._experiment_info.tuning_max_iterations/config.enemy_cores - init_pts)
             assert iterations > 0, "Bayesian optimization needs more iterations to work"
 
             for core in range(config.enemy_cores):
@@ -707,18 +699,14 @@ class Optimization:
 
     def outer_random(self, enemy_config, inner_tune,  max_evaluations=100):
 
-        objective_function = ObjectiveFunction(sut=self._sut,
-                                               log_file=self._log_file,
-                                               max_temperature=self._max_temperature,
-                                               quantile=self._quantile,
+        objective_function = ObjectiveFunction(experiment_info=self._experiment_info,
+                                               log=self._log,
                                                socket_connect=self._socket)
 
         current_config = enemy_config
         objective_function(enemy_config)
 
-        num_evaluations = 1
-
-        while num_evaluations < max_evaluations and time() < self._t_end:
+        while objective_function.iteration < max_evaluations and time() < self._t_end:
             current_config.random_set_all_templates()
 
             # The inner tune part
@@ -733,18 +721,6 @@ class Optimization:
             else:
                 print("I do not know how to tune like that")
 
-            rechecked_times = objective_function(best_inner_config)
-
-            with open(self._log_file, 'a') as data_file:
-                d = "Finishing outer loop " + str(num_evaluations) + \
-                    " best score " + str(objective_function.best_score) + \
-                    " rechecked times " + str(rechecked_times) + "\n" + \
-                    " Total time so far " + str(time()-self._t_start)
-                data_file.write(d)
-                data_file.write(str(best_inner_config))
-
-            num_evaluations += 1
-
         best_score = objective_function.best_score
         best_mapping = objective_function.best_mapping
 
@@ -752,17 +728,13 @@ class Optimization:
 
     def outer_anneal(self, enemy_config, inner_tune, max_evaluations=100, outer_temp=100, outer_alpha=0.8):
 
-
-        # wrap the objective function (so we record the best)
-        objective_function = ObjectiveFunction(sut=self._sut,
-                                               log_file=self._log_file,
-                                               max_temperature=self._max_temperature,
-                                               quantile=self._quantile,
+        objective_function = ObjectiveFunction(experiment_info=self._experiment_info,
+                                               log=self._log,
                                                socket_connect=self._socket)
 
         # Initialise SA
         current_outer_config = enemy_config.random_set_all()
-        current_outer_score = mquantiles(objective_function(enemy_config), self._quantile)[0]
+        current_outer_score = objective_function(enemy_config)
 
         num_evaluations = 1
 
@@ -779,7 +751,7 @@ class Optimization:
                     done = True
                     break
 
-                #The inner tune part
+                # The inner tune part
                 if inner_tune == "ran":
                     best_inner_config, score = self.inner_random(next_outer_config)
                 elif inner_tune == "hc":
@@ -791,16 +763,7 @@ class Optimization:
                 else:
                     print("I do not know how to tune like that")
 
-                rechecked_times = objective_function(best_inner_config)
-                next_outer_score = mquantiles(rechecked_times, self._quantile)[0]
-
-                with open(self._log_file, 'a') as data_file:
-                    d = "Finishing outer loop " + str(num_evaluations) +\
-                        " best score " + str(objective_function.best_score) + \
-                        " rechecked times " + str(rechecked_times) + "\n" + \
-                        " Total time so far " + str(time()-self._t_start)
-                    data_file.write(d)
-                    data_file.write(str(best_inner_config))
+                next_outer_score = score
 
                 num_evaluations += 1
 
@@ -859,7 +822,8 @@ class PackedStart:
 
 
 class Tuning:
-    """Run tuning based on fuzzing or Bayesian Optimisation
+    """
+    Run tuning based on random, SA or Bayesian Optimisation
     Reads and runs the tuning described in the JSON file.
     """
 
@@ -867,23 +831,13 @@ class Tuning:
         """
         Create a tuning object
         """
-        self._sut = None
 
-        self._cores = None
-        self._method = None
-
-        self._training_time = None
-        self._inner_iterations = None
-        self._max_temperature = None
-
-        self._quantile = 0.9
+        self._experiment_info = None
+        self._output_file = None
+        self._log = DataLog()
 
         # Store the enemy config
         self._enemy_config = None
-
-        self._log_file = None
-        self._max_file = None
-        self._output_binary = None
 
         # For network connection
         self._socket = None
@@ -901,25 +855,7 @@ class Tuning:
         :return:
         """
 
-        try:
-            self._sut = str(json_object["sut"])
-        except KeyError:
-            print("Unable to find sut in JSON")
-            sys.exit(1)
-
-        try:
-            self._quantile = float(json_object["quantile"])
-        except KeyError:
-            print("Unable to find quartile in JSON")
-            sys.exit(1)
-
-        try:
-            self._cores = int(json_object["cores"])
-        except KeyError:
-            print("Unable to find cores in JSON")
-            sys.exit(1)
-
-        self._enemy_config = EnemyConfiguration(self._cores)
+        self._enemy_config = EnemyConfiguration(self._experiment_info.cores)
 
         try:
             enemy_template = str(json_object["enemy_template"])
@@ -930,61 +866,13 @@ class Tuning:
             pass
 
         try:
-            self._method = str(json_object["method"])
-        except KeyError:
-            print("Unable to find method in JSON")
-            sys.exit(1)
-
-        try:
-            self._output_binary = str(json_object["output_binary"])
-            if not os.path.exists(self._output_binary):
-                os.makedirs(self._output_binary)
-        except KeyError:
-            print("Unable to find output_binary in JSON")
-            sys.exit(1)
-
-        try:
-            self._log_file = str(json_object["log_file"])
-            # Delete the file contents
-            open(self._log_file, 'w').close()
-        except KeyError:
-            print("Unable to find log_file in JSON")
-            sys.exit(1)
-
-        try:
-            self._max_file = str(json_object["max_file"])
-            # Delete the file contents
-            open(self._max_file, 'w').close()
-        except KeyError:
-            print("Unable to find max_file in JSON")
-            sys.exit(1)
-
-        try:
-            self._training_time = int(json_object["max_tuning_time"])
-        except KeyError:
-            print("Unable to find training_time in JSON")
-            sys.exit(1)
-
-        try:
-            self._inner_iterations = int(json_object["max_inner_iterations"])
-        except KeyError:
-            print("Unable to find inner_iterations in JSON")
-            sys.exit(1)
-
-        try:
-            self._max_temperature = int(json_object["max_temperature"])
-        except KeyError:
-            print("Unable to find max_temperature in JSON")
-            sys.exit(1)
-
-        try:
             host = str(json_object["network"])
             self._socket = socket.socket()
             port = 12345  # Reserve a port for your service
             print(host, port)
             self._socket.connect((host, port))
 
-            pack = PackedStart(self._sut, self._max_temperature)
+            pack = PackedStart(self._experiment_info.sut, self._experiment_info.sut)
             pickle_pack = pickle.dumps(pack)
             self._socket.send(pickle_pack)
             pickle_sync = self._socket.recv(1024)      # Sync message
@@ -1003,12 +891,8 @@ class Tuning:
 
         start_time = time()
 
-        sa = Optimization(sut=self._sut,
-                          log_file=self._log_file,
-                          max_temperature=self._max_temperature,
-                          quantile=self._quantile,
-                          inner_iterations=self._inner_iterations,
-                          max_time=self._training_time,
+        sa = Optimization(experiment_info=self._experiment_info,
+                          log=self._log,
                           network_socket=self._socket)
 
         if outer_tune_method == "ran":
@@ -1023,7 +907,7 @@ class Tuning:
             print("I do not know how to bilevel train that way")
             sys.exit(0)
 
-        f = open(self._max_file, 'w')
+        f = open(self._experiment_info.max_file, 'w')
         f.write("Max time " + str(best_score) +
                 "\n" + str(best_state) +
                 "\n" + "Total time " + str(time()-start_time))
@@ -1038,13 +922,10 @@ class Tuning:
         """
         assert self._enemy_config.fixed_template, "Can not train this way if the template is not given"
 
-        sa = Optimization(sut=self._sut,
-                          log_file=self._log_file,
-                          max_temperature=self._max_temperature,
-                          quantile=self._quantile,
-                          inner_iterations=self._inner_iterations,
-                          max_time=self._training_time,
+        sa = Optimization(experiment_info=self._experiment_info,
+                          log=self._log,
                           network_socket=self._socket)
+
         if tune_method == "ran":
             best_state, best_score = sa.inner_random(self._enemy_config)
         elif tune_method == "hc":
@@ -1057,69 +938,75 @@ class Tuning:
             print("I do not know how to simple train that way")
             sys.exit(0)
 
-        best_state.get_file_mapping(prefix=str(exp_prefix) + "_", output_folder=str(self._output_binary))
+        best_state.get_file_mapping(prefix=str(exp_prefix) + "_",
+                                    output_folder=self._experiment_info.output_binary)
 
-        f = open(self._max_file, 'w')
+        f = open(self._experiment_info.max_file, 'w')
         f.write("Max time " + str(best_score) + "\n" + str(best_state))
         f.close()
 
-    def run(self, input_file):
+    def run(self, input_file, output_file):
         """
         Run the configured experiment
         :param input_file: The JSON file where the tuning are defined
+        :param output_file: The JSON file where the result is stored
         """
+
+        self._output_file = output_file
 
         # Read the configuration in the JSON file
         with open(input_file) as data_file:
             tuning_object = json.load(data_file)
 
-        for tuning_session in tuning_object:
-            self.read_json_object(tuning_object[tuning_session])
+        for experiment_name in tuning_object:
+            self._experiment_info = ExperimentInfo(experiment_name)
+            self._experiment_info.read_json_object(tuning_object[experiment_name])
+            self.read_json_object(tuning_object[experiment_name])
 
-            if self._method == "sa_ran":
+            if self._experiment_info.method == "sa_ran":
                 print("Tuning by simulated annealing on the "
                       "outer loop and random on the inner loop")
                 self.bilevel_tune("sa", "ran")
-            elif self._method == "sa_hc":
+            elif self._experiment_info.method == "sa_hc":
                 print("Tuning by simulated annealing on the "
                       "outer loop and hill climbing on the inner loop")
                 self.bilevel_tune("sa", "hc")
-            elif self._method == "sa_sa":
+            elif self._experiment_info.method == "sa_sa":
                 print("Tuning by simulated annealing on the "
                       "outer loop and simulated annealing on the inner loop")
                 self.bilevel_tune("sa", "sa")
-            elif self._method == "sa_bo":
+            elif self._experiment_info.method == "sa_bo":
                 print("Tuning by simulated annealing on the "
                       "outer loop and bayesian optimization on the inner loop")
                 self.bilevel_tune("sa", "bo")
-            elif self._method == "ran_ran":
+            elif self._experiment_info.method == "ran_ran":
                 print("Tuning by randomising on the outer "
                       "loop and random on the inner loop")
                 self.bilevel_tune("ran", "ran")
-            elif self._method == "ran_hc":
+            elif self._experiment_info.method == "ran_hc":
                 print("Tuning by randomising on the outer "
                       "loop and hill climbing on the inner loop")
                 self.bilevel_tune("ran", "hc")
-            elif self._method == "ran_sa":
+            elif self._experiment_info.method == "ran_sa":
                 print("Tuning by randomising on the outer "
                       "loop and simulated annealing on the inner loop")
                 self.bilevel_tune("ran", "sa")
-            elif self._method == "ran_bo":
+            elif self._experiment_info.method == "ran_bo":
                 print("Tuning by randomising on the outer "
                       "loop and bayesian optimization on the inner loop")
                 self.bilevel_tune("ran", "bo")
-            elif self._method == "ran":
+            elif self._experiment_info.method == "ran":
                 print("Tuning by randomising with a fixed template")
-                self.simple_tune("ran", tuning_session)
-            elif self._method == "hc":
+                self.simple_tune("ran")
+            elif self._experiment_info.method == "hc":
                 print("Tuning by hillclimbing with a fixed template")
-                self.simple_tune("hc", tuning_session)
-            elif self._method == "sa":
+                self.simple_tune("hc")
+            elif self._experiment_info.method == "sa":
                 print("Tuning by simulated annealing with a fixed template")
-                self.simple_tune("sa", tuning_session)
-            elif self._method == "bo":
+                self.simple_tune("sa")
+            elif self._experiment_info.method == "bo":
                 print("Tuning with bayesian optimization with a fixed template")
-                self.simple_tune("bo", tuning_session)
+                self.simple_tune("bo")
             else:
                 print("I do not know how to train that way")
                 sys.exit(0)
@@ -1128,10 +1015,12 @@ class Tuning:
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("usage: " + sys.argv[0] + " <experiments_file>.json\n")
+    if len(sys.argv) != 3:
+        print("usage: " + sys.argv[0] + " <tuning_file>.json <results>.json\n")
         exit(1)
+
+    seed(1000)
 
     tr = Tuning()
 
-    tr.run(sys.argv[1])
+    tr.run(sys.argv[1], sys.argv[2])
