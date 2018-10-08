@@ -113,7 +113,6 @@ class Experiment(object):
                 log.file_dump()
 
         log.merge_docs(output_file)
-        log.cleanup()
 
 
 if __name__ == "__main__":

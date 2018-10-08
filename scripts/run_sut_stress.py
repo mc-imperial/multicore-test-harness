@@ -34,6 +34,8 @@ from time import sleep
 def confidence_variation(x, quantile, desired_confidence=.9):
 
     assert isinstance(x, list)
+    assert 0 < quantile < 1, "Quantile value is " + str(quantile)
+
     x.sort()
     print(x)
     q = mquantiles(x, quantile)[0]
@@ -75,7 +77,8 @@ class SutStress:
         """
         self._processes = ProcessManagement()
 
-    def _get_taskset_cmd(self, core):
+    @staticmethod
+    def _get_taskset_cmd(core):
         """
         Start a command on a aspecific core
         :param core: Core to start on
@@ -165,11 +168,12 @@ class SutStress:
 
         return metric
 
-    def run_mapping(self, experiment_info, mapping, style=0):
+    def run_mapping(self, experiment_info, mapping, iteration_name=None, style=0):
         """
         Run a mapping described by a mapping object
         :param experiment_info: An ExperimentInfo object
         :param mapping: A dict of core mappings
+        :param iteration_name: For tning, we can store the exact param
         :param style: In case you need to run with perf
         :return:
         """
@@ -185,8 +189,10 @@ class SutStress:
         total_times = []
         total_temps = []
 
-        candidate_quantiles = [90, 85, 80, 75, 70, 65, 60, 55, 50]
-        result = MappingResult(mapping)
+        candidate_quantiles = [0.90, 0.85, 0.80, 0.75, 0.70, 0.65, 0.60, 0.55, 0.50]
+        if iteration_name is None:
+            iteration_name = mapping
+        result = MappingResult(iteration_name)
 
         while len(total_temps) < experiment_info.measurement_iterations_max:
             it = 0
@@ -227,7 +233,7 @@ class SutStress:
 
             # This part runs if we have variable iterations based on confidence interval
             # and can stop early
-            if experiment_info.stopping  == "no_decrease" :
+            if experiment_info.stopping == "no_decrease" :
                 conf_var = confidence_variation(total_times, experiment_info.quantile)
                 print("The confidence variation is ", conf_var)
                 if conf_var < experiment_info.max_confidence_variation:
@@ -235,7 +241,7 @@ class SutStress:
                     result.times = total_times
                     result.temps = total_temps
                     result.stable_q = experiment_info.quantile
-                    result.q_value = mquantiles(total_times, experiment_info.quantile)
+                    result.q_value = mquantiles(total_times, experiment_info.quantile)[0]
                     result.success = True
                     return result
             elif experiment_info.stopping == "pessimistic":
@@ -244,7 +250,7 @@ class SutStress:
                         result.times = total_times
                         result.temps = total_temps
                         result.stable_q = q
-                        result.q_value = mquantiles(total_times, q)
+                        result.q_value = mquantiles(total_times, q)[0]
                         result.success = True
                         return result
 
@@ -255,7 +261,7 @@ class SutStress:
                     result.times = total_times
                     result.temps = total_temps
                     result.stable_q = q
-                    result.q_value = mquantiles(total_times, q)
+                    result.q_value = mquantiles(total_times, q)[0]
                     result.success = True
                     return result
 
@@ -264,7 +270,7 @@ class SutStress:
         result.times = total_times
         result.temps = total_temps
         result.stable_q = experiment_info.quantile
-        result.q_value = mquantiles(total_times, experiment_info.quantile)
+        result.q_value = mquantiles(total_times, experiment_info.quantile)[0]
         result.success = True if experiment_info.stopping == "fixed" else False
         return result
 

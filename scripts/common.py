@@ -26,6 +26,7 @@ import re
 import time
 import os
 import json
+import signal
 from copy import deepcopy
 
 
@@ -84,7 +85,7 @@ class ExperimentInfo:
             sys.exit(1)
 
         try:
-            self.quantile = int(json_object["quantile"])
+            self.quantile = float(json_object["quantile"])
         except KeyError:
             print("Unable to find quantile in JSON, going for default 0.9 ")
 
@@ -173,6 +174,7 @@ class MappingResult:
         self.temps = None
         self.stable_q = None
         self.q_value = None
+        self.time = None
         self.success = True
         self.mapping = mapping
 
@@ -185,6 +187,7 @@ class MappingResult:
         result["temps"] = self.temps
         result["stable_q"] = self.stable_q
         result["q_value"] = self.q_value
+        result["time"] = self.time
         result["success"] = self.success
         result["mapping"] = str(self.mapping)
 
@@ -285,8 +288,12 @@ class ProcessManagement:
         Call a background system command and leave it in the background
         :param command: Shell command to run
         """
+
         print("executing command: " + command + " in the background")
-        self._background_procs.append(subprocess.Popen(command, shell=True))
+        self._background_procs.append(subprocess.Popen(command,
+                                                       stdout=subprocess.PIPE,
+                                                       shell=True,
+                                                       preexec_fn=os.setsid))
         time.sleep(self._sleep_startup)
 
     def kill_stress(self):
@@ -294,13 +301,19 @@ class ProcessManagement:
         Kill all the background stress commands
         """
 
-        print("killing stress ")
         for p in self._background_procs:
-            p.terminate()
+            os.killpg(os.getpgid(p.pid), signal.SIGTERM)
             time.sleep(self._sleep_shutdown)
 
         self._background_procs = []
         time.sleep(self._sleep_shutdown)
+
+    def __del__(self):
+        """
+        Cleanup for whatever is running in the background
+        :return:
+        """
+        self.kill_stress()
 
 
 class DataLog:
@@ -353,7 +366,7 @@ class DataLog:
         self._data[experiment_name]["max_confidence_variation"] = \
             experiment_info.max_confidence_variation
 
-    def cleanup(self):
+    def __del__(self):
         """
         Remove temp files and temp dir
         """
@@ -374,17 +387,19 @@ class DataLog:
         """
         assert isinstance(mapping_result, MappingResult)
 
-        self._data[self._experiment_name][str(iteration)] = mapping_result.get_dict()
+        self._data[self._experiment_name]["it"] = dict()
+        self._data[self._experiment_name]["it"][str(iteration)] = mapping_result.get_dict()
 
     def file_dump(self):
         """
         Dump what you have stored in the data dict to a file
         :return:
         """
+
         config_out_file = self._folder_name + self._experiment_name + ".json"
 
         with open(config_out_file, 'w') as outfile:
-            json.dump(self._data, outfile, sort_keys=True, indent=4)
+            json.dump(self._data, outfile, indent=4)
 
         self._data.pop(self._experiment_name)
 
@@ -395,6 +410,7 @@ class DataLog:
         :param dict2: Second dict to merge
         :return: Merged dict
         """
+
         if isinstance(dict1, dict) and isinstance(dict2, dict):
             dict1_and_dict2 = set(dict1).intersection(dict2)
             every_key = set(dict1).union(dict2)
@@ -407,6 +423,7 @@ class DataLog:
         Merge the separate output files in a single one
         :param output_file: The JSON file where the experiment results are stored
         """
+
         output = dict()
         config_files = [f for f in os.listdir(self._folder_name) if os.path.isfile(os.path.join(self._folder_name, f))]
 
@@ -416,4 +433,4 @@ class DataLog:
                 output = self._merge_dict(output, experiments_object)
 
         with open(output_file, 'w') as outfile:
-            json.dump(output, outfile, sort_keys=True, indent=4)
+            json.dump(output, outfile, indent=4)

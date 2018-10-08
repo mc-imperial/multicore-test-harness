@@ -423,7 +423,6 @@ class ObjectiveFunction:
 
         # Logging information
         self.iteration = 0
-        self._log = DataLog()
         self._t_start = time()
         self._log.experiment_info(experiment_info)
 
@@ -469,12 +468,13 @@ class ObjectiveFunction:
         s = SutStress()
 
         result = s.run_mapping(experiment_info= self._experiment_info,
-                               mapping=self._enemy_mapping)
-
+                               mapping=self._enemy_mapping,
+                               iteration_name=str(enemy_config))
         if self.best_score is None or result.q_value > self.best_score:
             self.best_score = result.q_value
             self.best_mapping = enemy_config
 
+        result.time = time() - self._t_start
         self._log.log_data_mapping(mapping_result=result, iteration=self.iteration)
         self.iteration += 1
 
@@ -833,7 +833,6 @@ class Tuning:
         """
 
         self._experiment_info = None
-        self._output_file = None
         self._log = DataLog()
 
         # Store the enemy config
@@ -913,11 +912,10 @@ class Tuning:
                 "\n" + "Total time " + str(time()-start_time))
         f.close()
 
-    def simple_tune(self, tune_method, exp_prefix):
+    def simple_tune(self, tune_method):
         """
         This method can be used only if the template is fixed and we only need to determine the parameters
         :param tune_method: Optimization method
-        :param exp_prefix: The suffix used to identify the output binary
         :return:
         """
         assert self._enemy_config.fixed_template, "Can not train this way if the template is not given"
@@ -938,7 +936,7 @@ class Tuning:
             print("I do not know how to simple train that way")
             sys.exit(0)
 
-        best_state.get_file_mapping(prefix=str(exp_prefix) + "_",
+        best_state.get_file_mapping(prefix=str(self._experiment_info.experiment_name) + "_",
                                     output_folder=self._experiment_info.output_binary)
 
         f = open(self._experiment_info.max_file, 'w')
@@ -952,8 +950,6 @@ class Tuning:
         :param output_file: The JSON file where the result is stored
         """
 
-        self._output_file = output_file
-
         # Read the configuration in the JSON file
         with open(input_file) as data_file:
             tuning_object = json.load(data_file)
@@ -962,6 +958,9 @@ class Tuning:
             self._experiment_info = ExperimentInfo(experiment_name)
             self._experiment_info.read_json_object(tuning_object[experiment_name])
             self.read_json_object(tuning_object[experiment_name])
+
+            # To give each tuning a fair chance
+            seed(1000)
 
             if self._experiment_info.method == "sa_ran":
                 print("Tuning by simulated annealing on the "
@@ -1011,15 +1010,17 @@ class Tuning:
                 print("I do not know how to train that way")
                 sys.exit(0)
 
+            self._log.file_dump()
+
             self.cleanup()
+
+        self._log.merge_docs(output_file)
 
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
         print("usage: " + sys.argv[0] + " <tuning_file>.json <results>.json\n")
         exit(1)
-
-    seed(1000)
 
     tr = Tuning()
 
