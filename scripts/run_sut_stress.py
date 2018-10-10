@@ -233,7 +233,7 @@ class SutStress:
 
             # This part runs if we have variable iterations based on confidence interval
             # and can stop early
-            if experiment_info.stopping == "no_decrease" :
+            if experiment_info.stopping == "no_decrease" or experiment_info.stopping == "optimistic":
                 conf_var = confidence_variation(total_times, experiment_info.quantile)
                 print("The confidence variation is ", conf_var)
                 if conf_var < experiment_info.max_confidence_variation:

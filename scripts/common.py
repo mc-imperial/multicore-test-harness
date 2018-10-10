@@ -366,6 +366,8 @@ class DataLog:
         self._data[experiment_name]["max_confidence_variation"] = \
             experiment_info.max_confidence_variation
 
+        self._data[self._experiment_name]["it"] = dict()
+
     def __del__(self):
         """
         Remove temp files and temp dir
@@ -387,7 +389,6 @@ class DataLog:
         """
         assert isinstance(mapping_result, MappingResult)
 
-        self._data[self._experiment_name]["it"] = dict()
         self._data[self._experiment_name]["it"][str(iteration)] = mapping_result.get_dict()
 
     def file_dump(self):
