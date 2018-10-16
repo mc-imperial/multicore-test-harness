@@ -583,7 +583,7 @@ class Optimization:
                                                log=self._log,
                                                socket_connect=self._socket)
 
-        while objective_function.iteration < self._experiment_info.tuning_max_time and \
+        while objective_function.iteration < self._experiment_info.tuning_max_iterations and \
                 time() < self._t_end:
             enemy_config.random_set_all_defines()
             objective_function(enemy_config)
@@ -609,7 +609,7 @@ class Optimization:
         current_config = enemy_config
         current_score = 0
 
-        while objective_function.iteration < self._experiment_info.tuning_max_time and \
+        while objective_function.iteration < self._experiment_info.tuning_max_iterations and \
                 time() < self._t_end:
 
             next_config = current_config.neighbour_define()

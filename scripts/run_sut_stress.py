@@ -189,7 +189,9 @@ class SutStress:
         total_times = []
         total_temps = []
 
-        candidate_quantiles = [0.90, 0.85, 0.80, 0.75, 0.70, 0.65, 0.60, 0.55, 0.50]
+        # start from 95 and decrease to 50 by 1
+        candidate_quantiles= [x / 100.0 for x in range(95, 49, -1)]
+
         if iteration_name is None:
             iteration_name = mapping
         result = MappingResult(iteration_name)
