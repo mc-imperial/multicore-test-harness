@@ -31,7 +31,7 @@ from scipy.stats import binom
 from time import sleep
 
 
-def confidence_variation(x, quantile, desired_confidence=.9):
+def confidence_variation(x, quantile, desired_confidence=.95):
 
     assert isinstance(x, list)
     assert 0 < quantile < 1, "Quantile value is " + str(quantile)
@@ -52,8 +52,13 @@ def confidence_variation(x, quantile, desired_confidence=.9):
             li = li-1
         confidence = binom.cdf(ui-1, n, quantile) - binom.cdf(li-1, n, quantile)
 
-        if ui == n-1 and li == 0:
+        if ui >= n-1 and li <= 0:
             break
+
+    if ui >= n-1:
+        ui = n-1
+    if li <= 0:
+        li = 0
 
     lower_range = x[li]
     upper_range = x[ui]
@@ -189,7 +194,9 @@ class SutStress:
         total_times = []
         total_temps = []
 
-        candidate_quantiles = [0.90, 0.85, 0.80, 0.75, 0.70, 0.65, 0.60, 0.55, 0.50]
+        # start from 95 and decrease to 50 by 1
+        candidate_quantiles= [x / 100.0 for x in range(95, 49, -1)]
+
         if iteration_name is None:
             iteration_name = mapping
         result = MappingResult(iteration_name)
