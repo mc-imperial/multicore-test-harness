@@ -31,20 +31,21 @@ from scipy.stats import binom
 from time import sleep
 
 
-def confidence_variation(times, quantile, desired_confidence=.95):
+def confidence_variation(times, experiment_info):
     """
     Calculate the confidence interval
     :param times: The list of times for the calculation
-    :param quantile: The quantile for which the calculation is made
-    :param desired_confidence: The procentage of the confidence interval
+    :param experiment_info: An experiment info object
     :return: confidence variation, lower confidence, upper confidence
     """
 
     assert isinstance(times, list)
-    assert 0 < quantile < 1, "Quantile value is " + str(quantile)
+    assert isinstance(experiment_info, ExperimentInfo)
+
+    quantile = experiment_info.quantile
+    desired_confidence = experiment_info.confidence_interval
 
     times.sort()
-    print(times)
     q = mquantiles(times, quantile)[0]
     n = len(times)
 
@@ -248,7 +249,7 @@ class SutStress:
             # This part runs if we have variable iterations based on confidence interval
             # and can stop early
             if experiment_info.stopping == "no_decrease" or experiment_info.stopping == "optimistic":
-                (conf_var, conf_min, conf_max) = confidence_variation(total_times, experiment_info.quantile)
+                (conf_var, conf_min, conf_max) = confidence_variation(total_times, experiment_info)
                 print("The confidence variation is ", conf_var)
                 if conf_var < experiment_info.max_confidence_variation:
                     result.times = total_times
@@ -261,7 +262,7 @@ class SutStress:
                     return result
             elif experiment_info.stopping == "pessimistic":
                 for q in candidate_quantiles:
-                    (conf_var, conf_min, conf_max) = confidence_variation(total_times, experiment_info.quantile)
+                    (conf_var, conf_min, conf_max) = confidence_variation(total_times, experiment_info)
                     if conf_var < experiment_info.max_confidence_variation:
                         result.times = total_times
                         result.temps = total_temps
@@ -275,7 +276,7 @@ class SutStress:
         # At this point we know that we have hit max iterations
         if experiment_info.stopping == "optimistic":
             for q in candidate_quantiles:
-                (conf_var, conf_min, conf_max) = confidence_variation(total_times, experiment_info.quantile)
+                (conf_var, conf_min, conf_max) = confidence_variation(total_times, experiment_info)
                 if conf_var < experiment_info.max_confidence_variation:
                     result.times = total_times
                     result.temps = total_temps
@@ -288,7 +289,7 @@ class SutStress:
 
         # If we hit this and we did not intend to (not using "fixed"), we failed
         # to get a stable quantile basically
-        (conf_var, conf_min, conf_max) = confidence_variation(total_times, experiment_info.quantile)
+        (conf_var, conf_min, conf_max) = confidence_variation(total_times, experiment_info)
         result.times = total_times
         result.temps = total_temps
         result.stable_q = experiment_info.quantile
