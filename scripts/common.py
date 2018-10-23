@@ -48,6 +48,7 @@ class ExperimentInfo:
         self.measurement_iterations_step = 20
         self.measurement_iterations_max = 200
         self.max_confidence_variation = 5
+        self.confidence_interval = 0.95
         self.max_temperature = 80
         self.stopping = "fixed"
         self.governor = "powersave"
@@ -63,6 +64,32 @@ class ExperimentInfo:
         # Log and results
         self.max_file = None
         self.output_binary = None
+
+    def get_dict(self):
+
+        result = dict()
+
+        result["sut"] = self.sut
+        result["cores"] = self.cores
+        result["quantile"] = self.quantile
+        result["measurement_iterations_step"] = self.measurement_iterations_step
+        result["measurement_iterations_max"] = self.measurement_iterations_max
+        result["max_confidence_variation"] = self.max_confidence_variation
+        result["confidence_interval"] = self.confidence_interval
+        result["max_temeperature"] = self.max_temperature
+        result["stopping"] = self.stopping
+        result["governor"] = self.governor
+
+        result["tuning_max_time"] = self.tuning_max_time
+        result["tuning_max_iterations"] = self.tuning_max_iterations
+        result["method"] = self.method
+
+        result["enemy_config"] = self.enemy_config
+
+        result["max_file"] = self.max_file
+        result["output_binary"] = self.output_binary
+
+        return result
 
     def read_json_object(self, json_object):
         """
@@ -106,6 +133,11 @@ class ExperimentInfo:
         except KeyError:
             print("Unable to find max_confidence_variation in JSON, going for"
                   "default of 5")
+        try:
+            self.confidence_interval = float(json_object["confidence_interval"])
+        except KeyError:
+            print("Unable to find confidence_interval in JSON, going for"
+                  "default of 0.95")
 
         try:
             self.max_temperature = int(json_object["max_temperature"])
@@ -170,13 +202,15 @@ class MappingResult:
         Create a MappingResult object
         :param mapping: A mapping dict
         """
-        self.times = None
-        self.temps = None
-        self.stable_q = None
-        self.q_value = None
-        self.time = None
-        self.success = True
-        self.mapping = mapping
+        self.times = None               # List of times for the mapping
+        self.temps = None               # List of temperatures for the mapping
+        self.stable_q = None            # The quantile that was found stable
+        self.q_value = None             # The value of the quantile that was stable
+        self.q_min = None               # The minimum value in the confidence interval
+        self.q_max = None               # The maximum value in the confidence interval
+        self.time = None                # Time since the experiment started
+        self.success = True             # If the experiment was able to find a stable quantile
+        self.mapping = mapping          # The mapping of enemy processes
 
     def get_dict(self):
         """
@@ -187,6 +221,8 @@ class MappingResult:
         result["temps"] = self.temps
         result["stable_q"] = self.stable_q
         result["q_value"] = self.q_value
+        result["q_min"] = self.q_min
+        result["q_max"] = self.q_max
         result["time"] = self.time
         result["success"] = self.success
         result["mapping"] = str(self.mapping)
@@ -345,27 +381,7 @@ class DataLog:
 
         experiment_name = experiment_info.experiment_name
         self._experiment_name = experiment_name
-        self._data[experiment_name] = dict()
-
-        self._data[experiment_name]["sut"] = \
-            experiment_info.sut
-        self._data[experiment_name]["cores"] = \
-            experiment_info.cores
-        self._data[experiment_name]["measurement_iterations_step"] = \
-            experiment_info.measurement_iterations_step
-        self._data[experiment_name]["measurement_iterations_max"] = \
-            experiment_info.measurement_iterations_max
-        self._data[experiment_name]["max_temperature"] = \
-            experiment_info.max_temperature
-        self._data[experiment_name]["quantile"] = \
-            experiment_info.quantile
-        self._data[experiment_name]["stopping"] = \
-            experiment_info.stopping
-        self._data[experiment_name]["governor"] = \
-            experiment_info.governor
-        self._data[experiment_name]["max_confidence_variation"] = \
-            experiment_info.max_confidence_variation
-
+        self._data[experiment_name] = experiment_info.get_dict()
         self._data[self._experiment_name]["it"] = dict()
 
     def __del__(self):

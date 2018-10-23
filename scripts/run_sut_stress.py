@@ -31,15 +31,22 @@ from scipy.stats import binom
 from time import sleep
 
 
-def confidence_variation(x, quantile, desired_confidence=.95):
+def confidence_variation(times, quantile, desired_confidence=.95):
+    """
+    Calculate the confidence interval
+    :param times: The list of times for the calculation
+    :param quantile: The quantile for which the calculation is made
+    :param desired_confidence: The procentage of the confidence interval
+    :return: confidence variation, lower confidence, upper confidence
+    """
 
-    assert isinstance(x, list)
+    assert isinstance(times, list)
     assert 0 < quantile < 1, "Quantile value is " + str(quantile)
 
-    x.sort()
-    print(x)
-    q = mquantiles(x, quantile)[0]
-    n = len(x)
+    times.sort()
+    print(times)
+    q = mquantiles(times, quantile)[0]
+    n = len(times)
 
     confidence = 0
     middle = round(quantile * (n+1))
@@ -60,12 +67,12 @@ def confidence_variation(x, quantile, desired_confidence=.95):
     if li <= 0:
         li = 0
 
-    lower_range = x[li]
-    upper_range = x[ui]
+    lower_range = times[li]
+    upper_range = times[ui]
 
     confidence_range = upper_range - lower_range
 
-    return (confidence_range/q)*100
+    return (confidence_range/q)*100, lower_range, upper_range
 
 
 class SutStress:
@@ -241,43 +248,53 @@ class SutStress:
             # This part runs if we have variable iterations based on confidence interval
             # and can stop early
             if experiment_info.stopping == "no_decrease" or experiment_info.stopping == "optimistic":
-                conf_var = confidence_variation(total_times, experiment_info.quantile)
+                (conf_var, conf_min, conf_max) = confidence_variation(total_times, experiment_info.quantile)
                 print("The confidence variation is ", conf_var)
                 if conf_var < experiment_info.max_confidence_variation:
-
                     result.times = total_times
                     result.temps = total_temps
                     result.stable_q = experiment_info.quantile
                     result.q_value = mquantiles(total_times, experiment_info.quantile)[0]
+                    result.q_min = conf_min
+                    result.q_max = conf_max
                     result.success = True
                     return result
             elif experiment_info.stopping == "pessimistic":
                 for q in candidate_quantiles:
-                    if confidence_variation(total_times, q) < experiment_info.max_confidence_variation:
+                    (conf_var, conf_min, conf_max) = confidence_variation(total_times, experiment_info.quantile)
+                    if conf_var < experiment_info.max_confidence_variation:
                         result.times = total_times
                         result.temps = total_temps
                         result.stable_q = q
                         result.q_value = mquantiles(total_times, q)[0]
+                        result.q_min = conf_min
+                        result.q_max = conf_max
                         result.success = True
                         return result
 
         # At this point we know that we have hit max iterations
         if experiment_info.stopping == "optimistic":
             for q in candidate_quantiles:
-                if confidence_variation(total_times, q) < experiment_info.max_confidence_variation:
+                (conf_var, conf_min, conf_max) = confidence_variation(total_times, experiment_info.quantile)
+                if conf_var < experiment_info.max_confidence_variation:
                     result.times = total_times
                     result.temps = total_temps
                     result.stable_q = q
                     result.q_value = mquantiles(total_times, q)[0]
+                    result.q_min = conf_min
+                    result.q_max = conf_max
                     result.success = True
                     return result
 
         # If we hit this and we did not intend to (not using "fixed"), we failed
         # to get a stable quantile basically
+        (conf_var, conf_min, conf_max) = confidence_variation(total_times, experiment_info.quantile)
         result.times = total_times
         result.temps = total_temps
         result.stable_q = experiment_info.quantile
         result.q_value = mquantiles(total_times, experiment_info.quantile)[0]
+        result.q_min = conf_min
+        result.q_max = conf_max
         result.success = True if experiment_info.stopping == "fixed" else False
         return result
 

@@ -5,8 +5,13 @@
                     "../tuned_enemies/tuned_bus",
                     "../tuned_enemies/tuned_memory"],
     "cores": 7,
-    "quantile": 0.9,
-    "iterations": 20,
+    "quantile": 0.95,
+    "measurement_iterations_step": 20,
+    "measurement_iterations_max": 200,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.90,
+    "stopping" : "optimistic",
+    "governor" : "powersave",
     "max_temperature": 80
   },
   "mem_rank": {
@@ -15,8 +20,13 @@
                     "../tuned_enemies/tuned_bus",
                     "../tuned_enemies/tuned_memory"],
     "cores": 7,
-    "quantile": 0.9,
-    "iterations": 20,
+    "quantile": 0.95,
+    "measurement_iterations_step": 20,
+    "measurement_iterations_max": 200,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.90,
+    "stopping" : "optimistic",
+    "governor" : "powersave",
     "max_temperature": 80
   },
   "bus_rank": {
@@ -25,8 +35,13 @@
                     "../tuned_enemies/tuned_bus",
                     "../tuned_enemies/tuned_memory"],
     "cores": 7,
-    "quantile": 0.9,
-    "iterations": 20,
+    "quantile": 0.95,
+    "measurement_iterations_step": 20,
+    "measurement_iterations_max": 200,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.90,
+    "stopping" : "optimistic",
+    "governor" : "powersave",
     "max_temperature": 80
   }
 }
