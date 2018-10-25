@@ -450,8 +450,5 @@ class DataLog:
                 experiments_object = json.load(data_file)
                 output = self._merge_dict(output, experiments_object)
 
-        # sort json if needed
-        output = sorted(output, key=lambda k: k['page']['update_time'], reverse=True)
-
         with open(output_file, 'w') as outfile:
             json.dump(output, outfile, indent=4, sort_keys=True)
