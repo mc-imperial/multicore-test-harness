@@ -1,1 +1,2 @@
-perf stat -einstructions -eL1-dcache-loads -eL1-dcache-load-misses -eL1-dcache-stores -eL1-dcache-store-misses -eL1-dcache-prefetch-misses -eLLC-loads -eLLC-stores -eLLC-prefetches -eLLC-load-misses -eLLC-store-misses -eLLC-prefetch-misses -econtext-switches -epage-faults "${@:1}"
+#!/usr/bin/env bash
+perf stat -eLLC-loads -eLLC-stores -eLLC-load-misses -eLLC-store-misses -econtext-switches -epage-faults "${@:1}"
