@@ -44,7 +44,7 @@ def confidence_variation(times, quantile, confidence_interval):
     assert 0 < quantile < 1, "Quantile value is " + str(quantile) + "which should be between 0 and 1"
     assert 0.5 < confidence_interval < 1, "Desired confidence interval should be between 0.5 and 1"
 
-    sorted_times = sorted(times)hto
+    sorted_times = sorted(times)
     q = mquantiles(times, quantile)[0]
     n = len(times)
 
