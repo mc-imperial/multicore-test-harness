@@ -450,5 +450,6 @@ class DataLog:
                 experiments_object = json.load(data_file)
                 output = self._merge_dict(output, experiments_object)
 
+        # Note to self, do not sort the keys, it will make the iterations strange
         with open(output_file, 'w') as outfile:
-            json.dump(output, outfile, indent=4, sort_keys=True)
+            json.dump(output, outfile, indent=4, sort_keys=False)
