@@ -44,7 +44,7 @@ def confidence_variation(times, quantile, confidence_interval):
     assert 0 < quantile < 1, "Quantile value is " + str(quantile) + "which should be between 0 and 1"
     assert 0.5 < confidence_interval < 1, "Desired confidence interval should be between 0.5 and 1"
 
-    times.sort()
+    sorted_times = sorted(times)hto
     q = mquantiles(times, quantile)[0]
     n = len(times)
 
@@ -67,8 +67,8 @@ def confidence_variation(times, quantile, confidence_interval):
     if li <= 0 or li > ui:
         li = 0
 
-    lower_range = times[li]
-    upper_range = times[ui]
+    lower_range = sorted_times[li]
+    upper_range = sorted_times[ui]
 
     confidence_range = upper_range - lower_range
 
@@ -307,7 +307,7 @@ class SutStress:
         result.q_value = mquantiles(total_times, experiment_info.quantile)[0]
         result.q_min = conf_min
         result.q_max = conf_max
-        result.success = True if experiment_info.stopping == "fixed" else False
+        result.success = True if conf_var < experiment_info.max_confidence_variation else False
         return result
 
     def run_sut_stress(self, sut, stress, cores, style=0):
