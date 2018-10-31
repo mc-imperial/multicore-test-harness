@@ -47,9 +47,9 @@ def remove_outliers(times, scale=3):
 
     c = -1 / (sqrt(2) * erfcinv(3 / 2))
     temp = [abs(x-median_value) for x in times]
-    scaled_mad = scale * c * median(temp)
+    scaled_mad = c * median(temp)
 
-    new_values = [x for x in times if x < scaled_mad]
+    new_values = [x for x in times if x < scale * scaled_mad + median_value]
 
     return new_values
 
@@ -68,8 +68,8 @@ def confidence_variation(times, quantile, confidence_interval):
     assert 0.5 < confidence_interval < 1, "Desired confidence interval should be between 0.5 and 1"
 
     sorted_times = sorted(remove_outliers(times))
-    q = mquantiles(times, quantile)[0]
-    n = len(times)
+    q = mquantiles(sorted_times, quantile)[0]
+    n = len(sorted_times)
 
     confidence = 0
     middle = round(quantile * (n+1))
