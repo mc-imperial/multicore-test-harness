@@ -204,6 +204,7 @@ class MappingResult:
         :param mapping: A mapping dict
         """
         self.times = None               # List of times for the mapping
+        self.no_outliers_times = None   # List of times with outliers removed
         self.temps = None               # List of temperatures for the mapping
         self.stable_q = None            # The quantile that was found stable
         self.q_value = None             # The value of the quantile that was stable
@@ -219,6 +220,7 @@ class MappingResult:
         """
         result = dict()
         result["times"] = self.times
+        result["no_outliers_times"] = self.no_outliers_times
         result["temps"] = self.temps
         result["stable_q"] = self.stable_q
         result["q_value"] = self.q_value
