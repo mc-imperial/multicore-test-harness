@@ -203,24 +203,24 @@ class MappingResult:
         Create a MappingResult object
         :param mapping: A mapping dict
         """
-        self.times = None               # List of times for the mapping
-        self.no_outliers_times = None   # List of times with outliers removed
-        self.temps = None               # List of temperatures for the mapping
-        self.stable_q = None            # The quantile that was found stable
-        self.q_value = None             # The value of the quantile that was stable
-        self.q_min = None               # The minimum value in the confidence interval
-        self.q_max = None               # The maximum value in the confidence interval
-        self.time = None                # Time since the experiment started
-        self.success = True             # If the experiment was able to find a stable quantile
-        self.mapping = mapping          # The mapping of enemy processes
+        self.measurements = None                # List of times for the mapping
+        self.no_outliers_measurements = None    # List of times with outliers removed
+        self.temps = None                       # List of temperatures for the mapping
+        self.stable_q = None                    # The quantile that was found stable
+        self.q_value = None                     # The value of the quantile that was stable
+        self.q_min = None                       # The minimum value in the confidence interval
+        self.q_max = None                       # The maximum value in the confidence interval
+        self.time = None                        # Time since the experiment started
+        self.success = True                     # If the experiment was able to find a stable quantile
+        self.mapping = mapping                  # The mapping of enemy processes
 
     def get_dict(self):
         """
         :return: A dict with all the stored values
         """
         result = dict()
-        result["times"] = self.times
-        result["no_outliers_times"] = self.no_outliers_times
+        result["measurements"] = self.measurements
+        result["no_outliers_measurements"] = self.no_outliers_measurements
         result["temps"] = self.temps
         result["stable_q"] = self.stable_q
         result["q_value"] = self.q_value

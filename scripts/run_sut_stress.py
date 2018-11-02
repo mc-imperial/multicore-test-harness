@@ -49,7 +49,7 @@ def remove_outliers(times, scale=3):
     temp = [abs(x-median_value) for x in times]
     scaled_mad = c * median(temp)
 
-    new_values = [x for x in times if x < scale * scaled_mad + median_value]
+    new_values = [x for x in times if median_value - scale * scaled_mad < x < median_value + scale * scaled_mad]
 
     return new_values
 
@@ -277,8 +277,8 @@ class SutStress:
                                          confidence_interval=experiment_info.confidence_interval)
                 print("The confidence variation is ", conf_var)
                 if conf_var < experiment_info.max_confidence_variation:
-                    result.times = total_times
-                    result.no_outliers_times = remove_outliers(total_times)
+                    result.measurements = total_times
+                    result.no_outliers_measurements = remove_outliers(total_times)
                     result.temps = total_temps
                     result.stable_q = experiment_info.quantile
                     result.q_value = mquantiles(total_times, experiment_info.quantile)[0]
@@ -293,8 +293,8 @@ class SutStress:
                                              quantile=q,
                                              confidence_interval=experiment_info.confidence_interval)
                     if conf_var < experiment_info.max_confidence_variation:
-                        result.times = total_times
-                        result.no_outliers_times = remove_outliers(total_times)
+                        result.measurements = total_times
+                        result.no_outliers_measurements = remove_outliers(total_times)
                         result.temps = total_temps
                         result.stable_q = q
                         result.q_value = mquantiles(total_times, q)[0]
@@ -311,8 +311,8 @@ class SutStress:
                                          quantile=q,
                                          confidence_interval=experiment_info.confidence_interval)
                 if conf_var < experiment_info.max_confidence_variation:
-                    result.times = total_times
-                    result.no_outliers_times = remove_outliers(total_times)
+                    result.measurements = total_times
+                    result.no_outliers_measurements = remove_outliers(total_times)
                     result.temps = total_temps
                     result.stable_q = q
                     result.q_value = mquantiles(total_times, q)[0]
@@ -327,8 +327,8 @@ class SutStress:
             confidence_variation(times=total_times,
                                  quantile=experiment_info.confidence_interval,
                                  confidence_interval=experiment_info.confidence_interval)
-        result.times = total_times
-        result.no_outliers_times = remove_outliers(total_times)
+        result.measurements = total_times
+        result.no_outliers_measurements = remove_outliers(total_times)
         result.temps = total_temps
         result.stable_q = experiment_info.quantile
         result.q_value = mquantiles(total_times, experiment_info.quantile)[0]
