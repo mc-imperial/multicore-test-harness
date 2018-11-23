@@ -43,6 +43,7 @@ class ExperimentInfo:
 
         # General attributes
         self.sut = None
+        self.instrument_cmd = ""
         self.cores = None
         self.quantile = 0.9
         self.measurement_iterations_step = 20
@@ -70,6 +71,7 @@ class ExperimentInfo:
         result = dict()
 
         result["sut"] = self.sut
+        result["instrument_cmd"] = self.instrument_cmd
         result["cores"] = self.cores
         result["quantile"] = self.quantile
         result["measurement_iterations_step"] = self.measurement_iterations_step
@@ -103,6 +105,12 @@ class ExperimentInfo:
             self.sut = str(json_object["sut"])
         except KeyError:
             print("Unable to find sut in JSON")
+            sys.exit(1)
+
+        try:
+            self.instrument_cmd = str(json_object["instrument_cmd"])
+        except KeyError:
+            print("Unable to find instrument in JSON")
             sys.exit(1)
 
         try:

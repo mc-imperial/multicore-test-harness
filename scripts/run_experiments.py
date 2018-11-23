@@ -82,7 +82,7 @@ class Experiment(object):
             log.experiment_info(self._experiment_info)
 
             if self._mapping:
-                s = SutStress()
+                s = SutStress(self._experiment_info.instrument_cmd)
 
                 result_baseline = s.run_mapping(self._experiment_info, mapping=dict())
                 result_enemy = s.run_mapping(self._experiment_info, mapping=self._mapping)

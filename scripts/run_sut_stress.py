@@ -104,13 +104,14 @@ class SutStress:
     Used to run an SUT together with enemy processes
     """
     # Profiling tools options for the SUT
-    INSTRUMENT_CMDS = ["", "bash my_perf_script.sh", "bash my_perf.sh", "strace -c"]
 
-    def __init__(self):
+    def __init__(self, instrument_cmd=""):
         """
         Create a stressed SUT object
+        :param instrument_cmd: Script to run code instrumentation
         """
         self._processes = ProcessManagement()
+        self._instrument_cmd = instrument_cmd
 
     @staticmethod
     def _get_taskset_cmd(core):
@@ -131,16 +132,15 @@ class SutStress:
         cmd = self._get_taskset_cmd(core) + " " + "./" + stress
         self._processes.system_call_background(cmd)
 
-    def run_program_single(self, sut, core, style):
+    def run_program_single(self, sut, core):
         """
         Start the SUT with perf to gather more info
         :param sut: System under stress
         :param core: Core to start on
-        :param style: Run the SUT with perf or some simillar instrument
         :return: Output and error
         """
-        cmd = self._get_taskset_cmd(core) + " " + "nice -20" + \
-              self.INSTRUMENT_CMDS[style] + " " + "./" + sut
+        cmd = self._get_taskset_cmd(core) + " " + "nice -20 " + \
+              self._instrument_cmd + " " + "./" + sut
         s_out,s_err = self._processes.system_call(cmd)
         return s_out, s_err
 
@@ -249,7 +249,7 @@ class SutStress:
                 self._check_error(s_err)
 
                 # Run the program on core 0
-                s_out,s_err = self.run_program_single(experiment_info.sut, 0, style)
+                s_out,s_err = self.run_program_single(experiment_info.sut, 0)
                 self._check_error(s_err)
 
                 final_temp = get_temp()
