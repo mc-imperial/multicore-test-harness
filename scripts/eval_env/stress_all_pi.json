@@ -12,7 +12,7 @@
     "iterations_step": 20,
     "iterations_max": 200,
     "max_confidence_variation": 5,
-    "stopping" : "fixed",
+    "stopping" : "no_decrease",
     "governor" : "powersave",
     "max_temperature": 80
   },
@@ -29,7 +29,7 @@
     "iterations_step": 20,
     "iterations_max": 200,
     "max_confidence_variation": 5,
-    "stopping" : "fixed",
+    "stopping" : "no_decrease",
     "governor" : "powersave",
     "iterations": 20,
     "max_temperature": 80
@@ -47,7 +47,7 @@
     "iterations_step": 20,
     "iterations_max": 200,
     "max_confidence_variation": 5,
-    "stopping" : "fixed",
+    "stopping" : "no_decrease",
     "governor" : "powersave",
     "iterations": 20,
     "max_temperature": 80
@@ -65,7 +65,7 @@
     "iterations_step": 20,
     "iterations_max": 200,
     "max_confidence_variation": 5,
-    "stopping" : "fixed",
+    "stopping" : "no_decrease",
     "governor" : "powersave",
     "iterations": 20,
     "max_temperature": 80
@@ -83,7 +83,7 @@
     "iterations_step": 20,
     "iterations_max": 200,
     "max_confidence_variation": 5,
-    "stopping" : "fixed",
+    "stopping" : "no_decrease",
     "governor" : "powersave",
     "iterations": 20,
     "max_temperature": 80
@@ -101,7 +101,7 @@
     "iterations_step": 20,
     "iterations_max": 200,
     "max_confidence_variation": 5,
-    "stopping" : "fixed",
+    "stopping" : "no_decrease",
     "governor" : "powersave",
     "iterations": 20,
     "max_temperature": 80
@@ -119,7 +119,7 @@
     "iterations_step": 20,
     "iterations_max": 200,
     "max_confidence_variation": 5,
-    "stopping" : "fixed",
+    "stopping" : "no_decrease",
     "governor" : "powersave",
     "iterations": 20,
     "max_temperature": 80
@@ -137,7 +137,7 @@
     "iterations_step": 20,
     "iterations_max": 200,
     "max_confidence_variation": 5,
-    "stopping" : "fixed",
+    "stopping" : "no_decrease",
     "governor" : "powersave",
     "iterations": 20,
     "max_temperature": 80
@@ -155,7 +155,7 @@
     "iterations_step": 20,
     "iterations_max": 200,
     "max_confidence_variation": 5,
-    "stopping" : "fixed",
+    "stopping" : "no_decrease",
     "governor" : "powersave",
     "iterations": 20,
     "max_temperature": 80
@@ -173,7 +173,7 @@
     "iterations_step": 20,
     "iterations_max": 200,
     "max_confidence_variation": 5,
-    "stopping" : "fixed",
+    "stopping" : "no_decrease",
     "governor" : "powersave",
     "iterations": 20,
     "max_temperature": 80
@@ -191,7 +191,7 @@
     "iterations_step": 20,
     "iterations_max": 200,
     "max_confidence_variation": 5,
-    "stopping" : "fixed",
+    "stopping" : "no_decrease",
     "governor" : "powersave",
     "iterations": 20,
     "max_temperature": 80
@@ -209,7 +209,7 @@
     "iterations_step": 20,
     "iterations_max": 200,
     "max_confidence_variation": 5,
-    "stopping" : "fixed",
+    "stopping" : "no_decrease",
     "governor" : "powersave",
     "iterations": 20,
     "max_temperature": 80
@@ -227,7 +227,7 @@
     "iterations_step": 20,
     "iterations_max": 200,
     "max_confidence_variation": 5,
-    "stopping" : "fixed",
+    "stopping" : "no_decrease",
     "governor" : "powersave",
     "iterations": 20,
     "max_temperature": 80
@@ -245,7 +245,7 @@
     "iterations_step": 20,
     "iterations_max": 200,
     "max_confidence_variation": 5,
-    "stopping" : "fixed",
+    "stopping" : "no_decrease",
     "governor" : "powersave",
     "iterations": 20,
     "max_temperature": 80
@@ -263,7 +263,7 @@
     "iterations_step": 20,
     "iterations_max": 200,
     "max_confidence_variation": 5,
-    "stopping" : "fixed",
+    "stopping" : "no_decrease",
     "governor" : "powersave",
     "iterations": 20,
     "max_temperature": 80
@@ -281,7 +281,7 @@
     "iterations_step": 20,
     "iterations_max": 200,
     "max_confidence_variation": 5,
-    "stopping" : "fixed",
+    "stopping" : "no_decrease",
     "governor" : "powersave",
     "iterations": 20,
     "max_temperature": 80
@@ -299,7 +299,7 @@
     "iterations_step": 20,
     "iterations_max": 200,
     "max_confidence_variation": 5,
-    "stopping" : "fixed",
+    "stopping" : "no_decrease",
     "governor" : "powersave",
     "iterations": 20,
     "max_temperature": 80
@@ -317,7 +317,7 @@
     "iterations_step": 20,
     "iterations_max": 200,
     "max_confidence_variation": 5,
-    "stopping" : "fixed",
+    "stopping" : "no_decrease",
     "governor" : "powersave",
     "iterations": 20,
     "max_temperature": 80
@@ -335,7 +335,7 @@
     "iterations_step": 20,
     "iterations_max": 200,
     "max_confidence_variation": 5,
-    "stopping" : "fixed",
+    "stopping" : "no_decrease",
     "governor" : "powersave",
     "iterations": 20,
     "max_temperature": 80
@@ -353,7 +353,7 @@
     "iterations_step": 20,
     "iterations_max": 200,
     "max_confidence_variation": 5,
-    "stopping" : "fixed",
+    "stopping" : "no_decrease",
     "governor" : "powersave",
 V    "iterations": 20,
     "max_temperature": 80
@@ -371,7 +371,7 @@ V    "iterations": 20,
     "iterations_step": 20,
     "iterations_max": 200,
     "max_confidence_variation": 5,
-    "stopping" : "fixed",
+    "stopping" : "no_decrease",
     "governor" : "powersave",
     "iterations": 20,
     "max_temperature": 80

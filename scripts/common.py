@@ -212,6 +212,7 @@ class MappingResult:
         :param mapping: A mapping dict
         """
         self.measurements = None                # List of times for the mapping
+        self.perf = None                        # A dict of the output of perf
         self.no_outliers_measurements = None    # List of times with outliers removed
         self.temps = None                       # List of temperatures for the mapping
         self.stable_q = None                    # The quantile that was found stable
@@ -228,6 +229,7 @@ class MappingResult:
         """
         result = dict()
         result["measurements"] = self.measurements
+        result['perf'] = self.perf
         result["no_outliers_measurements"] = self.no_outliers_measurements
         result["temps"] = self.temps
         result["stable_q"] = self.stable_q
@@ -246,7 +248,7 @@ def get_event(data,field):
     From data, Read the number in e field
     :param data: The output to process
     :param field: The field to search for
-    :return: Int found in the field
+    :return: Float(Int) found in the field
     """
     # First try to find a float
     value = None
@@ -266,6 +268,26 @@ def get_event(data,field):
             value = None
 
     return value
+
+
+def get_perf_event(data, separator="      "):
+    """
+    From data, Read the numbers provided by perf
+    :param data: The output to process
+    :param separator: In perf, it is usally number+<separator>+descriptor>
+    :return: A dict of all the values found by perf
+    """
+
+    data = str(data)
+    result = dict()
+
+    line = re.findall("\d+(?:,\d+)*" + separator + "(?:[^\s]+)", data)
+    for counter in line:
+        value = re.findall("\d+(?:,\d+)*", counter)[0]
+        name = re.findall("\d+(?:,\d+)*" + separator + "([^\s]+)", counter)[0]
+        result[name] = int(value.replace(',', ''))
+
+    return result
 
 
 def get_temp():

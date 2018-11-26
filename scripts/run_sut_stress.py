@@ -25,7 +25,8 @@ Runs individual tests.
 """
 
 import sys
-from common import ProcessManagement, ExperimentInfo, get_event, get_temp, MappingResult
+from common import ProcessManagement, ExperimentInfo, get_event, get_perf_event, get_temp, MappingResult
+from collections import Counter
 from scipy.stats.mstats import mquantiles
 from scipy.stats import binom
 from time import sleep
@@ -203,7 +204,7 @@ class SutStress:
 
         return metric
 
-    def run_mapping(self, experiment_info, mapping, iteration_name=None, style=0):
+    def run_mapping(self, experiment_info, mapping, iteration_name=None):
         """
         Run a mapping described by a mapping object
         :param experiment_info: An ExperimentInfo object
@@ -231,6 +232,10 @@ class SutStress:
             iteration_name = mapping
         result = MappingResult(iteration_name)
 
+        # Initialise a perf result list
+        if self._instrument_cmd:
+            perf_results = []
+
         while len(total_temps) < experiment_info.measurement_iterations_max:
             it = 0
 
@@ -248,9 +253,12 @@ class SutStress:
                 s_out, s_err = self._processes.system_call(cmd)
                 self._check_error(s_err)
 
+                # For perf, I need to think if we need to log all values, take an average...
+                # For the moment, an average should be fine
                 # Run the program on core 0
                 s_out,s_err = self.run_program_single(experiment_info.sut, 0)
-                self._check_error(s_err)
+                if self._instrument_cmd:
+                    perf_results.append(get_perf_event(s_err))
 
                 final_temp = get_temp()
                 if final_temp < experiment_info.max_temperature:
@@ -277,6 +285,11 @@ class SutStress:
                                          confidence_interval=experiment_info.confidence_interval)
                 print("The confidence variation is ", conf_var)
                 if conf_var < experiment_info.max_confidence_variation:
+                    sums = dict()
+                    for res in perf_results:
+                        sums = dict(Counter(sums) + Counter(res))
+                    means = {k: sums[k] / float(len(perf_results)) for k in sums}
+                    result.perf = means
                     result.measurements = total_times
                     result.no_outliers_measurements = remove_outliers(total_times)
                     result.temps = total_temps
@@ -293,6 +306,11 @@ class SutStress:
                                              quantile=q,
                                              confidence_interval=experiment_info.confidence_interval)
                     if conf_var < experiment_info.max_confidence_variation:
+                        sums = dict()
+                        for res in perf_results:
+                            sums = dict(Counter(sums) + Counter(res))
+                        means = {k: sums[k] / float(len(perf_results)) for k in sums}
+                        result.perf = means
                         result.measurements = total_times
                         result.no_outliers_measurements = remove_outliers(total_times)
                         result.temps = total_temps
@@ -311,7 +329,12 @@ class SutStress:
                                          quantile=q,
                                          confidence_interval=experiment_info.confidence_interval)
                 if conf_var < experiment_info.max_confidence_variation:
+                    sums = dict()
+                    for res in perf_results:
+                        sums = dict(Counter(sums) + Counter(res))
+                    means = {k: sums[k] / float(len(perf_results)) for k in sums}
                     result.measurements = total_times
+                    result.perf = means
                     result.no_outliers_measurements = remove_outliers(total_times)
                     result.temps = total_temps
                     result.stable_q = q
@@ -328,6 +351,10 @@ class SutStress:
                                  quantile=experiment_info.confidence_interval,
                                  confidence_interval=experiment_info.confidence_interval)
         result.measurements = total_times
+        for res in perf_results:
+            sums = dict(Counter(sums) + Counter(res))
+        means = {k: sums[k] / float(len(perf_results)) for k in sums}
+        result.perf = means
         result.no_outliers_measurements = remove_outliers(total_times)
         result.temps = total_temps
         result.stable_q = experiment_info.quantile
@@ -345,7 +372,7 @@ class SutStress:
         :param style: Run the SUT with perf or some similar instrument
         """
         # start up the stress on cores 1-cores+1
-        if (cores > 0):
+        if cores > 0:
             for i in range(1, cores + 1):
                 self.start_stress(stress, i)
 
