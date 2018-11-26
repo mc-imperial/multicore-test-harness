@@ -197,8 +197,8 @@ class SutStress:
             metric = get_event(s_out, "Max: ")
         elif get_event(s_out, "time(ns)="):
             metric = get_event(s_out, "time(ns)=")
-        elif get_event(s_out, "time(secs)="):
-            metric = get_event(s_out, "time(secs)=")
+        elif get_event(s_out, "time(secs)= "):
+            metric = get_event(s_out, "time(secs)= ")
 
         else:
             print("Unable find execution time or maximum latency")
