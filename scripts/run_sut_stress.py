@@ -353,6 +353,7 @@ class SutStress:
                                  quantile=experiment_info.confidence_interval,
                                  confidence_interval=experiment_info.confidence_interval)
         result.measurements = total_times
+        sums = dict()
         for res in perf_results:
             sums = dict(Counter(sums) + Counter(res))
         means = {k: sums[k] / float(len(perf_results)) for k in sums}
