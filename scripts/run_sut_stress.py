@@ -25,34 +25,10 @@ Runs individual tests.
 """
 
 import sys
-from common import ProcessManagement, ExperimentInfo, get_event, get_perf_event, get_temp, MappingResult
-from collections import Counter
+from common import ProcessManagement, ExperimentInfo, get_event, get_perf_event, get_temp, MappingResult, remove_outliers
 from scipy.stats.mstats import mquantiles
 from scipy.stats import binom
 from time import sleep
-from statistics import median
-from math import sqrt
-from scipy.special import erfcinv
-
-
-def remove_outliers(times, scale=3):
-    """
-    Remove elements more than scale scaled MAD from the median.
-    :param times: The list of times to remove from
-    :param scale: The order of magnitude (aggressivness)
-    :return: The list without outliers
-    """
-
-    assert isinstance(times, list)
-    median_value = median(times)
-
-    c = -1 / (sqrt(2) * erfcinv(3 / 2))
-    temp = [abs(x-median_value) for x in times]
-    scaled_mad = c * median(temp)
-
-    new_values = [x for x in times if median_value - scale * scaled_mad < x < median_value + scale * scaled_mad]
-
-    return new_values
 
 
 def confidence_variation(times, quantile, confidence_interval):
@@ -91,8 +67,16 @@ def confidence_variation(times, quantile, confidence_interval):
     if li <= 0 or li > ui:
         li = 0
 
-    lower_range = sorted_times[li]
-    upper_range = sorted_times[ui]
+    try:
+        lower_range = sorted_times[li]
+        upper_range = sorted_times[ui]
+    except IndexError:
+        # This should not happen. Just for debugging purposes
+        print("Lower range", li)
+        print("Upper range", ui)
+        print("List length", len(sorted_times))
+        sys.exit(1)
+        pass
 
     confidence_range = upper_range - lower_range
 
@@ -212,7 +196,6 @@ class SutStress:
         :param experiment_info: An ExperimentInfo object
         :param mapping: A dict of core mappings
         :param iteration_name: For tning, we can store the exact param
-        :param style: In case you need to run with perf
         :return:
         """
 
@@ -287,19 +270,13 @@ class SutStress:
                                          confidence_interval=experiment_info.confidence_interval)
                 print("The confidence variation is ", conf_var)
                 if conf_var < experiment_info.max_confidence_variation:
-                    sums = dict()
-                    for res in perf_results:
-                        sums = dict(Counter(sums) + Counter(res))
-                    means = {k: sums[k] / float(len(perf_results)) for k in sums}
-                    result.perf = means
-                    result.measurements = total_times
-                    result.no_outliers_measurements = remove_outliers(total_times)
-                    result.temps = total_temps
-                    result.stable_q = experiment_info.quantile
-                    result.q_value = mquantiles(total_times, experiment_info.quantile)[0]
-                    result.q_min = conf_min
-                    result.q_max = conf_max
-                    result.success = True
+                    result.log_result(perf_results=perf_results,
+                                      total_times=total_times,
+                                      total_temps=total_temps,
+                                      quantile=experiment_info.quantile,
+                                      conf_min=conf_min,
+                                      conf_max=conf_max,
+                                      success=True)
                     return result
             elif experiment_info.stopping == "pessimistic":
                 for q in candidate_quantiles:
@@ -308,19 +285,13 @@ class SutStress:
                                              quantile=q,
                                              confidence_interval=experiment_info.confidence_interval)
                     if conf_var < experiment_info.max_confidence_variation:
-                        sums = dict()
-                        for res in perf_results:
-                            sums = dict(Counter(sums) + Counter(res))
-                        means = {k: sums[k] / float(len(perf_results)) for k in sums}
-                        result.perf = means
-                        result.measurements = total_times
-                        result.no_outliers_measurements = remove_outliers(total_times)
-                        result.temps = total_temps
-                        result.stable_q = q
-                        result.q_value = mquantiles(total_times, q)[0]
-                        result.q_min = conf_min
-                        result.q_max = conf_max
-                        result.success = True
+                        result.log_result(perf_results=perf_results,
+                                          total_times=total_times,
+                                          total_temps=total_temps,
+                                          quantile=q,
+                                          conf_min=conf_min,
+                                          conf_max=conf_max,
+                                          success=True)
                         return result
 
         # At this point we know that we have hit max iterations
@@ -331,19 +302,13 @@ class SutStress:
                                          quantile=q,
                                          confidence_interval=experiment_info.confidence_interval)
                 if conf_var < experiment_info.max_confidence_variation:
-                    sums = dict()
-                    for res in perf_results:
-                        sums = dict(Counter(sums) + Counter(res))
-                    means = {k: sums[k] / float(len(perf_results)) for k in sums}
-                    result.measurements = total_times
-                    result.perf = means
-                    result.no_outliers_measurements = remove_outliers(total_times)
-                    result.temps = total_temps
-                    result.stable_q = q
-                    result.q_value = mquantiles(total_times, q)[0]
-                    result.q_min = conf_min
-                    result.q_max = conf_max
-                    result.success = True
+                    result.log_result(perf_results=perf_results,
+                                      total_times=total_times,
+                                      total_temps=total_temps,
+                                      quantile=q,
+                                      conf_min=conf_min,
+                                      conf_max=conf_max,
+                                      success=True)
                     return result
 
         # If we hit this and we did not intend to (not using "fixed"), we failed
@@ -352,22 +317,16 @@ class SutStress:
             confidence_variation(times=total_times,
                                  quantile=experiment_info.confidence_interval,
                                  confidence_interval=experiment_info.confidence_interval)
-        result.measurements = total_times
-        sums = dict()
-        for res in perf_results:
-            sums = dict(Counter(sums) + Counter(res))
-        means = {k: sums[k] / float(len(perf_results)) for k in sums}
-        result.perf = means
-        result.no_outliers_measurements = remove_outliers(total_times)
-        result.temps = total_temps
-        result.stable_q = experiment_info.quantile
-        result.q_value = mquantiles(total_times, experiment_info.quantile)[0]
-        result.q_min = conf_min
-        result.q_max = conf_max
-        result.success = True if conf_var < experiment_info.max_confidence_variation else False
+        result.log_result(perf_results=perf_results,
+                          total_times=total_times,
+                          total_temps=total_temps,
+                          quantile=experiment_info.quantile,
+                          conf_min=conf_min,
+                          conf_max=conf_max,
+                          success=True if conf_var < experiment_info.max_confidence_variation else False)
         return result
 
-    def run_sut_stress(self, sut, stress, cores, style=0):
+    def run_sut_stress(self, sut, stress, cores):
         """
         :param sut: System under stress
         :param stress: Enemy process
@@ -380,7 +339,7 @@ class SutStress:
                 self.start_stress(stress, i)
 
         # Run the program on core 0
-        s_out,s_err = self.run_program_single(sut,0, style)
+        s_out,s_err = self.run_program_single(sut, 0)
         self._check_error(s_err)
 
         if cores > 0:

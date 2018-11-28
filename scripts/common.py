@@ -28,6 +28,12 @@ import os
 import json
 import signal
 from copy import deepcopy
+from collections import Counter
+
+from statistics import median
+from math import sqrt
+from scipy.special import erfcinv
+from scipy.stats.mstats import mquantiles
 
 
 class ExperimentInfo:
@@ -223,6 +229,32 @@ class MappingResult:
         self.success = True                     # If the experiment was able to find a stable quantile
         self.mapping = mapping                  # The mapping of enemy processes
 
+    def log_result(self, perf_results, total_times, total_temps, quantile, conf_min, conf_max, success):
+        """
+        Log the parameters of the result
+        :param perf_results: A dict of all the params gathered by perf
+        :param total_times: A list of the total execution time
+        :param total_temps: All the temperatures of the measurement
+        :param quantile: The quantile that was chosen for the results
+        :param conf_min: The minimum value of the confidence interval
+        :param conf_max: The maximum value of the confidence interval
+        :param success: If we were are able successfully get a stable quantile
+        :return:
+        """
+        sums = dict()
+        for res in perf_results:
+            sums = dict(Counter(sums) + Counter(res))
+        means = {k: sums[k] / float(len(perf_results)) for k in sums}
+        self.perf = means
+        self.measurements = total_times
+        self.no_outliers_measurements = remove_outliers(total_times)
+        self.temps = total_temps
+        self.stable_q = quantile
+        self.q_value = mquantiles(self.no_outliers_measurements, quantile)[0]
+        self.q_min = conf_min
+        self.q_max = conf_max
+        self.success = success
+
     def get_dict(self):
         """
         :return: A dict with all the stored values
@@ -268,6 +300,26 @@ def get_event(data,field):
             value = None
 
     return value
+
+
+def remove_outliers(times, scale=3):
+    """
+    Remove elements more than scale scaled MAD from the median.
+    :param times: The list of times to remove from
+    :param scale: The order of magnitude (aggressivness)
+    :return: The list without outliers
+    """
+
+    assert isinstance(times, list)
+    median_value = median(times)
+
+    c = -1 / (sqrt(2) * erfcinv(3 / 2))
+    temp = [abs(x-median_value) for x in times]
+    scaled_mad = c * median(temp)
+
+    new_values = [x for x in times if median_value - scale * scaled_mad < x < median_value + scale * scaled_mad]
+
+    return new_values
 
 
 def get_perf_event(data, separator="      "):
