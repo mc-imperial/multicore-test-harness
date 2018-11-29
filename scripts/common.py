@@ -317,7 +317,7 @@ def remove_outliers(times, scale=3):
     temp = [abs(x-median_value) for x in times]
     scaled_mad = c * median(temp)
 
-    new_values = [x for x in times if median_value - scale * scaled_mad < x < median_value + scale * scaled_mad]
+    new_values = [x for x in times if median_value - scale * scaled_mad <= x <= median_value + scale * scaled_mad]
 
     return new_values
 

@@ -43,18 +43,22 @@ def system_call(command, silent = False):
     p = subprocess.Popen([command], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     return p.stdout.read(),p.stderr.read()
 
+
 def system_call_background(command):
     global BACKGROUND_PROCS
     print("executing command: " + command + " in the background")
     BACKGROUND_PROCS.append(subprocess.Popen(command, shell = True, preexec_fn=os.setsid))
     time.sleep(SLEEP_AMOUNT_STARTUP)
 
+
 def get_taskset_cmd(i):
     return "taskset -c " + str(i) + " "
+
 
 def start_stress(stress, i):
     cmd = get_taskset_cmd(i) + " " + "./" + stress
     system_call_background(cmd)
+
 
 def log_data(prev_temp):
     cmd = "vcgencmd measure_clock arm"
@@ -70,6 +74,7 @@ def log_data(prev_temp):
 
     # do your stuff
     s.enter(1, 1, log_data, (prev_temp,))
+
 
 def run_raspberry_stress(stress, processors):
 

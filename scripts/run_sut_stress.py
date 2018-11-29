@@ -48,6 +48,10 @@ def confidence_variation(times, quantile, confidence_interval):
     q = mquantiles(sorted_times, quantile)[0]
     n = len(sorted_times)
 
+    # This should not happen, just for debugging purposes
+    if not n:
+        print(times)
+
     confidence = 0
     middle = round(quantile * (n+1))
     ui = middle
@@ -195,7 +199,7 @@ class SutStress:
         Run a mapping described by a mapping object
         :param experiment_info: An ExperimentInfo object
         :param mapping: A dict of core mappings
-        :param iteration_name: For tning, we can store the exact param
+        :param iteration_name: For tuning, we can store the exact param
         :return:
         """
 
@@ -211,7 +215,7 @@ class SutStress:
         total_temps = []
 
         # start from 95 and decrease to 50 by 1
-        candidate_quantiles= [x / 100.0 for x in range(95, 49, -1)]
+        candidate_quantiles = [x / 100.0 for x in range(95, 49, -1)]
 
         if iteration_name is None:
             iteration_name = mapping
