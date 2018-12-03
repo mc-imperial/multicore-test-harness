@@ -1,0 +1,68 @@
+{
+  "cache": {
+    "sut": "../bin/sut/L2_unified_test",
+    "instrument_cmd": "bash selected_perf.sh",
+    "mapping": {
+      "1" : "../tuned_enemies/tuned_cache",
+      "2" : "../tuned_enemies/tuned_cache",
+      "3" : "../tuned_enemies/tuned_cache",
+      "4" : "../tuned_enemies/tuned_cache",
+      "5" : "../tuned_enemies/tuned_cache",
+      "6" : "../tuned_enemies/tuned_cache",
+      "7" : "../tuned_enemies/tuned_cache"
+    },
+    "cores": 7,
+    "quantile": 0.9,
+    "measurement_iterations_step": 20,
+    "measurement_iterations_max": 200,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "no_decrease",
+    "governor" : "powersave",
+    "max_temperature": 80
+  },
+  "mem": {
+    "sut": "../bin/sut/mem_thrashing_test",
+    "instrument_cmd": "bash selected_perf.sh",
+    "mapping": {
+      "1" : "../tuned_enemies/tuned_memory",
+      "2" : "../tuned_enemies/tuned_memory",
+      "3" : "../tuned_enemies/tuned_memory",
+      "4" : "../tuned_enemies/tuned_memory",
+      "5" : "../tuned_enemies/tuned_memory",
+      "6" : "../tuned_enemies/tuned_memory",
+      "7" : "../tuned_enemies/tuned_memory"
+    },
+    "cores": 7,
+    "quantile": 0.9,
+    "measurement_iterations_step": 20,
+    "measurement_iterations_max": 200,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "no_decrease",
+    "governor" : "powersave",
+    "max_temperature": 80
+  },
+  "bus": {
+    "sut": "../bin/sut/bus_test",
+    "instrument_cmd": "bash selected_perf.sh",
+    "mapping": {
+      "1" : "../tuned_enemies/tuned_bus",
+      "2" : "../tuned_enemies/tuned_bus",
+      "3" : "../tuned_enemies/tuned_bus",
+      "4" : "../tuned_enemies/tuned_bus",
+      "5" : "../tuned_enemies/tuned_bus",
+      "6" : "../tuned_enemies/tuned_bus",
+      "7" : "../tuned_enemies/tuned_bus"
+    },
+    "cores": 7,
+    "quantile": 0.9,
+    "measurement_iterations_step": 20,
+    "measurement_iterations_max": 200,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "no_decrease",
+    "governor" : "powersave",
+    "max_temperature": 80
+  }
+}
