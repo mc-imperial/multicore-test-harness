@@ -116,8 +116,7 @@ class ExperimentInfo:
         try:
             self.instrument_cmd = str(json_object["instrument_cmd"])
         except KeyError:
-            print("Unable to find instrument in JSON")
-            sys.exit(1)
+            print("Not using any instrumentation in JSON")
 
         try:
             self.cores = int(json_object["cores"])
