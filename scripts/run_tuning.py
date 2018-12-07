@@ -31,6 +31,7 @@ import math
 import socket
 import pickle
 
+from termcolor import colored
 from time import time
 from random import randrange, uniform, choice, random, shuffle, seed
 from collections import OrderedDict
@@ -995,16 +996,16 @@ class Tuning:
                       "loop and bayesian optimization on the inner loop")
                 self.bilevel_tune("ran", "bo")
             elif self._experiment_info.method == "ran":
-                print("Tuning by randomising with a fixed template")
+                print(colored("Tuning by randomising with a fixed template", "blue"))
                 self.simple_tune("ran")
             elif self._experiment_info.method == "hc":
-                print("Tuning by hillclimbing with a fixed template")
+                print(colored("Tuning by hillclimbing with a fixed template", "blue"))
                 self.simple_tune("hc")
             elif self._experiment_info.method == "sa":
-                print("Tuning by simulated annealing with a fixed template")
+                print(colored("Tuning by simulated annealing with a fixed template", "blue"))
                 self.simple_tune("sa")
             elif self._experiment_info.method == "bo":
-                print("Tuning with bayesian optimization with a fixed template")
+                print(colored("Tuning with bayesian optimization with a fixed template", "blue"))
                 self.simple_tune("bo")
             else:
                 print("I do not know how to train that way")
