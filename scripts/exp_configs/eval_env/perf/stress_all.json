@@ -1,7 +1,7 @@
 {
   "coremark1": {
     "sut": "../bin/sut/coremark.exe 0x0 0x0 0x66 1000",
-    "instrument_cmd": "bash full_perf.sh",
+    "instrument_cmd": "bash perf_scripts/full_perf.sh",
     "mapping": {
       "1" : "../tuned_enemies/tuned_cache",
       "2" : "../tuned_enemies/tuned_cache",

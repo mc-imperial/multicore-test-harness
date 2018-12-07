@@ -1,7 +1,7 @@
 {
   "cache": {
     "sut": "../bin/sut/L2_unified_test",
-    "instrument_cmd": "bash selected_perf.sh --log-fd 2",
+    "instrument_cmd": "bash perf_scripts/selected_perf.sh --log-fd 2",
     "mapping": {
       "1" : "../tuned_enemies/tuned_cache",
       "2" : "../tuned_enemies/tuned_cache",
@@ -23,7 +23,7 @@
   },
   "mem": {
     "sut": "../bin/sut/mem_thrashing_test",
-    "instrument_cmd": "bash selected_perf.sh --log-fd 2",
+    "instrument_cmd": "bash perf_scripts/selected_perf.sh --log-fd 2",
     "mapping": {
       "1" : "../tuned_enemies/tuned_memory",
       "2" : "../tuned_enemies/tuned_memory",
@@ -45,7 +45,7 @@
   },
   "bus": {
     "sut": "../bin/sut/bus_test",
-    "instrument_cmd": "bash selected_perf.sh --log-fd 2",
+    "instrument_cmd": "bash perf_scripts/selected_perf.sh --log-fd 2",
     "mapping": {
       "1" : "../tuned_enemies/tuned_bus",
       "2" : "../tuned_enemies/tuned_bus",
