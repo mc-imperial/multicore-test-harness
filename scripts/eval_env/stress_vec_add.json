@@ -1,7 +1,6 @@
 {
   "L2_joule": {
     "sut": "../bin/sut/vector_add_test" ,
-    "instrument_cmd": "",
     "mapping": {
       "1" : "../demo/L2_joule",
       "2" : "../demo/L2_joule",
@@ -19,7 +18,6 @@
   },
   "L2_pi": {
     "sut": "../bin/sut/vector_add_test" ,
-    "instrument_cmd": "",
     "mapping": {
       "1" : "../demo/L2_rpi",
       "2" : "../demo/L2_rpi",
@@ -37,7 +35,6 @@
   },
   "L2_banana": {
     "sut": "../bin/sut/vector_add_test" ,
-    "instrument_cmd": "",
     "mapping": {
       "1" : "../demo/L2_banana",
       "2" : "../demo/L2_banana",
@@ -54,7 +51,6 @@
     "max_temperature": 80
   },
   "L2_dragon": {
-    "instrument_cmd": "",
     "sut": "../bin/sut/vector_add_test" ,
     "mapping": {
       "1" : "../demo/L2_dragon",
@@ -73,7 +69,6 @@
   },
   "L2_joule_tuned": {
     "sut": "../bin/sut/vector_add_test" ,
-    "instrument_cmd": "",
     "mapping": {
       "1" : "../demo/L2_joule_tuned",
       "2" : "../demo/L2_joule_tuned",
@@ -91,7 +86,6 @@
   },
   "L2_pi_tuned": {
     "sut": "../bin/sut/vector_add_test" ,
-    "instrument_cmd": "",
     "mapping": {
       "1" : "../demo/L2_rpi_tuned",
       "2" : "../demo/L2_rpi_tuned",
@@ -109,7 +103,6 @@
   },
   "L2_banana_tuned": {
     "sut": "../bin/sut/vector_add_test" ,
-    "instrument_cmd": "",
     "mapping": {
       "1" : "../demo/L2_banana_tuned",
       "2" : "../demo/L2_banana_tuned",
@@ -127,7 +120,6 @@
   },
   "L2_dragon_tuned": {
     "sut": "../bin/sut/vector_add_test" ,
-    "instrument_cmd": "",
     "mapping": {
       "1" : "../demo/L2_dragon_tuned",
       "2" : "../demo/L2_dragon_tuned",

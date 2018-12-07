@@ -10,7 +10,7 @@
     "measurement_iterations_max": 200,
     "max_confidence_variation": 5,
     "confidence_interval": 0.90,
-    "stopping" : "optimistic",
+    "stopping" : "fixed",
     "governor" : "powersave",
     "max_temperature": 80
   },
@@ -25,7 +25,7 @@
     "measurement_iterations_max": 200,
     "max_confidence_variation": 5,
     "confidence_interval": 0.90,
-    "stopping" : "optimistic",
+    "stopping" : "fixed",
     "governor" : "powersave",
     "max_temperature": 80
   },
@@ -40,7 +40,7 @@
     "measurement_iterations_max": 200,
     "max_confidence_variation": 5,
     "confidence_interval": 0.90,
-    "stopping" : "optimistic",
+    "stopping" : "fixed",
     "governor" : "powersave",
     "max_temperature": 80
   }
