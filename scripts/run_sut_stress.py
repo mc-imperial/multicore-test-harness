@@ -213,6 +213,7 @@ class SutStress:
         delta_temp = 5
         total_times = []
         total_temps = []
+        perf_results = dict()
 
         # start from 95 and decrease to 50 by 1
         candidate_quantiles = [x / 100.0 for x in range(95, 49, -1)]
