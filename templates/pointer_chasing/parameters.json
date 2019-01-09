@@ -1,11 +1,11 @@
 {
   "DEFINES": {
     "ELEMENTS": {
-      "range" :[1,16777216],
+      "range" :[1,1677721],
       "type": "int"
     },
     "STRIDE": {
-      "range" :[1,16777216],
+      "range" :[1,1677721],
       "type": "int"
     }
   }
