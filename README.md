@@ -2,6 +2,8 @@
 
 This software is a black-box testing technique with the capability of provoking interference behaviour in multi-core chips, enabling an assessment of the extent to which interference affects execution of a piece of Software Under Test (SUT).  Interference is analysed by having an “enemy” process run a configurable test harness that is designed, through a combination of manual and automated tuning, to maximize the degree of certain types of interference. The black-box nature of this technique makes it applicable to any multi-core microprocessor running any operating system, so long as compilation and execution of ANSI-C programs is supported.
 
+More information about the paper can be found [here](https://arxiv.org/abs/1809.05197)
+
 ## Benchmarks ##
 
 The systems under stress are divided into 4 categories and range from synthetic tests designed to be especially vulnerable to interference, to actual benchmarks.  
@@ -32,9 +34,9 @@ The enemy processes are written in C and the experiments are driven by scripts w
 * **bin** : Default folder where the SUTs and enemy processes are built
 * **templates** : C sources for the configurable templates used for tuning
 * **scripts** : Python scripts used to drive the experiments
-* **scripts/enemy_tune** : Example JSON files for the tuning enemies
-* **scripts/env_rank** : Example JSON files for ranking the environments
-* **scripts/eval_env** : Example JSON files for testing the benchmarks in hostile environments
+* **scripts/exp_configs/enemy_tune** : Example JSON files for the tuning enemies
+* **scripts//exp_configs/env_rank** : Example JSON files for ranking the environments
+* **scripts//exp_configs/eval_env** : Example JSON files for testing the benchmarks in hostile environments
 
 
 ## Building ##
@@ -45,9 +47,15 @@ The system has been tested on Ubuntu 16.04 and on an Raspberry Pi 3 running Rasp
 
 For Bayesian optimization:
 ```
-  sudo apt install python3-pip
-  sudo apt-get install python3-numpy python3-scipy
-  sudo pip3 install bayesian-optimization
+sudo apt install python3-pip
+sudo apt-get install python3-numpy python3-scipy
+sudo pip3 install bayesian-optimization
+```
+
+For color terminal:
+```
+sudo pip3 install termcolor
+
 ```
 
 For Simulated Annealing:
@@ -63,7 +71,7 @@ sudo pip3 install scipy
 
 For RT-tests:
 ```
-  sudo apt-get install libnuma-dev
+sudo apt-get install libnuma-dev
 ```
 
 
@@ -114,11 +122,17 @@ c) **Bayesian Optimisation**. Bayesian optimization works by constructing an app
 * **cores** : The number of cores on which to lunch the enemy process
 * **method** : The tuning method to use (**ran**, **sa** or **bo**)
 * **quantile** : When taking multiple measurements, what quantile to use.
-* **log_file** : The log files where all the tuning iterations
-* **output_binary** : Output folder where the best enemy binaries are sored 
 * **max_file** : The files where the maximum interference is recorded and the parameters that caused it
-* **max_tuning_time** : The time (in minutes) after which the tuning process is stopped
-* **max_inner_iterations** : The number of iterations after which the tuning process is stopped.
+* **output_binary** : Output folder where the best enemy binaries are stored 
+* **tuning_max_time**: Maximum minutes for tuning
+* **tuning_max_iterations**: Maximum number of tuning iterations
+* **measurement_iterations_step**: The minimum number of measurements when measuring a configuration
+* **measurement_iterations_max**: The maximum number of measurements when measuring a configuration
+* **max_confidence_variation**: The permitted size of the confidence interval when measuring a configuration
+* **confidence_interval**: The confidence interval desired when measuring a configuration
+* **stopping** : "fixed" will measure measurement_iterations_max times each configurations
+                 "no_decrease" will try to quit measuring early if the confidence interval gets size gets bellow max_confidence_variation 
+* **governor** : The governor to set before starting experiments
 * **max_temperature** : The maximum temperature allowed for a measurement to be considered valid.
 
 *Note:* Examples of such JSON files can be found in scripts/enemy_tune
@@ -127,10 +141,10 @@ c) **Bayesian Optimisation**. Bayesian optimization works by constructing an app
 
 ```
     cd scripts
-    python3 run_tuning.py <enemy_tune>.json
+    python3 run_tuning.py <enemy_tune>.json <log_file>.json
 ```
 
-3\. A file describing all the iterations **log_file** and a file describing the parameters for the maximum interference **max_file** will be created. The best enemy files are stored in  **output_binary**
+3\. A file describing all the iterations is stored in **<log_file>.json** . The best enemy files are stored in  **output_binary**
 
 #### Demo scripts ###
 
@@ -138,7 +152,8 @@ c) **Bayesian Optimisation**. Bayesian optimization works by constructing an app
 * **enemy_tune/tune_mem.json** : This script will try to find the optimal parameters for the memory stress using **ran**, **sa** and **bo**
 * **enemy_tune/tune_bus.json** : This script will try to find the optimal parameters for the system stress using **ran**, **sa** and **bo**
 
-*Note:* All scripts will run for 2 hours, record the detected parameters in .txt files and create the binary files.
+*Note:* All scripts will run for 2h, record the detected parameters in .txt files and create the binary files.
+*Note:* To uncover the most aggressive enemy processes, you should run a tuning technique for at least 10h 
 
 ### 3. Creating the ranked list ###
 

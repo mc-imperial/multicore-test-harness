@@ -7,12 +7,13 @@ CACHE_DIR = ./src/cache_set
 MEM_DIR = ./src/mem_thrashing_set
 SYS_DIR = ./src/system_calls_set
 PIPE_DIR = ./src/pipeline_set
+POINTER_DIR = ./src/pointer_chasing
 COREMARK_DIR = ./src/coremark_v1.0
 RT_TESTS_DIR = ./src/rt-tests
 
 WCET_DIR = ./src/wcet
 
-all: bus_set cache_set mem_set sys_set pipeline_set wcet_sut coremark_sut cyclictest
+all: bus_set cache_set mem_set sys_set pipeline_set pointer_chasing wcet_sut coremark_sut cyclictest
 
 bus_set:
 	(cd $(BUS_DIR); make all)
@@ -24,6 +25,8 @@ sys_set:
 	(cd $(SYS_DIR); make all)
 pipeline_set:
 	(cd $(PIPE_DIR); make all)
+pointer_chasing:
+	(cd $(POINTER_DIR); make all)
 
 wcet_sut:
 	(cd $(WCET_DIR); make all)
@@ -39,6 +42,7 @@ clean:
 	(cd $(MEM_DIR); make clean)
 	(cd $(SYS_DIR); make clean)
 	(cd $(PIPE_DIR); make clean)
+	(cd $(POINTER_DIR); make clean)
 	(cd $(WCET_DIR); make clean)
 	(cd $(COREMARK_DIR); make clean PORT_DIR=$(COREMARK_PORT_DIR) )
 	(cd $(RT_TESTS_DIR); make clean)
