@@ -102,16 +102,9 @@ int launch()
 	DIE ( mem_chunk == NULL, "Failed to allocate memory ");
 
 
-  for ( j = 0 ; j < ELEMENTS; j++ )
+	for ( j = 0 ; j < (unsigned long) ELEMENTS; j++ )
 	{
-		if (j < ELEMENTS - STRIDE)
-		{
-			mem_chunk[j].next = &mem_chunk[j + STRIDE];
-		}
-		else
-		{
-			mem_chunk[j].next = mem_chunk;
-		}
+		mem_chunk[j].next = &mem_chunk[(j + (unsigned long) STRIDE) % (unsigned long) ELEMENTS];
 	}
 
 	#if defined(__i386__) || defined(__amd64__)

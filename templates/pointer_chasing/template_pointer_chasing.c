@@ -79,14 +79,7 @@ int launch()
 
   for ( j = 0 ; j < (unsigned long) ELEMENTS; j++ )
 	{
-		if (j < (unsigned long) ELEMENTS - (unsigned long) STRIDE)
-		{
-			mem_chunk[j].next = &mem_chunk[j + (unsigned long) STRIDE];
-		}
-		else
-		{
-			mem_chunk[j].next = mem_chunk;
-		}
+		mem_chunk[j].next = &mem_chunk[(j + (unsigned long) STRIDE) % (unsigned long) ELEMENTS];
 	}
 
 	#if defined(__i386__) || defined(__amd64__)
