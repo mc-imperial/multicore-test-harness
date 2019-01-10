@@ -7,8 +7,8 @@
 #include "../common/common.h"
 
 
-#define ELEMENTS					8388608LU
-#define STRIDE						10000LU
+#define ELEMENTS					2097152LU
+#define STRIDE						1000LU
 
 #define CACHE_LINE_SIZE   (64)
 #define PAD_CACHE_LINEPTR (CACHE_LINE_SIZE - sizeof(void *))
