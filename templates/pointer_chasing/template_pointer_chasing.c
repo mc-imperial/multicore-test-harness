@@ -21,7 +21,7 @@ struct line
   * *return NULL
   */
 #if defined(__i386__) || defined(__amd64__)
-int benchmark_x86(struct line *ptr)
+long benchmark_x86(struct line *ptr)
 {
 
 	register struct line *next asm("rdx");
@@ -33,7 +33,7 @@ int benchmark_x86(struct line *ptr)
   );
 
   // It should not get stuck here
-	return (int) next;
+	return (long) next;
 }
 #endif
 
@@ -43,7 +43,7 @@ int benchmark_x86(struct line *ptr)
   * *return NULL
   */
 	#ifdef __arm__
-int benchmark_arm(struct line *ptr)
+long benchmark_arm(struct line *ptr)
 {
 
 	register struct line *next asm("r3");
@@ -58,7 +58,7 @@ int benchmark_arm(struct line *ptr)
   );
 
     // It should not get stuck here
-	return (int) next;
+	return (long) next;
 }
 #endif
 
