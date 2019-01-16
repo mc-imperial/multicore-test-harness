@@ -1,0 +1,326 @@
+{
+  "ttsprk-a2time-pntrch-idctrn-4K-tuned": {
+    "sut": "../bin/automotive/ttsprk-a2time-pntrch-idctrn-4K.exe -v0 -c1 -i1000",
+    "instrument_cmd": "bash perf_scripts/selected_perf.sh",
+    "mapping": {
+      "1" : "../tuned_enemies/tuned_cache",
+      "2" : "../tuned_enemies/tuned_memory",
+      "3" : "../tuned_enemies/tuned_cache"
+    },
+    "cores": 3,
+    "quantile": 0.9,
+    "measurement_iterations_step": 30,
+    "measurement_iterations_max": 200,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "no_decrease",
+    "governor" : "powersave",
+    "max_temperature": 80
+  },
+  "ttsprk-a2time-pntrch-idctrn-4K-0000004096": {
+    "sut": "../bin/automotive/ttsprk-a2time-pntrch-idctrn-4K.exe -v0 -c1 -i1000",
+    "instrument_cmd": "bash perf_scripts/selected_perf.sh",
+    "mapping": {
+      "1" : "../../assembly_stress/latency/11_ng_run/1/real_001/0000004096",
+      "2" : "../../assembly_stress/latency/11_ng_run/1/real_001/0000004096",
+      "3" : "../../assembly_stress/latency/11_ng_run/1/real_001/0000004096"
+    },
+    "cores": 3,
+    "quantile": 0.9,
+    "measurement_iterations_step": 30,
+    "measurement_iterations_max": 200,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "no_decrease",
+    "governor" : "powersave",
+    "max_temperature": 80
+  },
+  "ttsprk-a2time-pntrch-idctrn-4K-0000012288": {
+    "sut": "../bin/automotive/ttsprk-a2time-pntrch-idctrn-4K.exe -v0 -c1 -i1000",
+    "instrument_cmd": "bash perf_scripts/selected_perf.sh",
+    "mapping": {
+      "1" : "../../assembly_stress/latency/11_ng_run/1/real_001/0000012288",
+      "2" : "../../assembly_stress/latency/11_ng_run/1/real_001/0000012288",
+      "3" : "../../assembly_stress/latency/11_ng_run/1/real_001/0000012288"
+    },
+    "cores": 3,
+    "quantile": 0.9,
+    "measurement_iterations_step": 30,
+    "measurement_iterations_max": 200,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "no_decrease",
+    "governor" : "powersave",
+    "max_temperature": 80
+  },
+  "ttsprk-a2time-pntrch-idctrn-4K-0000020480": {
+    "sut": "../bin/automotive/ttsprk-a2time-pntrch-idctrn-4K.exe -v0 -c1 -i1000",
+    "instrument_cmd": "bash perf_scripts/selected_perf.sh",
+    "mapping": {
+      "1" : "../../assembly_stress/latency/11_ng_run/1/real_001/0000020480",
+      "2" : "../../assembly_stress/latency/11_ng_run/1/real_001/0000020480",
+      "3" : "../../assembly_stress/latency/11_ng_run/1/real_001/0000020480"
+    },
+    "cores": 3,
+    "quantile": 0.9,
+    "measurement_iterations_step": 30,
+    "measurement_iterations_max": 200,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "no_decrease",
+    "governor" : "powersave",
+    "max_temperature": 80
+  },
+  "ttsprk-a2time-pntrch-idctrn-4K-0000028672": {
+    "sut": "../bin/automotive/ttsprk-a2time-pntrch-idctrn-4K.exe -v0 -c1 -i1000",
+    "instrument_cmd": "bash perf_scripts/selected_perf.sh",
+    "mapping": {
+      "1" : "../../assembly_stress/latency/11_ng_run/1/real_001/0000028672",
+      "2" : "../../assembly_stress/latency/11_ng_run/1/real_001/0000028672",
+      "3" : "../../assembly_stress/latency/11_ng_run/1/real_001/0000028672"
+    },
+    "cores": 3,
+    "quantile": 0.9,
+    "measurement_iterations_step": 30,
+    "measurement_iterations_max": 200,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "no_decrease",
+    "governor" : "powersave",
+    "max_temperature": 80
+  },
+  "ttsprk-a2time-pntrch-idctrn-4K-0000061440": {
+    "sut": "../bin/automotive/ttsprk-a2time-pntrch-idctrn-4K.exe -v0 -c1 -i1000",
+    "instrument_cmd": "bash perf_scripts/selected_perf.sh",
+    "mapping": {
+      "1" : "../../assembly_stress/latency/11_ng_run/1/real_001/0000061440",
+      "2" : "../../assembly_stress/latency/11_ng_run/1/real_001/0000061440",
+      "3" : "../../assembly_stress/latency/11_ng_run/1/real_001/0000061440"
+    },
+    "cores": 3,
+    "quantile": 0.9,
+    "measurement_iterations_step": 30,
+    "measurement_iterations_max": 200,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "no_decrease",
+    "governor" : "powersave",
+    "max_temperature": 80
+  },
+  "ttsprk-a2time-pntrch-idctrn-4K-0000118784": {
+    "sut": "../bin/automotive/ttsprk-a2time-pntrch-idctrn-4K.exe -v0 -c1 -i1000",
+    "instrument_cmd": "bash perf_scripts/selected_perf.sh",
+    "mapping": {
+      "1" : "../../assembly_stress/latency/11_ng_run/1/real_001/0000118784",
+      "2" : "../../assembly_stress/latency/11_ng_run/1/real_001/0000118784",
+      "3" : "../../assembly_stress/latency/11_ng_run/1/real_001/0000118784"
+    },
+    "cores": 3,
+    "quantile": 0.9,
+    "measurement_iterations_step": 30,
+    "measurement_iterations_max": 200,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "no_decrease",
+    "governor" : "powersave",
+    "max_temperature": 80
+  },
+  "ttsprk-a2time-pntrch-idctrn-4K-0000176128": {
+    "sut": "../bin/automotive/ttsprk-a2time-pntrch-idctrn-4K.exe -v0 -c1 -i1000",
+    "instrument_cmd": "bash perf_scripts/selected_perf.sh",
+    "mapping": {
+      "1" : "../../assembly_stress/latency/11_ng_run/1/real_001/0000176128",
+      "2" : "../../assembly_stress/latency/11_ng_run/1/real_001/0000176128",
+      "3" : "../../assembly_stress/latency/11_ng_run/1/real_001/0000176128"
+    },
+    "cores": 3,
+    "quantile": 0.9,
+    "measurement_iterations_step": 30,
+    "measurement_iterations_max": 200,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "no_decrease",
+    "governor" : "powersave",
+    "max_temperature": 80
+  },
+  "ttsprk-a2time-pntrch-idctrn-4K-0000233472": {
+    "sut": "../bin/automotive/ttsprk-a2time-pntrch-idctrn-4K.exe -v0 -c1 -i1000",
+    "instrument_cmd": "bash perf_scripts/selected_perf.sh",
+    "mapping": {
+      "1" : "../../assembly_stress/latency/11_ng_run/1/real_001/0000233472",
+      "2" : "../../assembly_stress/latency/11_ng_run/1/real_001/0000233472",
+      "3" : "../../assembly_stress/latency/11_ng_run/1/real_001/0000233472"
+    },
+    "cores": 3,
+    "quantile": 0.9,
+    "measurement_iterations_step": 30,
+    "measurement_iterations_max": 200,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "no_decrease",
+    "governor" : "powersave",
+    "max_temperature": 80
+  },
+  "ttsprk-a2time-pntrch-idctrn-4K-0002850816": {
+    "sut": "../bin/automotive/ttsprk-a2time-pntrch-idctrn-4K.exe -v0 -c1 -i1000",
+    "instrument_cmd": "bash perf_scripts/selected_perf.sh",
+    "mapping": {
+      "1" : "../../assembly_stress/latency/11_ng_run/1/real_001/0002850816",
+      "2" : "../../assembly_stress/latency/11_ng_run/1/real_001/0002850816",
+      "3" : "../../assembly_stress/latency/11_ng_run/1/real_001/0002850816"
+    },
+    "cores": 3,
+    "quantile": 0.9,
+    "measurement_iterations_step": 30,
+    "measurement_iterations_max": 200,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "no_decrease",
+    "governor" : "powersave",
+    "max_temperature": 80
+  },
+  "ttsprk-a2time-pntrch-idctrn-4K-0005439488": {
+    "sut": "../bin/automotive/ttsprk-a2time-pntrch-idctrn-4K.exe -v0 -c1 -i1000",
+    "instrument_cmd": "bash perf_scripts/selected_perf.sh",
+    "mapping": {
+      "1" : "../../assembly_stress/latency/11_ng_run/1/real_001/0005439488",
+      "2" : "../../assembly_stress/latency/11_ng_run/1/real_001/0005439488",
+      "3" : "../../assembly_stress/latency/11_ng_run/1/real_001/0005439488"
+    },
+    "cores": 3,
+    "quantile": 0.9,
+    "measurement_iterations_step": 30,
+    "measurement_iterations_max": 200,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "no_decrease",
+    "governor" : "powersave",
+    "max_temperature": 80
+  },
+  "ttsprk-a2time-pntrch-idctrn-4K-0008028160": {
+    "sut": "../bin/automotive/ttsprk-a2time-pntrch-idctrn-4K.exe -v0 -c1 -i1000",
+    "instrument_cmd": "bash perf_scripts/selected_perf.sh",
+    "mapping": {
+      "1" : "../../assembly_stress/latency/11_ng_run/1/real_001/0008028160",
+      "2" : "../../assembly_stress/latency/11_ng_run/1/real_001/0008028160",
+      "3" : "../../assembly_stress/latency/11_ng_run/1/real_001/0008028160"
+    },
+    "cores": 3,
+    "quantile": 0.9,
+    "measurement_iterations_step": 30,
+    "measurement_iterations_max": 200,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "no_decrease",
+    "governor" : "powersave",
+    "max_temperature": 80
+  },
+  "ttsprk-a2time-pntrch-idctrn-4K-0013205504": {
+    "sut": "../bin/automotive/ttsprk-a2time-pntrch-idctrn-4K.exe -v0 -c1 -i1000",
+    "instrument_cmd": "bash perf_scripts/selected_perf.sh",
+    "mapping": {
+      "1" : "../../assembly_stress/latency/11_ng_run/1/real_001/0013205504",
+      "2" : "../../assembly_stress/latency/11_ng_run/1/real_001/0013205504",
+      "3" : "../../assembly_stress/latency/11_ng_run/1/real_001/0013205504"
+    },
+    "cores": 3,
+    "quantile": 0.9,
+    "measurement_iterations_step": 30,
+    "measurement_iterations_max": 200,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "no_decrease",
+    "governor" : "powersave",
+    "max_temperature": 80
+  },
+  "ttsprk-a2time-pntrch-idctrn-4K-0018382848": {
+    "sut": "../bin/automotive/ttsprk-a2time-pntrch-idctrn-4K.exe -v0 -c1 -i1000",
+    "instrument_cmd": "bash perf_scripts/selected_perf.sh",
+    "mapping": {
+      "1" : "../../assembly_stress/latency/11_ng_run/1/real_001/0018382848",
+      "2" : "../../assembly_stress/latency/11_ng_run/1/real_001/0018382848",
+      "3" : "../../assembly_stress/latency/11_ng_run/1/real_001/0018382848"
+    },
+    "cores": 3,
+    "quantile": 0.9,
+    "measurement_iterations_step": 30,
+    "measurement_iterations_max": 200,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "no_decrease",
+    "governor" : "powersave",
+    "max_temperature": 80
+  },
+  "ttsprk-a2time-pntrch-idctrn-4K-0557842432": {
+    "sut": "../bin/automotive/ttsprk-a2time-pntrch-idctrn-4K.exe -v0 -c1 -i1000",
+    "instrument_cmd": "bash perf_scripts/selected_perf.sh",
+    "mapping": {
+      "1" : "../../assembly_stress/latency/11_ng_run/1/real_001/0557842432",
+      "2" : "../../assembly_stress/latency/11_ng_run/1/real_001/0557842432",
+      "3" : "../../assembly_stress/latency/11_ng_run/1/real_001/0557842432"
+    },
+    "cores": 3,
+    "quantile": 0.9,
+    "measurement_iterations_step": 30,
+    "measurement_iterations_max": 200,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "no_decrease",
+    "governor" : "powersave",
+    "max_temperature": 80
+  },
+  "ttsprk-a2time-pntrch-idctrn-4K-1631584256": {
+    "sut": "../bin/automotive/ttsprk-a2time-pntrch-idctrn-4K.exe -v0 -c1 -i1000",
+    "instrument_cmd": "bash perf_scripts/selected_perf.sh",
+    "mapping": {
+      "1" : "../../assembly_stress/latency/11_ng_run/1/real_001/1631584256",
+      "2" : "../../assembly_stress/latency/11_ng_run/1/real_001/1631584256",
+      "3" : "../../assembly_stress/latency/11_ng_run/1/real_001/1631584256"
+    },
+    "cores": 3,
+    "quantile": 0.9,
+    "measurement_iterations_step": 30,
+    "measurement_iterations_max": 200,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "no_decrease",
+    "governor" : "powersave",
+    "max_temperature": 80
+  },
+  "ttsprk-a2time-pntrch-idctrn-4K-2705326080": {
+    "sut": "../bin/automotive/ttsprk-a2time-pntrch-idctrn-4K.exe -v0 -c1 -i1000",
+    "instrument_cmd": "bash perf_scripts/selected_perf.sh",
+    "mapping": {
+      "1" : "../../assembly_stress/latency/11_ng_run/1/real_001/2705326080",
+      "2" : "../../assembly_stress/latency/11_ng_run/1/real_001/2705326080",
+      "3" : "../../assembly_stress/latency/11_ng_run/1/real_001/2705326080"
+    },
+    "cores": 3,
+    "quantile": 0.9,
+    "measurement_iterations_step": 30,
+    "measurement_iterations_max": 200,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "no_decrease",
+    "governor" : "powersave",
+    "max_temperature": 80
+  },
+  "ttsprk-a2time-pntrch-idctrn-4K-3779067904": {
+    "sut": "../bin/automotive/ttsprk-a2time-pntrch-idctrn-4K.exe -v0 -c1 -i1000",
+    "instrument_cmd": "bash perf_scripts/selected_perf.sh",
+    "mapping": {
+      "1" : "../../assembly_stress/latency/11_ng_run/1/real_001/3779067904",
+      "2" : "../../assembly_stress/latency/11_ng_run/1/real_001/3779067904",
+      "3" : "../../assembly_stress/latency/11_ng_run/1/real_001/3779067904"
+    },
+    "cores": 3,
+    "quantile": 0.9,
+    "measurement_iterations_step": 30,
+    "measurement_iterations_max": 200,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "no_decrease",
+    "governor" : "powersave",
+    "max_temperature": 80
+  }
+}
