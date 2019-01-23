@@ -2,7 +2,7 @@
   "vec_add_ 1_core": {
     "sut": "../bin/sut/vector_add_test" ,
     "mapping": {
-      "1" : "../tuned_enemies/tuned_cache",
+      "1" : "../tuned_enemies/tuned_cache"
     },
     "cores": 1,
     "quantile": 0.9,
