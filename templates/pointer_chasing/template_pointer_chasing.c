@@ -9,6 +9,68 @@
 #define CACHE_LINE_SIZE   (64)
 #define PAD_CACHE_LINEPTR (CACHE_LINE_SIZE - sizeof(void *))
 
+
+#if defined(__i386__) || defined(__amd64__)
+/** Load instruction x86 */
+#define MY_INSTR_LOAD "mov (%rdx), %rdx;"
+/** Store instruction x86*/
+#define MY_INSTR_STORE "movl $10, 8(%rdx);"
+/** Nop instruction x86*/
+#define MY_INSTR_NOP "nop"
+#elif __arm__
+/** Load instruction ARM*/
+#define MY_INSTR_LOAD "ldr r3, [r3];"
+/** Store instruction ARM*/
+#define MY_INSTR_STORE "str r2, [r3,8]
+/** Store instruction ARM*/
+#define MY_INSTR_NOP "nop"
+#endif
+
+/** 1st tunnable parameter */
+#if INSTR1 == 1
+#define INSTR1_V MY_INSTR_STORE
+#elif INSTR1 == 2
+#define INSTR1_V MY_INSTR_LOAD
+#else
+#define INSTR1_V MY_INSTR_NOP
+#endif
+
+/** 2nd tunnable parameter */
+#if INSTR2 == 1
+#define INSTR2_V MY_INSTR_STORE
+#elif INSTR2 == 2
+#define INSTR2_V MY_INSTR_LOAD
+#else
+#define INSTR2_V MY_INSTR_NOP
+#endif
+
+/** 3rd tunnable parameter */
+#if INSTR3 == 1
+#define INSTR3_V MY_INSTR_STORE
+#elif INSTR3 == 2
+#define INSTR3_V MY_INSTR_LOAD
+#else
+#define INSTR3_V MY_INSTR_NOP
+#endif
+
+/** 4th tunnable parameter */
+#if INSTR4 == 1
+#define INSTR4_V MY_INSTR_STORE
+#elif INSTR4 == 2
+#define INSTR4_V MY_INSTR_LOAD
+#else
+#define INSTR4_V MY_INSTR_NOP
+#endif
+
+/** 5th tunnable parameter */
+#if INSTR5 == 1
+#define INSTR5_V MY_INSTR_STORE
+#elif INSTR5 == 2
+#define INSTR5_V MY_INSTR_LOAD
+#else
+#define INSTR5_V MY_INSTR_NOP
+#endif
+
 struct line
 {
 	struct line *next;
@@ -28,8 +90,12 @@ long benchmark_x86(struct line *ptr)
 	next = ptr->next;
   __asm__ __volatile__ (
   	"start_loop:"
-    	"mov (%rdx), %rdx;"
-      "jmp start_loop;"
+    INSTR1_V
+    INSTR2_V
+    INSTR3_V
+    INSTR4_V
+    INSTR5_V
+    "jmp start_loop;"
   );
 
   // It should not get stuck here
@@ -49,12 +115,16 @@ long benchmark_arm(struct line *ptr)
 	register struct line *next asm("r3");
 	next = ptr->next;
 	asm volatile (
-		"start_loop:;"
-	    "ldr r3, [r3];"
-			"b start_loop;"
-			:
+	  "start_loop:;"
+      INSTR1_V
+      INSTR2_V
+      INSTR3_V
+      INSTR4_V
+      INSTR5_V
+	  "b start_loop;"
+	  :
       :
-      :"r3", "cc", "memory"
+      :"r2", "r3", "cc", "memory"
   );
 
     // It should not get stuck here
