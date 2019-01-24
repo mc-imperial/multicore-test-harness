@@ -21,7 +21,7 @@
 /** Load instruction ARM*/
 #define MY_INSTR_LOAD "ldr r3, [r3];"
 /** Store instruction ARM*/
-#define MY_INSTR_STORE "str r2, [r3,8]
+#define MY_INSTR_STORE "str r2, [r3,8];"
 /** Store instruction ARM*/
 #define MY_INSTR_NOP "nop"
 #endif
