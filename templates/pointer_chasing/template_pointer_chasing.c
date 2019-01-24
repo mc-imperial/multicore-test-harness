@@ -16,14 +16,14 @@
 /** Store instruction x86*/
 #define MY_INSTR_STORE "movl $10, 8(%rdx);"
 /** Nop instruction x86*/
-#define MY_INSTR_NOP "nop"
+#define MY_INSTR_NOP "nop;"
 #elif __arm__
 /** Load instruction ARM*/
 #define MY_INSTR_LOAD "ldr r3, [r3];"
 /** Store instruction ARM*/
 #define MY_INSTR_STORE "str r2, [r3,8];"
 /** Store instruction ARM*/
-#define MY_INSTR_NOP "nop"
+#define MY_INSTR_NOP "nop;"
 #endif
 
 /** 1st tunnable parameter */
