@@ -1,6 +1,6 @@
 {
   "vec_add_ 1_core": {
-    "sut": "../bin/automotive/bitmnp-rspeed-puwmod-4K.exe -v0 -c1 -i1000" ,
+    "sut": "../bin/sut/L2_unified_test" ,
     "mapping": {
       "1" : "../tuned_enemies/tuned_cache"
     },
@@ -15,7 +15,7 @@
     "max_temperature": 80
   },
   "vec_add_ 2_core": {
-    "sut": "../bin/automotive/bitmnp-rspeed-puwmod-4K.exe -v0 -c1 -i1000" ,
+    "sut": "../bin/sut/L2_unified_test" ,
     "mapping": {
       "1" : "../tuned_enemies/tuned_cache",
       "2" : "../tuned_enemies/tuned_cache"
@@ -31,7 +31,7 @@
     "max_temperature": 80
   },
   "vec_add_ 3_core": {
-    "sut": "../bin/automotive/bitmnp-rspeed-puwmod-4K.exe -v0 -c1 -i1000" ,
+    "sut": "../bin/sut/L2_unified_test" ,
     "mapping": {
       "1" : "../tuned_enemies/tuned_cache",
       "2" : "../tuned_enemies/tuned_cache",
