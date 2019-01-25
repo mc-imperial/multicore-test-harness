@@ -1,7 +1,7 @@
 {
   "DEFINES": {
-    "MY_FACTOR": {
-      "range" :[1,5],
+    "SIZE": {
+      "range" :[1,5120],
       "type": "int"
     },
     "CACHE_LINE": {

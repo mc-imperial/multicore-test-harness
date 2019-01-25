@@ -93,10 +93,10 @@
 #endif
 
 /** Helper defines for memory allocation */
-#define MB              (((1) << 10) << 10)
+#define KB              ((1) << 10)
 
 /** 6th tunnable parameter */
-#define CACHE_SIZE 10 * MB * MY_FACTOR
+#define CACHE_SIZE KB * SIZE
 
 
 /**
