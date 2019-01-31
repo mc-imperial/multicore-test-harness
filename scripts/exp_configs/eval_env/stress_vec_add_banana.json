@@ -13,7 +13,7 @@
     "cores": 7,
     "quantile": 0.9,
     "measurement_iterations_step": 20,
-    "measurement_iterations_max": 5000,
+    "measurement_iterations_max": 2000,
     "max_confidence_variation": 5,
     "confidence_interval": 0.95,
     "stopping" : "fixed",
