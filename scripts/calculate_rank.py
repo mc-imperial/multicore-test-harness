@@ -67,7 +67,7 @@ class CalculateRank(object):
         rank_list_bad = list()
         for it1 in dict_list[0]:
             for it2 in dict_list[0]:
-                if len([i for i, j in zip(it1['rank'], it2['rank']) if i > j]) == len(it1):
+                if len([i for i, j in zip(it1['rank'], it2['rank']) if i > j]) == len(it1['rank']):
                     rank_list_bad.append(it1)
 
         # Put the Pareto Optimal in a list
@@ -81,7 +81,7 @@ class CalculateRank(object):
             rank_list_bad = list()
             for it1 in paretto_optimal:
                 for it2 in paretto_optimal:
-                    if len([i for i, j in zip(it1['rank'], it2['rank']) if i > j]) == len(it1) - 1:
+                    if len([i for i, j in zip(it1['rank'], it2['rank']) if i > j]) == len(it1['rank']) - 1:
                         rank_list_bad.append(it1)
 
             # Put the tie broken ones in a list
@@ -91,7 +91,7 @@ class CalculateRank(object):
                     paretto_optimal_tie_break.append(it)
 
             for i in range(len(paretto_optimal_tie_break)):
-                print(paretto_optimal_tie_break[i])
+                print(paretto_optimal_tie_break[i]['mapping'])
         else:
             print(paretto_optimal)
 
