@@ -3,7 +3,7 @@
     "sut": "../bin/sut/coremark.exe 0x0 0x0 0x66 1000",
     "mapping": {
       "1" : "../tuned_enemies/tuned_cache",
-      "2" : "../tuned_enemies/tuned_memory",
+      "2" : "../tuned_enemies/tuned_cache",
       "3" : "../tuned_enemies/tuned_cache"
     },
     "cores": 3,
@@ -20,7 +20,7 @@
     "sut": "../bin/automotive/bitmnp-rspeed-puwmod-4K.exe -v0 -c1 -i1000",
     "mapping": {
       "1" : "../tuned_enemies/tuned_cache",
-      "2" : "../tuned_enemies/tuned_memory",
+      "2" : "../tuned_enemies/tuned_cache",
       "3" : "../tuned_enemies/tuned_cache"
     },
     "cores": 3,
@@ -37,7 +37,7 @@
     "sut": "../bin/automotive/bitmnp-rspeed-puwmod-4M.exe -v0 -c1 -i5",
     "mapping": {
       "1" : "../tuned_enemies/tuned_cache",
-      "2" : "../tuned_enemies/tuned_memory",
+      "2" : "../tuned_enemies/tuned_cache",
       "3" : "../tuned_enemies/tuned_cache"
     },
     "cores": 3,
@@ -54,7 +54,7 @@
     "sut": "../bin/automotive/matrix-tblook-4K.exe -v0 -c1 -i1000",
     "mapping": {
       "1" : "../tuned_enemies/tuned_cache",
-      "2" : "../tuned_enemies/tuned_memory",
+      "2" : "../tuned_enemies/tuned_cache",
       "3" : "../tuned_enemies/tuned_cache"
     },
     "cores": 3,
@@ -71,7 +71,7 @@
     "sut": "../bin/automotive/matrix-tblook-4M.exe -v0 -c1 -i5",
     "mapping": {
       "1" : "../tuned_enemies/tuned_cache",
-      "2" : "../tuned_enemies/tuned_memory",
+      "2" : "../tuned_enemies/tuned_cache",
       "3" : "../tuned_enemies/tuned_cache"
     },
     "cores": 3,
@@ -88,7 +88,7 @@
     "sut": "../bin/automotive/puwmod-rspeed-4K.exe -v0 -c1 -i1000",
     "mapping": {
       "1" : "../tuned_enemies/tuned_cache",
-      "2" : "../tuned_enemies/tuned_memory",
+      "2" : "../tuned_enemies/tuned_cache",
       "3" : "../tuned_enemies/tuned_cache"
     },
     "cores": 3,
@@ -105,7 +105,7 @@
     "sut": "../bin/automotive/puwmod-rspeed-4M.exe -v0 -c1 -i5",
     "mapping": {
       "1" : "../tuned_enemies/tuned_cache",
-      "2" : "../tuned_enemies/tuned_memory",
+      "2" : "../tuned_enemies/tuned_cache",
       "3" : "../tuned_enemies/tuned_cache"
     },
     "cores": 3,
@@ -122,7 +122,7 @@
     "sut": "../bin/automotive/rspeed-idctrn-canrdr-4K.exe -v0 -c1 -i1000",
     "mapping": {
       "1" : "../tuned_enemies/tuned_cache",
-      "2" : "../tuned_enemies/tuned_memory",
+      "2" : "../tuned_enemies/tuned_cache",
       "3" : "../tuned_enemies/tuned_cache"
     },
     "cores": 3,
@@ -139,7 +139,7 @@
     "sut": "../bin/automotive/rspeed-idctrn-canrdr-4M.exe -v0 -c1 -i5",
     "mapping": {
       "1" : "../tuned_enemies/tuned_cache",
-      "2" : "../tuned_enemies/tuned_memory",
+      "2" : "../tuned_enemies/tuned_cache",
       "3" : "../tuned_enemies/tuned_cache"
     },
     "cores": 3,
@@ -156,7 +156,7 @@
     "sut": "../bin/automotive/rspeed-idctrn-iirflt-4K.exe -v0 -c1 -i1000",
     "mapping": {
       "1" : "../tuned_enemies/tuned_cache",
-      "2" : "../tuned_enemies/tuned_memory",
+      "2" : "../tuned_enemies/tuned_cache",
       "3" : "../tuned_enemies/tuned_cache"
     },
     "cores": 3,
@@ -173,7 +173,7 @@
     "sut": "../bin/automotive/rspeed-idctrn-iirflt-4M.exe -v0 -c1 -i5",
     "mapping": {
       "1" : "../tuned_enemies/tuned_cache",
-      "2" : "../tuned_enemies/tuned_memory",
+      "2" : "../tuned_enemies/tuned_cache",
       "3" : "../tuned_enemies/tuned_cache"
     },
     "cores": 3,
@@ -190,7 +190,7 @@
     "sut": "../bin/automotive/ttsprk-a2time-matrix-4K.exe -v0 -c1 -i1000",
     "mapping": {
       "1" : "../tuned_enemies/tuned_cache",
-      "2" : "../tuned_enemies/tuned_memory",
+      "2" : "../tuned_enemies/tuned_cache",
       "3" : "../tuned_enemies/tuned_cache"
     },
     "cores": 3,
@@ -207,7 +207,7 @@
     "sut": "../bin/automotive/ttsprk-a2time-matrix-4M.exe -v0 -c1 -i5",
     "mapping": {
       "1" : "../tuned_enemies/tuned_cache",
-      "2" : "../tuned_enemies/tuned_memory",
+      "2" : "../tuned_enemies/tuned_cache",
       "3" : "../tuned_enemies/tuned_cache"
     },
     "cores": 3,
@@ -224,7 +224,7 @@
     "sut": "../bin/automotive/ttsprk-a2time-pntrch-4K.exe -v0 -c1 -i1000",
     "mapping": {
       "1" : "../tuned_enemies/tuned_cache",
-      "2" : "../tuned_enemies/tuned_memory",
+      "2" : "../tuned_enemies/tuned_cache",
       "3" : "../tuned_enemies/tuned_cache"
     },
     "cores": 3,
@@ -241,7 +241,7 @@
     "sut": "../bin/automotive/ttsprk-a2time-pntrch-4M.exe -v0 -c1 -i5",
     "mapping": {
       "1" : "../tuned_enemies/tuned_cache",
-      "2" : "../tuned_enemies/tuned_memory",
+      "2" : "../tuned_enemies/tuned_cache",
       "3" : "../tuned_enemies/tuned_cache"
     },
     "cores": 3,
@@ -258,7 +258,7 @@
     "sut": "../bin/automotive/ttsprk-a2time-pntrch-aifirf-4K.exe -v0 -c1 -i1000",
     "mapping": {
       "1" : "../tuned_enemies/tuned_cache",
-      "2" : "../tuned_enemies/tuned_memory",
+      "2" : "../tuned_enemies/tuned_cache",
       "3" : "../tuned_enemies/tuned_cache"
     },
     "cores": 3,
@@ -275,7 +275,7 @@
     "sut": "../bin/automotive/ttsprk-a2time-pntrch-aifirf-4M.exe -v0 -c1 -i5",
     "mapping": {
       "1" : "../tuned_enemies/tuned_cache",
-      "2" : "../tuned_enemies/tuned_memory",
+      "2" : "../tuned_enemies/tuned_cache",
       "3" : "../tuned_enemies/tuned_cache"
     },
     "cores": 3,
@@ -292,7 +292,7 @@
     "sut": "../bin/automotive/ttsprk-a2time-pntrch-idctrn-4K.exe -v0 -c1 -i1000",
     "mapping": {
       "1" : "../tuned_enemies/tuned_cache",
-      "2" : "../tuned_enemies/tuned_memory",
+      "2" : "../tuned_enemies/tuned_cache",
       "3" : "../tuned_enemies/tuned_cache"
     },
     "cores": 3,
@@ -309,7 +309,7 @@
     "sut": "../bin/automotive/ttsprk-a2time-pntrch-idctrn-4M.exe -v0 -c1 -i5",
     "mapping": {
       "1" : "../tuned_enemies/tuned_cache",
-      "2" : "../tuned_enemies/tuned_memory",
+      "2" : "../tuned_enemies/tuned_cache",
       "3" : "../tuned_enemies/tuned_cache"
     },
     "cores": 3,
@@ -326,7 +326,7 @@
     "sut": "../bin/automotive/ttsprk-a2time-pntrch-tblook-4K.exe -v0 -c1 -i1000",
     "mapping": {
       "1" : "../tuned_enemies/tuned_cache",
-      "2" : "../tuned_enemies/tuned_memory",
+      "2" : "../tuned_enemies/tuned_cache",
       "3" : "../tuned_enemies/tuned_cache"
     },
     "cores": 3,
@@ -343,7 +343,7 @@
     "sut": "../bin/automotive/ttsprk-a2time-pntrch-tblook-4M.exe -v0 -c1 -i5",
     "mapping": {
       "1" : "../tuned_enemies/tuned_cache",
-      "2" : "../tuned_enemies/tuned_memory",
+      "2" : "../tuned_enemies/tuned_cache",
       "3" : "../tuned_enemies/tuned_cache"
     },
     "cores": 3,

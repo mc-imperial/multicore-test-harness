@@ -3,7 +3,7 @@
     "sut": "../bin/sut/vector_add_test" ,
     "mapping": {
       "1" : "../tuned_enemies/tuned_cache",
-      "2" : "../tuned_enemies/tuned_memory",
+      "2" : "../tuned_enemies/tuned_cache",
       "3" : "../tuned_enemies/tuned_cache"
     },
     "cores": 3,
