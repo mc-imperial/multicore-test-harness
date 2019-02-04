@@ -320,7 +320,7 @@ class SutStress:
         # to get a stable quantile basically
         (conf_var, conf_min, conf_max) = \
             confidence_variation(times=total_times,
-                                 quantile=experiment_info.confidence_interval,
+                                 quantile=experiment_info.quantile,
                                  confidence_interval=experiment_info.confidence_interval)
         result.log_result(perf_results=perf_results,
                           total_times=total_times,
