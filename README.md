@@ -151,8 +151,8 @@ c) **Bayesian Optimisation**. Bayesian optimization works by constructing an app
 #### Demo scripts ###
 
 * **exp_configs/enemy_tune/demo/tune_cache.json** : This script will try to find the optimal parameters for the cache stress using **ran** for 30 min.
-* **exp_configs/enemy_tune/tune_mem.json** : This script will try to find the optimal parameters for the memory stress using **ran** for 30 min.
-* **exp_configs/enemy_tune/tune_bus.json** : This script will try to find the optimal parameters for the system bus stress using **ran** for 30 min.
+* **exp_configs/enemy_tune/demo/tune_mem.json** : This script will try to find the optimal parameters for the memory stress using **ran** for 30 min.
+* **exp_configs/enemy_tune/demo/tune_bus.json** : This script will try to find the optimal parameters for the system bus stress using **ran** for 30 min.
 
 *Note:* All scripts will record the detected parameters in .txt files and create the coresponding binary files in the **results_tuning** folder, one binary for each core.
 *Note:* To uncover the most aggressive enemy processes, you should run a tuning technique for at least 10h
@@ -248,12 +248,10 @@ The next step involves running the script to determine the Paretto Optimal hosti
 ```
     sudo python3 run_experiments exp_configs/env_rank/demo/rank_litmus.json rank.json
 ```
-3. Determining the Paretto Optimal hostile environment 
+3. Determine the Paretto Optimal hostile environment. This will output the Paretto optimal hostile environment for the current development board. For the Raspberry Pi, this will probably consist of cache enemy on all cores.
 ```
     python3 calculate_rank.py rank.json
 ```
-
-This will output the Paretto optimal hostile environment for the current development board. For the Raspberry Pi, this will probably consist of cache enemy on all cores.
 
 4. If needed, change the mapping in scripts/exp_configs/eval_env/stress_all_pi.json to reflect the configuration found in the previous step.
 
