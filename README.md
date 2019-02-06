@@ -246,19 +246,19 @@ The next step involves running the script to determine the Paretto Optimal hosti
 ```
 2. Create the ranked list
 ```
-    sudo python3 run_experiments exp_configs/env_rank/demo/rank_litmus.json rank.json
+    sudo python3 run_experiments.py exp_configs/env_rank/demo/rank_litmus.json rank.json
 ```
 3. Determine the Paretto Optimal hostile environment. This will output the Paretto optimal hostile environment for the current development board. For the Raspberry Pi, this will probably consist of cache enemy on all cores.
 ```
     python3 calculate_rank.py rank.json
 ```
 
-4. If needed, change the mapping in scripts/exp_configs/eval_env/stress_all_pi.json to reflect the configuration found in the previous step.
+4. If needed, change the mapping in scripts/exp_configs/eval_env/demo/stress_all_pi.json to reflect the configuration found in the previous step.
 
 5. Test the hostile environment on "coremark"
  
 ```
-    sudo python3 run_experiments.py exp_configs/eval_env/stress_all_pi.json log.json
+    sudo python3 run_experiments.py exp_configs/eval_env/demo/stress_all_pi.json log.json
 ```
 6. Investigate the log file for the effect of the enemy on the bechmark
 
