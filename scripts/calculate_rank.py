@@ -93,7 +93,7 @@ class CalculateRank(object):
             for i in range(len(paretto_optimal_tie_break)):
                 print(paretto_optimal_tie_break[i]['mapping'])
         else:
-            print(paretto_optimal)
+            print(paretto_optimal[1]['mapping'])
 
 
 if __name__ == "__main__":
