@@ -22,6 +22,7 @@
 
 import sys
 import json
+from pprint import pprint
 
 
 class CalculateRank(object):
@@ -36,19 +37,26 @@ class CalculateRank(object):
         # Sort all the configurations in a list
         dict_list = list()
         for experiment in experiments_object:
-            ranked_list = experiments_object[experiment]["ranked_list"]
-            od = list(sorted(ranked_list.values(), key=lambda x:x['score'], reverse=True))
+            ranked_list = experiments_object[experiment]["it"]
+            od = list(sorted(ranked_list.values(), key=lambda x:x['q_value'], reverse=True))
             dict_list.append(od)
+
+        # for it in dict_list:
+        #     print()
+        #     print()
+        #     for i in range(len(it)):
+        #         print(it[i]['mapping'])
+        #         print(it[i]['q_value'])
 
         # For each environment. get the rank in the other experiments and store in 'rank'
         for it in dict_list[0]:
-            environment = it['env']
+            environment = it['mapping']
             rank_list = list()
             # Look it up for each victim(experiment)
             for it2 in dict_list:
                 # Find its rank there
                 for i in range(len(it2)):
-                    env = it2[i]['env']
+                    env = it2[i]['mapping']
                     if environment == env:
                         rank_here = i
                         break
@@ -59,7 +67,7 @@ class CalculateRank(object):
         rank_list_bad = list()
         for it1 in dict_list[0]:
             for it2 in dict_list[0]:
-                if len([i for i, j in zip(it1['rank'], it2['rank']) if i > j]) == len(it1):
+                if len([i for i, j in zip(it1['rank'], it2['rank']) if i > j]) == len(it1['rank']):
                     rank_list_bad.append(it1)
 
         # Put the Pareto Optimal in a list
@@ -73,7 +81,7 @@ class CalculateRank(object):
             rank_list_bad = list()
             for it1 in paretto_optimal:
                 for it2 in paretto_optimal:
-                    if len([i for i, j in zip(it1['rank'], it2['rank']) if i > j]) == len(it1) - 1:
+                    if len([i for i, j in zip(it1['rank'], it2['rank']) if i > j]) == len(it1['rank']) - 1:
                         rank_list_bad.append(it1)
 
             # Put the tie broken ones in a list
@@ -82,7 +90,8 @@ class CalculateRank(object):
                 if not (it in rank_list_bad):
                     paretto_optimal_tie_break.append(it)
 
-            print(paretto_optimal_tie_break)
+            for i in range(len(paretto_optimal_tie_break)):
+                print(paretto_optimal_tie_break[i]['mapping'])
         else:
             print(paretto_optimal)
 

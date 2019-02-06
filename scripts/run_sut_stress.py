@@ -25,56 +25,85 @@ Runs individual tests.
 """
 
 import sys
-from common import ProcessManagement, get_event, get_temp
+from common import ProcessManagement, ExperimentInfo, get_event, get_perf_event, get_temp, MappingResult, remove_outliers
 from scipy.stats.mstats import mquantiles
 from scipy.stats import binom
 from time import sleep
 
 
-def confidence_variation(x, quantile, desired_confidence=.9):
+def confidence_variation(times, quantile, confidence_interval):
+    """
+    Calculate the confidence interval
+    :param times: The list of times for the calculation
+    :param quantile: the quantile we are going to use
+    :param confidence_interval: The confidence interval
+    :return: confidence_variation, lower confidence, upper confidence
+    """
 
-    assert isinstance(x, list)
-    x.sort()
-    print(x)
-    q = mquantiles(x, quantile)[0]
-    n = len(x)
+    assert isinstance(times, list)
+    assert 0 < quantile < 1, "Quantile value is " + str(quantile) + "which should be between 0 and 1"
+    assert 0.5 < confidence_interval < 1, "Desired confidence interval should be between 0.5 and 1"
+
+    sorted_times = sorted(remove_outliers(times))
+    q = mquantiles(sorted_times, quantile)[0]
+    n = len(sorted_times)
+
+    # This should not happen, just for debugging purposes
+    if not n:
+        print(times)
 
     confidence = 0
     middle = round(quantile * (n+1))
     ui = middle
     li = middle
-    while confidence < desired_confidence:
+    while confidence < confidence_interval:
         if ui < n-1:
             ui = ui + 1
         if li > 0:
             li = li-1
         confidence = binom.cdf(ui-1, n, quantile) - binom.cdf(li-1, n, quantile)
 
-        if ui == n-1 and li == 0:
+        if ui >= n-1 and li <= 0:
             break
 
-    lower_range = x[li]
-    upper_range = x[ui]
+    if ui >= n-1:
+        ui = n-1
+    if li <= 0 or li > ui:
+        li = 0
+
+    try:
+        lower_range = sorted_times[li]
+        upper_range = sorted_times[ui]
+    except IndexError:
+        # This should not happen. Just for debugging purposes
+        print("Lower range", li)
+        print("Upper range", ui)
+        print("List length", len(sorted_times))
+        sys.exit(1)
+        pass
 
     confidence_range = upper_range - lower_range
 
-    return (confidence_range/q)*100
+    return (confidence_range/q)*100, lower_range, upper_range
 
 
 class SutStress:
-    """A class used to run individual SUT tests
+    """
+    A class used to run individual SUT tests
     Used to run an SUT together with enemy processes
     """
-    ## Profiling tools options for the SUT
-    INSTRUMENT_CMDS = ["", "bash my_perf_script.sh", "bash my_perf.sh", "strace -c"]
+    # Profiling tools options for the SUT
 
-    def __init__(self):
+    def __init__(self, instrument_cmd=""):
         """
         Create a stressed SUT object
+        :param instrument_cmd: Script to run code instrumentation
         """
         self._processes = ProcessManagement()
+        self._instrument_cmd = instrument_cmd
 
-    def _get_taskset_cmd(self, core):
+    @staticmethod
+    def _get_taskset_cmd(core):
         """
         Start a command on a aspecific core
         :param core: Core to start on
@@ -92,16 +121,15 @@ class SutStress:
         cmd = self._get_taskset_cmd(core) + " " + "./" + stress
         self._processes.system_call_background(cmd)
 
-    def run_program_single(self, sut, core, style):
+    def run_program_single(self, sut, core):
         """
         Start the SUT with perf to gather more info
         :param sut: System under stress
         :param core: Core to start on
-        :param style: Run the SUT with perf or some simillar instrument
         :return: Output and error
         """
-        cmd = self._get_taskset_cmd(core) + " " + "nice -20" + \
-              self.INSTRUMENT_CMDS[style] + " " + "./" + sut
+        cmd = self._get_taskset_cmd(core) + " " + "nice -20 " + \
+              self._instrument_cmd + " " + "./" + sut
         s_out,s_err = self._processes.system_call(cmd)
         return s_out, s_err
 
@@ -157,6 +185,8 @@ class SutStress:
             metric = get_event(s_out, "Max: ")
         elif get_event(s_out, "time(ns)="):
             metric = get_event(s_out, "time(ns)=")
+        elif get_event(s_out, "time(secs)= "):
+            metric = get_event(s_out, "time(secs)= ")
 
         else:
             print("Unable find execution time or maximum latency")
@@ -164,44 +194,47 @@ class SutStress:
 
         return metric
 
-    def run_mapping(self,
-                    sut,
-                    mapping,
-                    iterations=20,
-                    max_temperature=50,
-                    quantile=.9,
-                    style=0,
-                    max_confidence_variation=5,
-                    governor="powersave"
-                    ):
+    def run_mapping(self, experiment_info, mapping, iteration_name=None):
         """
-        :param sut: System under stress
-        :param mapping: A mapping of enemies o cores
-        :param iterations: The total number of times to repeat the experiment
-        :param max_temperature: If the temperature is above this, discard the result
-        :param quantile: When running multiple measurements, what quantile to choose
-        :param style: Run the SUT with perf or some similar instrument
-        :param max_confidence_variation: How much variation should be allow before stopping measurements
-        :param governor: The governor for power scaling
+        Run a mapping described by a mapping object
+        :param experiment_info: An ExperimentInfo object
+        :param mapping: A dict of core mappings
+        :param iteration_name: For tuning, we can store the exact param
+        :return:
         """
 
+        assert isinstance(experiment_info, ExperimentInfo)
+
         # Make sure the governor is correctly
-        cmd = "echo " + governor + " | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor"
+        cmd = "echo " + experiment_info.governor + \
+              " | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor"
         self._processes.system_call(cmd)
 
         delta_temp = 5
         total_times = []
         total_temps = []
+        perf_results = dict()
 
-        while True:
+        # start from 95 and decrease to 50 by 1
+        candidate_quantiles = [x / 100.0 for x in range(95, 49, -1)]
+
+        if iteration_name is None:
+            iteration_name = mapping
+        result = MappingResult(iteration_name)
+
+        # Initialise a perf result list
+        if self._instrument_cmd:
+            perf_results = []
+
+        while len(total_temps) < experiment_info.measurement_iterations_max:
             it = 0
 
             # start up the stress in accordance with the mapping
             for core in mapping:
                 self.start_stress(mapping[core], core)
 
-            while it < iterations:
-                if self.cool_down(max_temperature - delta_temp, mapping):
+            while it < experiment_info.measurement_iterations_step:
+                if self.cool_down(experiment_info.max_temperature - delta_temp, mapping):
                     for core in mapping:
                         self.start_stress(mapping[core], core)
 
@@ -210,12 +243,15 @@ class SutStress:
                 s_out, s_err = self._processes.system_call(cmd)
                 self._check_error(s_err)
 
+                # For perf, I need to think if we need to log all values, take an average...
+                # For the moment, an average should be fine
                 # Run the program on core 0
-                s_out,s_err = self.run_program_single(sut, 0, style)
-                self._check_error(s_err)
+                s_out,s_err = self.run_program_single(experiment_info.sut, 0)
+                if self._instrument_cmd:
+                    perf_results.append(get_perf_event(s_err))
 
                 final_temp = get_temp()
-                if final_temp < max_temperature:
+                if final_temp < experiment_info.max_temperature:
                     total_times.append(self.get_metric(s_out))
                     total_temps.append(final_temp)
                     it = it + 1
@@ -230,35 +266,85 @@ class SutStress:
             if len(mapping) > 0:
                 self._processes.kill_stress()
 
-            conf_var = confidence_variation(total_times, quantile)
-            print("The confidence variation is ", conf_var)
+            # This part runs if we have variable iterations based on confidence interval
+            # and can stop early
+            if experiment_info.stopping == "no_decrease" or experiment_info.stopping == "optimistic":
+                (conf_var, conf_min, conf_max) = \
+                    confidence_variation(times=total_times,
+                                         quantile=experiment_info.quantile,
+                                         confidence_interval=experiment_info.confidence_interval)
+                print("The confidence variation is ", conf_var)
+                if conf_var < experiment_info.max_confidence_variation:
+                    result.log_result(perf_results=perf_results,
+                                      total_times=total_times,
+                                      total_temps=total_temps,
+                                      quantile=experiment_info.quantile,
+                                      conf_min=conf_min,
+                                      conf_max=conf_max,
+                                      success=True)
+                    return result
+            elif experiment_info.stopping == "pessimistic":
+                for q in candidate_quantiles:
+                    (conf_var, conf_min, conf_max) = \
+                        confidence_variation(times=total_times,
+                                             quantile=q,
+                                             confidence_interval=experiment_info.confidence_interval)
+                    if conf_var < experiment_info.max_confidence_variation:
+                        result.log_result(perf_results=perf_results,
+                                          total_times=total_times,
+                                          total_temps=total_temps,
+                                          quantile=q,
+                                          conf_min=conf_min,
+                                          conf_max=conf_max,
+                                          success=True)
+                        return result
 
-            if conf_var < max_confidence_variation:
-                break
+        # At this point we know that we have hit max iterations
+        if experiment_info.stopping == "optimistic":
+            for q in candidate_quantiles:
+                (conf_var, conf_min, conf_max) = \
+                    confidence_variation(times=total_times,
+                                         quantile=q,
+                                         confidence_interval=experiment_info.confidence_interval)
+                if conf_var < experiment_info.max_confidence_variation:
+                    result.log_result(perf_results=perf_results,
+                                      total_times=total_times,
+                                      total_temps=total_temps,
+                                      quantile=q,
+                                      conf_min=conf_min,
+                                      conf_max=conf_max,
+                                      success=True)
+                    return result
 
-            # It sometimes happens that we never get the desired confidence interval
-            if len(total_times) > 200:
-                break
+        # If we hit this and we did not intend to (not using "fixed"), we failed
+        # to get a stable quantile basically
+        (conf_var, conf_min, conf_max) = \
+            confidence_variation(times=total_times,
+                                 quantile=experiment_info.quantile,
+                                 confidence_interval=experiment_info.confidence_interval)
+        result.log_result(perf_results=perf_results,
+                          total_times=total_times,
+                          total_temps=total_temps,
+                          quantile=experiment_info.quantile,
+                          conf_min=conf_min,
+                          conf_max=conf_max,
+                          success=True if conf_var < experiment_info.max_confidence_variation else False)
+        return result
 
-        print(total_times)
-
-        return total_times, total_temps
-
-    def run_sut_stress(self, sut, stress, cores, style = 0):
+    def run_sut_stress(self, sut, stress, cores):
         """
         :param sut: System under stress
         :param stress: Enemy process
         :param cores: Number of cores to start the enemy on
         :param style: Run the SUT with perf or some similar instrument
         """
-        #start up the stress on cores 1-cores+1
-        if (cores > 0):
+        # start up the stress on cores 1-cores+1
+        if cores > 0:
             for i in range(1, cores + 1):
                 self.start_stress(stress, i)
 
-
-        #Run the program on core 0
-        s_out,s_err = self.run_program_single(sut,0, style)
+        # Run the program on core 0
+        s_out,s_err = self.run_program_single(sut, 0)
         self._check_error(s_err)
 
         if cores > 0:

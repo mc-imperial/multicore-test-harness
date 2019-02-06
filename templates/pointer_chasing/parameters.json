@@ -1,35 +1,31 @@
 {
   "DEFINES": {
-    "SIZE": {
-      "range" :[1,5120],
+    "ELEMENTS": {
+      "range" :[1,2097152],
       "type": "int"
     },
-    "CACHE_LINE": {
-      "range" :[1,256],
-      "type": "int"
-    },
-    "ASSOCIATIVITY": {
-      "range" :[1,256],
+    "STRIDE": {
+      "range" :[1,2097152],
       "type": "int"
     },
     "INSTR1": {
-      "range" :[1,3],
+      "range" :[1,4],
       "type": "int"
     },
     "INSTR2": {
-      "range" :[1,3],
+      "range" :[1,4],
       "type": "int"
     },
     "INSTR3": {
-      "range" :[1,3],
+      "range" :[1,4],
       "type": "int"
     },
     "INSTR4": {
-      "range" :[1,3],
+      "range" :[1,4],
       "type": "int"
     },
     "INSTR5": {
-      "range" :[1,3],
+      "range" :[1,4],
       "type": "int"
     }
   }

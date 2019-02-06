@@ -3,7 +3,7 @@
 #include <time.h>
 
 #define ITERATIONS  100
-static size_t MM = 32000;
+static size_t MM = 64000;
 
 void add(float * restrict a, float * restrict b, float * restrict c, size_t n){
     size_t i;
