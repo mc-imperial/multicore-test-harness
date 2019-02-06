@@ -1,7 +1,7 @@
 {
   "DEFINES": {
     "SIZE": {
-      "range" :[1,5120],
+      "range" :[1,10240],
       "type": "int"
     },
     "CACHE_LINE": {

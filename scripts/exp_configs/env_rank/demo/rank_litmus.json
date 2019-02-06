@@ -1,0 +1,47 @@
+{
+  "cache_rank": {
+    "sut": "../bin/sut/L2_unified_test",
+    "ranked_list": ["../results_tuning/cache_ran_tune_1_enemy",
+                    "../results_tuning/bus_ran_tune_1_enemy",
+                    "../results_tuning/mem_ran_tune_1_enemy"],
+    "cores": 3,
+    "quantile": 0.9,
+    "measurement_iterations_step": 2,
+    "measurement_iterations_max": 2,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "no_decrease",
+    "governor" : "powersave",
+    "max_temperature": 80
+  },
+  "mem_rank": {
+    "sut": "../bin/sut/mem_thrashing_test",
+    "ranked_list": ["../results_tuning/cache_ran_tune_1_enemy",
+                    "../results_tuning/bus_ran_tune_1_enemy",
+                    "../results_tuning/mem_ran_tune_1_enemy"],
+    "cores": 3,
+    "quantile": 0.9,
+    "measurement_iterations_step": 2,
+    "measurement_iterations_max": 2,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "no_decrease",
+    "governor" : "powersave",
+    "max_temperature": 80
+  },
+  "bus_rank": {
+    "sut": "../bin/sut/bus_test",
+    "ranked_list": ["../results_tuning/cache_ran_tune_1_enemy",
+                    "../results_tuning/bus_ran_tune_1_enemy",
+                    "../results_tuning/mem_ran_tune_1_enemy"],
+    "cores": 3,
+    "quantile": 0.9,
+    "measurement_iterations_step": 2,
+    "measurement_iterations_max": 2,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "no_decrease",
+    "governor" : "powersave",
+    "max_temperature": 80
+  }
+}
