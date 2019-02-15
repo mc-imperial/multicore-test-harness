@@ -121,10 +121,10 @@
  */
 int main ()
 {
-	SIZE_A *mem1;
-  SIZE_A *mem2;
+    volatile SIZE_A *mem1;
+    volatile SIZE_A *mem2;
 
-	srand(time(NULL));
+    srand(time(NULL));
 
 
 	while(1)
