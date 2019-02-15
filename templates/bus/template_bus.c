@@ -66,15 +66,27 @@
 #endif
 
 /** location 1 to location 2 */
-#define MEM1_2_MEM2 for (SIZE_A i; i < MEM_SIZE/sizeof(SIZE_A); i++) mem2[i] = mem1[i] + rand()
+#define MEM1_2_MEM2 for (SIZE_A i; i < MEM_SIZE/sizeof(SIZE_A); i++) mem2[i] = mem1[i]
 /** location 2 to location 1 */
-#define MEM2_2_MEM1 for (SIZE_A i; i < MEM_SIZE/sizeof(SIZE_A); i++) mem1[i] = mem2[i] + rand()
+#define MEM2_2_MEM1 for (SIZE_A i; i < MEM_SIZE/sizeof(SIZE_A); i++) mem1[i] = mem2[i]
+/** location 1 to CPU to location 1 */
+#define MEM1_2_CPU_2_MEM1 for (SIZE_A i; i < MEM_SIZE/sizeof(SIZE_A); i++) mem1[i] = mem1[i] + rand()
+/** location 1 to CPU to location 2 */
+#define MEM1_2_CPU_2_MEM2 for (SIZE_A i; i < MEM_SIZE/sizeof(SIZE_A); i++) mem2[i] = mem1[i] + rand()
+/** location 2 to CPU to location 1 */
+#define MEM2_2_CPU_2_MEM1 for (SIZE_A i; i < MEM_SIZE/sizeof(SIZE_A); i++) mem1[i] = mem2[i] + rand()
 
 /** 1st tunnable parameter */
 #if INSTR1 == 1
 #define INSTR1_V MEM1_2_MEM2
 #elif INSTR1 == 2
 #define INSTR1_V MEM2_2_MEM1
+#elif INSTR1 == 3
+#define INSTR1_V MEM1_2_CPU_2_MEM1
+#elif INSTR1 == 4
+#define INSTR1_V MEM1_2_CPU_2_MEM2
+#elif INSTR1 == 5
+#define INSTR1_V MEM2_2_CPU_2_MEM1
 #else
 #define INSTR1_V
 #endif
@@ -84,6 +96,12 @@
 #define INSTR2_V MEM1_2_MEM2
 #elif INSTR2 == 2
 #define INSTR2_V MEM2_2_MEM1
+#elif INSTR2 == 3
+#define INSTR1_V MEM1_2_CPU_2_MEM1
+#elif INSTR2 == 4
+#define INSTR1_V MEM1_2_CPU_2_MEM2
+#elif INSTR2 == 5
+#define INSTR1_V MEM2_2_CPU_2_MEM1
 #else
 #define INSTR2_V
 #endif
@@ -93,6 +111,12 @@
 #define INSTR3_V MEM1_2_MEM2
 #elif INSTR3 == 2
 #define INSTR3_V MEM2_2_MEM1
+#elif INSTR3 == 3
+#define INSTR1_V MEM1_2_CPU_2_MEM1
+#elif INSTR3 == 4
+#define INSTR1_V MEM1_2_CPU_2_MEM2
+#elif INSTR3 == 5
+#define INSTR1_V MEM2_2_CPU_2_MEM1
 #else
 #define INSTR3_V
 #endif
@@ -102,6 +126,12 @@
 #define INSTR4_V MEM1_2_MEM2
 #elif INSTR4 == 2
 #define INSTR4_V MEM2_2_MEM1
+#elif INSTR4 == 3
+#define INSTR1_V MEM1_2_CPU_2_MEM1
+#elif INSTR4 == 4
+#define INSTR1_V MEM1_2_CPU_2_MEM2
+#elif INSTR4 == 5
+#define INSTR1_V MEM2_2_CPU_2_MEM1
 #else
 #define INSTR4_V
 #endif
@@ -111,6 +141,12 @@
 #define INSTR5_V MEM1_2_MEM2
 #elif INSTR5 == 2
 #define INSTR5_V MEM2_2_MEM1
+#elif INSTR5 == 3
+#define INSTR1_V MEM1_2_CPU_2_MEM1
+#elif INSTR5 == 4
+#define INSTR1_V MEM1_2_CPU_2_MEM2
+#elif INSTR5 == 5
+#define INSTR1_V MEM2_2_CPU_2_MEM1
 #else
 #define INSTR5_V
 #endif
