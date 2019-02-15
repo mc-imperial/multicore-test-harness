@@ -63,7 +63,7 @@ int main ()
     // total number of chunks you divide your memory in
     size_t chunks = MEM_SIZE / page_size;
 
-    void *mem = malloc(MEM_SIZE);
+    volatile void *mem = malloc(MEM_SIZE);
     DIE ( mem == NULL, "Unable to allocate memory\n");
 
     begin = get_current_time_us();
