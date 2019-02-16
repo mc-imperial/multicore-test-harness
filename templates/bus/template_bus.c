@@ -97,11 +97,11 @@
 #elif INSTR2 == 2
 #define INSTR2_V MEM2_2_MEM1
 #elif INSTR2 == 3
-#define INSTR1_V MEM1_2_CPU_2_MEM1
+#define INSTR2_V MEM1_2_CPU_2_MEM1
 #elif INSTR2 == 4
-#define INSTR1_V MEM1_2_CPU_2_MEM2
+#define INSTR2_V MEM1_2_CPU_2_MEM2
 #elif INSTR2 == 5
-#define INSTR1_V MEM2_2_CPU_2_MEM1
+#define INSTR2_V MEM2_2_CPU_2_MEM1
 #else
 #define INSTR2_V
 #endif
@@ -112,11 +112,11 @@
 #elif INSTR3 == 2
 #define INSTR3_V MEM2_2_MEM1
 #elif INSTR3 == 3
-#define INSTR1_V MEM1_2_CPU_2_MEM1
+#define INSTR3_V MEM1_2_CPU_2_MEM1
 #elif INSTR3 == 4
-#define INSTR1_V MEM1_2_CPU_2_MEM2
+#define INSTR3_V MEM1_2_CPU_2_MEM2
 #elif INSTR3 == 5
-#define INSTR1_V MEM2_2_CPU_2_MEM1
+#define INSTR3_V MEM2_2_CPU_2_MEM1
 #else
 #define INSTR3_V
 #endif
@@ -127,11 +127,11 @@
 #elif INSTR4 == 2
 #define INSTR4_V MEM2_2_MEM1
 #elif INSTR4 == 3
-#define INSTR1_V MEM1_2_CPU_2_MEM1
+#define INSTR4_V MEM1_2_CPU_2_MEM1
 #elif INSTR4 == 4
-#define INSTR1_V MEM1_2_CPU_2_MEM2
+#define INSTR4_V MEM1_2_CPU_2_MEM2
 #elif INSTR4 == 5
-#define INSTR1_V MEM2_2_CPU_2_MEM1
+#define INSTR4_V MEM2_2_CPU_2_MEM1
 #else
 #define INSTR4_V
 #endif
@@ -142,11 +142,11 @@
 #elif INSTR5 == 2
 #define INSTR5_V MEM2_2_MEM1
 #elif INSTR5 == 3
-#define INSTR1_V MEM1_2_CPU_2_MEM1
+#define INSTR5_V MEM1_2_CPU_2_MEM1
 #elif INSTR5 == 4
 #define INSTR1_V MEM1_2_CPU_2_MEM2
 #elif INSTR5 == 5
-#define INSTR1_V MEM2_2_CPU_2_MEM1
+#define INSTR5_V MEM2_2_CPU_2_MEM1
 #else
 #define INSTR5_V
 #endif
