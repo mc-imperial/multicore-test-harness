@@ -162,23 +162,23 @@ int main ()
 
     srand(time(NULL));
 
+    mem1 = (SIZE_A*) malloc(MEM_SIZE);
+    DIE ( mem1 == NULL, "Unable to allocate memory\n");
+    memset((SIZE_A *)mem1, rand(), MEM_SIZE);
+    mem2 = (SIZE_A*) malloc(MEM_SIZE);
+    DIE ( mem2 == NULL, "Unable to allocate memory\n");
+    memset((SIZE_A *)mem2, rand(), MEM_SIZE);
 
 	while(1)
 	{
-        mem1 = (SIZE_A*) malloc(MEM_SIZE);
-        DIE ( mem1 == NULL, "Unable to allocate memory\n");
-        memset((SIZE_A *)mem1, rand(), MEM_SIZE);
-        mem2 = (SIZE_A*) malloc(MEM_SIZE);
-        DIE ( mem2 == NULL, "Unable to allocate memory\n");
-        memset((SIZE_A *)mem2, rand(), MEM_SIZE);
         INSTR1_V;
         INSTR2_V;
         INSTR3_V;
         INSTR4_V;
         INSTR5_V;
-        free(mem1);
-        free(mem2);
 	}
+    free( (SIZE_A*) mem1);
+    free( (SIZE_A*) mem2);
 
 	return 0;
 }
