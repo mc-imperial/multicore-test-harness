@@ -144,7 +144,7 @@
 #elif INSTR5 == 3
 #define INSTR5_V MEM1_2_CPU_2_MEM1
 #elif INSTR5 == 4
-#define INSTR1_V MEM1_2_CPU_2_MEM2
+#define INSTR5_V MEM1_2_CPU_2_MEM2
 #elif INSTR5 == 5
 #define INSTR5_V MEM2_2_CPU_2_MEM1
 #else
