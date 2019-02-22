@@ -54,8 +54,8 @@
 int main ()
 {
     long begin = 0, end = 0;
-    int32_t *mem1;
-    int32_t *mem2;
+    volatile int32_t *mem1;
+    volatile int32_t *mem2;
 
     srand(time(NULL));
     mem1 = (int32_t*) malloc(MEM_SIZE);

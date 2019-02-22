@@ -128,7 +128,7 @@
 int main ()
 {
 	int page_size = PAGE_SIZE_BYTES;
-	void *mem = malloc(MEM_SIZE);
+	volatile void *mem = malloc(MEM_SIZE);
 
 
 	if (mem == NULL) {
