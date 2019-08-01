@@ -108,13 +108,10 @@ int main() {
 
   volatile char * my_array_1 = (char *) malloc(sizeof(char) * CACHE_SIZE);
   register unsigned long total = 0;
-  register int stride = CACHE_SIZE/ASSOCIATIVITY;
-
 
   while(1) {
 
-    for (int i = 0; i < stride; i+=CACHE_LINE) {
-      for (int j = 0; j < ASSOCIATIVITY; j++) {
+    for (int i = 0; i < CACHE_SIZE; i+=STRIDE) {
         INSTR1_V(my_array_1, i + (j * stride), i, total);
         INSTR2_V(my_array_1, i + (j * stride), i, total);
         INSTR3_V(my_array_1, i + (j * stride), i, total);

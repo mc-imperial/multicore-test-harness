@@ -4,12 +4,8 @@
       "range" :[1,5120],
       "type": "int"
     },
-    "CACHE_LINE": {
-      "range" :[1,256],
-      "type": "int"
-    },
-    "ASSOCIATIVITY": {
-      "range" :[1,256],
+    "STRIDE": {
+      "range" :[1,64],
       "type": "int"
     },
     "INSTR1": {
