@@ -53,15 +53,9 @@
 int main() {
 
     register volatile char * my_array_1;
-
-
-    register unsigned long total = 0;
-    register unsigned long total_stores = 0;
-    register unsigned long total_loads = 0;
-
-    register int stride = CACHE_SIZE/ASSOCIATIVITY;
-
-    long begin = 0, end = 0;
+    register unsigned int sum = 0;
+    long begin = 0;
+    long end = 0;
 
     my_array_1 = (char *) aligned_alloc(64, sizeof(char) * CACHE_SIZE);
     DIE(my_array_1 == NULL, "Unable to allocate memory");
@@ -74,17 +68,12 @@ int main() {
     for (int it = 0; it < ITERATIONS; it++) {
 #endif
         for (int i = 0; i < CACHE_SIZE; i+=CACHE_LINE/4) {
-                total += my_array_1[i * stride)];
+                sum += my_array_1[i];
             }
-        total_loads += ASSOCIATIVITY;
-        }
     }
+    
 
     end = get_current_time_us();
-
-    printf("total stores: %lu\n", total_stores);
-    printf("total loads: %lu\n", total_loads);
-    printf("total: %lu\n", total);
 
     printf("total time(us): %ld\n", end - begin);
 
