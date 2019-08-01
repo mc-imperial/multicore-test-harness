@@ -119,7 +119,6 @@ int main() {
         INSTR5_V(my_array_1, i, i, total);
       }
     }
-  }
 
 
 
