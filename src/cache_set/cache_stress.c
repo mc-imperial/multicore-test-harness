@@ -73,16 +73,8 @@ int main() {
 #else
     for (int it = 0; it < ITERATIONS; it++) {
 #endif
-        for (int i = 0; i < stride; i+=CACHE_LINE) {
-            for (int j = 0; j < ASSOCIATIVITY; j++) {
-                my_array_1[i + (j * stride)] = i;
-            }
-        total_stores += ASSOCIATIVITY;
-        }
-
-        for (int i = 0; i < stride; i+=CACHE_LINE) {
-            for (int j = 0; j < ASSOCIATIVITY; j++) {
-                total += my_array_1[i + (j * stride)];
+        for (int i = 0; i < CACHE_SIZE; i+=CACHE_LINE/4) {
+                total += my_array_1[i * stride)];
             }
         total_loads += ASSOCIATIVITY;
         }
