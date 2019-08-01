@@ -106,12 +106,13 @@
 int main() {
 
 
-  volatile int * my_array_1 = (int *) malloc(sizeof(char) * CACHE_SIZE);
+  volatile int * my_array_1 = (int *) malloc(CACHE_SIZE);
   register unsigned long total = 0;
+  int max_elements = CACHE_SIZE/sizeof(int);
 
   while(1) {
 
-    for (int i = 0; i < CACHE_SIZE; i+=STRIDE) {
+    for (int i = 0; i < max_elements; i+=STRIDE) {
         INSTR1_V(my_array_1, i , i, total);
         INSTR2_V(my_array_1, i, i, total);
         INSTR3_V(my_array_1, i, i, total);
