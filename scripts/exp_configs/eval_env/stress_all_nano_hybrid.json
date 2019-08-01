@@ -7,8 +7,8 @@
       "3" : "../tuned_enemies/tuned_bus",
       "4" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
       "5" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "6" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
+      "7" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -28,8 +28,8 @@
       "3" : "../tuned_enemies/tuned_bus",
       "4" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
       "5" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "6" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
+      "7" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -49,8 +49,8 @@
       "3" : "../tuned_enemies/tuned_bus",
       "4" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
       "5" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "6" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
+      "7" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -70,8 +70,8 @@
       "3" : "../tuned_enemies/tuned_bus",
       "4" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
       "5" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "6" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
+      "7" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -91,8 +91,8 @@
       "3" : "../tuned_enemies/tuned_bus",
       "4" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
       "5" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "6" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
+      "7" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -112,8 +112,8 @@
       "3" : "../tuned_enemies/tuned_bus",
       "4" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
       "5" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "6" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
+      "7" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -133,8 +133,8 @@
       "3" : "../tuned_enemies/tuned_bus",
       "4" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
       "5" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "6" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
+      "7" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -154,8 +154,8 @@
       "3" : "../tuned_enemies/tuned_bus",
       "4" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
       "5" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "6" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
+      "7" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -175,8 +175,8 @@
       "3" : "../tuned_enemies/tuned_bus",
       "4" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
       "5" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "6" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
+      "7" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -196,8 +196,8 @@
       "3" : "../tuned_enemies/tuned_bus",
       "4" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
       "5" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "6" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
+      "7" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -217,8 +217,8 @@
       "3" : "../tuned_enemies/tuned_bus",
       "4" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
       "5" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "6" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
+      "7" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -238,8 +238,8 @@
       "3" : "../tuned_enemies/tuned_bus",
       "4" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
       "5" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "6" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
+      "7" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -259,8 +259,8 @@
       "3" : "../tuned_enemies/tuned_bus",
       "4" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
       "5" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "6" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
+      "7" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -280,8 +280,8 @@
       "3" : "../tuned_enemies/tuned_bus",
       "4" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
       "5" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "6" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
+      "7" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -301,8 +301,8 @@
       "3" : "../tuned_enemies/tuned_bus",
       "4" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
       "5" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "6" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
+      "7" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -322,8 +322,8 @@
       "3" : "../tuned_enemies/tuned_bus",
       "4" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
       "5" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "6" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
+      "7" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -343,8 +343,8 @@
       "3" : "../tuned_enemies/tuned_bus",
       "4" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
       "5" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "6" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
+      "7" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -364,8 +364,8 @@
       "3" : "../tuned_enemies/tuned_bus",
       "4" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
       "5" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "6" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
+      "7" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -385,8 +385,8 @@
       "3" : "../tuned_enemies/tuned_bus",
       "4" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
       "5" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "6" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
+      "7" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -406,8 +406,8 @@
       "3" : "../tuned_enemies/tuned_bus",
       "4" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
       "5" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "6" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
+      "7" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -427,8 +427,8 @@
       "3" : "../tuned_enemies/tuned_bus",
       "4" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
       "5" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "6" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
+      "7" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0"
     },
     "cores": 7,
     "quantile": 0.9,
