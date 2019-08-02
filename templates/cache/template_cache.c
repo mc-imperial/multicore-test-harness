@@ -122,8 +122,8 @@ int main() {
     }
 
     // Just to make sure that no optimisation takes place
-    if (total) array[0] = total;
-    printf("Total is %d", total);
+    if (total) my_array_1[0] = total;
+    printf("Total is %ld", total);
 
 
 
