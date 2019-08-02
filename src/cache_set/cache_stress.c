@@ -44,7 +44,7 @@
 #define CACHE_SIZE      SIZE * KB
 
 /** Wrap the code in a loop consisting of ITERATIONS iterations */
-#define ITERATIONS      100
+#define ITERATIONS      1000
 
 /**
  @brief this main func
@@ -52,13 +52,15 @@
  */
 int main() {
 
-    register volatile char * my_array_1;
+    register volatile int * my_array_1;
     register unsigned int sum = 0;
     long begin = 0;
     long end = 0;
 
-    my_array_1 = (char *) aligned_alloc(64, sizeof(char) * CACHE_SIZE);
+    my_array_1 = (int *) malloc(CACHE_SIZE);
     DIE(my_array_1 == NULL, "Unable to allocate memory");
+
+    for (int i = 0; i < CACHE_SIZE/sizeof(int); i++) my_array_1[i] = i;
 
     begin = get_current_time_us();
 
@@ -67,7 +69,7 @@ int main() {
 #else
     for (int it = 0; it < ITERATIONS; it++) {
 #endif
-        for (int i = 0; i < CACHE_SIZE; i+=CACHE_LINE/4) {
+        for (int i = 0; i < CACHE_SIZE/sizeof(int); i+=CACHE_LINE/4) {
                 sum += my_array_1[i];
             }
     }
@@ -75,6 +77,7 @@ int main() {
 
     end = get_current_time_us();
 
+    printf("Sum: %u\n", sum);
     printf("total time(us): %ld\n", end - begin);
 
     free( (void *) my_array_1);

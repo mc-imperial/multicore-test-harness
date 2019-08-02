@@ -6,7 +6,7 @@
     "cores": 3,
     "method":"ran",
     "quantile": 0.9,
-    "max_file": "../log_tuning/cache_bo_600_max.txt",
+    "max_file": "../log_tuning/cache_ran_600_max.txt",
     "output_binary": "../log_tuning/",
     "tuning_max_time": 600,
     "tuning_max_iterations": 4000,
