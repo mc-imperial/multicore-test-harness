@@ -121,6 +121,9 @@ int main() {
       }
     }
 
+    // Just to make sure that no optimisation takes place
+    if (total) array[0] = total
+
 
 
   free( (void *) my_array_1);
