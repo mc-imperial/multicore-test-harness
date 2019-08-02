@@ -113,7 +113,7 @@ int main() {
   while(1) {
 
     for (int i = 0; i < max_elements; i+=STRIDE) {
-        INSTR1_V(my_array_1, i , i, total);
+        INSTR1_V(my_array_1, i, i, total);
         INSTR2_V(my_array_1, i, i, total);
         INSTR3_V(my_array_1, i, i, total);
         INSTR4_V(my_array_1, i, i, total);
@@ -122,7 +122,8 @@ int main() {
     }
 
     // Just to make sure that no optimisation takes place
-    if (total) array[0] = total
+    if (total) array[0] = total;
+    printf("Total is %d", total);
 
 
 
