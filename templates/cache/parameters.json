@@ -5,7 +5,7 @@
       "type": "int"
     },
     "STRIDE": {
-      "range" :[1,64],
+      "range" :[1,128],
       "type": "int"
     },
     "INSTR1": {
