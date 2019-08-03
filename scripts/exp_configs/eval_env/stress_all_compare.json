@@ -1,0 +1,70 @@
+{
+  "coremark_dan": {
+    "sut": "../bin/sut/coremark.exe 0x0 0x0 0x66 1000",
+    "mapping": {
+      "1" : "../tuned_enemies/tuned_cache",
+      "2" : "../tuned_enemies/tuned_cache",
+      "3" : "../tuned_enemies/tuned_cache"
+    },
+    "cores": 3,
+    "quantile": 0.9,
+    "measurement_iterations_step": 20,
+    "measurement_iterations_max": 500,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "no_decrease",
+    "governor" : "powersave",
+    "max_temperature": 80
+  },
+  "victim_dan": {
+    "sut": "../bin/sut/L2_unified_test",
+    "mapping": {
+      "1" : "../tuned_enemies/tuned_cache",
+      "2" : "../tuned_enemies/tuned_cache",
+      "3" : "../tuned_enemies/tuned_cache"
+    },
+    "cores": 3,
+    "quantile": 0.9,
+    "measurement_iterations_step": 20,
+    "measurement_iterations_max": 500,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "no_decrease",
+    "governor" : "powersave",
+    "max_temperature": 80
+  },
+  "coremark_yun": {
+    "sut": "../bin/sut/coremark.exe 0x0 0x0 0x66 1000",
+    "mapping": {
+      "1" : "../tuned_enemies/tuned_cache",
+      "2" : "../tuned_enemies/tuned_cache",
+      "3" : "../tuned_enemies/tuned_cache"
+    },
+    "cores": 3,
+    "quantile": 0.9,
+    "measurement_iterations_step": 20,
+    "measurement_iterations_max": 500,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "no_decrease",
+    "governor" : "powersave",
+    "max_temperature": 80
+  },
+  "victim_yun": {
+    "sut": "../bin/sut/L2_unified_test",
+    "mapping": {
+      "1" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
+      "2" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
+      "3" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0"
+    },
+    "cores": 3,
+    "quantile": 0.9,
+    "measurement_iterations_step": 20,
+    "measurement_iterations_max": 500,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "no_decrease",
+    "governor" : "powersave",
+    "max_temperature": 80
+  }
+}
