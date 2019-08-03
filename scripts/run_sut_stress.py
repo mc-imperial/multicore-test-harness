@@ -360,6 +360,8 @@ class SutStress:
             ex_time = get_event(s_out, "Total time (secs): ")
         elif get_event(s_out, "Max: "):
             ex_time = get_event(s_out, "Max: ")
+        elif get_event(s_out, "average = "):
+            ex_time = get_event(s_out, "average = ")
         else:
             print("Unable find execution time or maximum latency")
             sys.exit(0)
