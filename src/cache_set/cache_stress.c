@@ -57,7 +57,7 @@ int main() {
     long begin = 0;
     long end = 0;
 
-    my_array_1 = (int *) malloc(CACHE_SIZE);
+    my_array_1 = (int *) malloc(10 * CACHE_SIZE);
     DIE(my_array_1 == NULL, "Unable to allocate memory");
 
     for (int i = 0; i < CACHE_SIZE/sizeof(int); i++) my_array_1[i] = i;
