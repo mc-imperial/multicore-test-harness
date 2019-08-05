@@ -42,7 +42,7 @@
     "max_temperature": 80
   },
   "bitmnp-rspeed-puwmod-4M": {
-    "sut": "../bin/automotive/bitmnp-rspeed-puwmod-4M.exe -v0 -c1 -i5",
+    "sut": "../bin/automotive/bitmnp-rspeed-puwmod-4M.exe -v0 -c1 -i2",
     "mapping": {
       "1" : "../tuned_enemies/tuned_bus",
       "2" : "../tuned_enemies/tuned_bus",
@@ -84,7 +84,7 @@
     "max_temperature": 80
   },
   "matrix-tblook-4M": {
-    "sut": "../bin/automotive/matrix-tblook-4M.exe -v0 -c1 -i5",
+    "sut": "../bin/automotive/matrix-tblook-4M.exe -v0 -c1 -i2",
     "mapping": {
       "1" : "../tuned_enemies/tuned_bus",
       "2" : "../tuned_enemies/tuned_bus",
@@ -126,7 +126,7 @@
     "max_temperature": 80
   },
   "puwmod-rspeed-4M": {
-    "sut": "../bin/automotive/puwmod-rspeed-4M.exe -v0 -c1 -i5",
+    "sut": "../bin/automotive/puwmod-rspeed-4M.exe -v0 -c1 -i2",
     "mapping": {
       "1" : "../tuned_enemies/tuned_bus",
       "2" : "../tuned_enemies/tuned_bus",
@@ -168,7 +168,7 @@
     "max_temperature": 80
   },
   "rspeed-idctrn-canrdr-4M": {
-    "sut": "../bin/automotive/rspeed-idctrn-canrdr-4M.exe -v0 -c1 -i5",
+    "sut": "../bin/automotive/rspeed-idctrn-canrdr-4M.exe -v0 -c1 -i2",
     "mapping": {
       "1" : "../tuned_enemies/tuned_bus",
       "2" : "../tuned_enemies/tuned_bus",
@@ -210,7 +210,7 @@
     "max_temperature": 80
   },
   "rspeed-idctrn-iirflt-4M": {
-    "sut": "../bin/automotive/rspeed-idctrn-iirflt-4M.exe -v0 -c1 -i5",
+    "sut": "../bin/automotive/rspeed-idctrn-iirflt-4M.exe -v0 -c1 -i2",
     "mapping": {
       "1" : "../tuned_enemies/tuned_bus",
       "2" : "../tuned_enemies/tuned_bus",
@@ -252,7 +252,7 @@
     "max_temperature": 80
   },
   "ttsprk-a2time-matrix-4M": {
-    "sut": "../bin/automotive/ttsprk-a2time-matrix-4M.exe -v0 -c1 -i5",
+    "sut": "../bin/automotive/ttsprk-a2time-matrix-4M.exe -v0 -c1 -i2",
     "mapping": {
       "1" : "../tuned_enemies/tuned_bus",
       "2" : "../tuned_enemies/tuned_bus",
@@ -294,7 +294,7 @@
     "max_temperature": 80
   },
   "ttsprk-a2time-pntrch-4M": {
-    "sut": "../bin/automotive/ttsprk-a2time-pntrch-4M.exe -v0 -c1 -i5",
+    "sut": "../bin/automotive/ttsprk-a2time-pntrch-4M.exe -v0 -c1 -i2",
     "mapping": {
       "1" : "../tuned_enemies/tuned_bus",
       "2" : "../tuned_enemies/tuned_bus",
@@ -336,7 +336,7 @@
     "max_temperature": 80
   },
   "ttsprk-a2time-pntrch-aifirf-4M": {
-    "sut": "../bin/automotive/ttsprk-a2time-pntrch-aifirf-4M.exe -v0 -c1 -i5",
+    "sut": "../bin/automotive/ttsprk-a2time-pntrch-aifirf-4M.exe -v0 -c1 -i2",
     "mapping": {
       "1" : "../tuned_enemies/tuned_bus",
       "2" : "../tuned_enemies/tuned_bus",
@@ -378,7 +378,7 @@
     "max_temperature": 80
   },
   "ttsprk-a2time-pntrch-idctrn-4M": {
-    "sut": "../bin/automotive/ttsprk-a2time-pntrch-idctrn-4M.exe -v0 -c1 -i5",
+    "sut": "../bin/automotive/ttsprk-a2time-pntrch-idctrn-4M.exe -v0 -c1 -i2",
     "mapping": {
       "1" : "../tuned_enemies/tuned_bus",
       "2" : "../tuned_enemies/tuned_bus",
@@ -420,7 +420,7 @@
     "max_temperature": 80
   },
   "ttsprk-a2time-pntrch-tblook-4M": {
-    "sut": "../bin/automotive/ttsprk-a2time-pntrch-tblook-4M.exe -v0 -c1 -i5",
+    "sut": "../bin/automotive/ttsprk-a2time-pntrch-tblook-4M.exe -v0 -c1 -i2",
     "mapping": {
       "1" : "../tuned_enemies/tuned_bus",
       "2" : "../tuned_enemies/tuned_bus",
