@@ -41,7 +41,7 @@
 #define KB              ((1) << 10)
 
 /** The size of the cache */
-#define CACHE_SIZE      SIZE * KB
+#define CACHE_SIZE      10 * SIZE * KB
 
 /** Wrap the code in a loop consisting of ITERATIONS iterations */
 #define ITERATIONS      500
@@ -57,7 +57,7 @@ int main() {
     long begin = 0;
     long end = 0;
 
-    my_array_1 = (int *) malloc(10 * CACHE_SIZE);
+    my_array_1 = (int *) malloc(CACHE_SIZE);
     DIE(my_array_1 == NULL, "Unable to allocate memory");
 
     for (int i = 0; i < CACHE_SIZE/sizeof(int); i++) my_array_1[i] = i;
