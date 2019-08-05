@@ -1,7 +1,7 @@
 {
   "DEFINES": {
     "SIZE": {
-      "range" :[16,5120],
+      "range" :[16, 65536],
       "type": "int"
     },
     "STRIDE": {
