@@ -77,8 +77,8 @@ int main ()
         for (int32_t i; i < MEM_SIZE/sizeof(int32_t); i++) mem2[i] = mem1[i] + rand();
 
     }
-    free(mem1);
-    free(mem2);
+    free((void *) mem1);
+    free((void *) mem2);
 
     end = get_current_time_us();
     printf("total time(us): %ld\n", end - begin);

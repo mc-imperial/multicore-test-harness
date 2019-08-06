@@ -41,7 +41,7 @@
 #define KB              ((1) << 10)
 
 /** The size of the cache */
-#define CACHE_SIZE      10 * SIZE * KB
+#define CACHE_SIZE      SIZE * KB
 
 /** Wrap the code in a loop consisting of ITERATIONS iterations */
 #define ITERATIONS      500
@@ -50,17 +50,25 @@
  @brief this main func
  @ return 0 on success
  */
-int main() {
+int main(int argc, char *argv[]) {
 
-    register volatile int * my_array_1;
+    register volatile int * my_array;
     register unsigned int sum = 0;
     long begin = 0;
     long end = 0;
+    float amplifier;
+    long size = CACHE_SIZE;
 
-    my_array_1 = (int *) malloc(CACHE_SIZE);
-    DIE(my_array_1 == NULL, "Unable to allocate memory");
+    if (argc==2) {
+            amplifier = atof(argv[1]);
+            size = (int) amplifier * CACHE_SIZE;
+    }
 
-    for (int i = 0; i < CACHE_SIZE/sizeof(int); i++) my_array_1[i] = i;
+
+    my_array = (int *) malloc(size);
+    DIE(my_array == NULL, "Unable to allocate memory");
+
+    for (int i = 0; i < size/sizeof(int); i++) my_array[i] = i;
 
     begin = get_current_time_us();
 
@@ -69,8 +77,8 @@ int main() {
 #else
     for (int it = 0; it < ITERATIONS; it++) {
 #endif
-        for (int i = 0; i < CACHE_SIZE/sizeof(int); i+=CACHE_LINE/4) {
-                sum += my_array_1[i];
+        for (int i = 0; i < size/sizeof(int); i+=CACHE_LINE/4) {
+                sum += my_array[i];
             }
     }
     
@@ -80,6 +88,6 @@ int main() {
     printf("Sum: %u\n", sum);
     printf("total time(us): %ld\n", end - begin);
 
-    free( (void *) my_array_1);
+    free( (void *) my_array);
     return 0;
 }

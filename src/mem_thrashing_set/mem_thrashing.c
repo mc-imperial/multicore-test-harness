@@ -88,7 +88,7 @@ int main ()
         DIE ( check != location, "Failed to set memory ");
 
     }
-    free(mem);
+    free((void *) mem);
 
     end = get_current_time_us();
     printf("total time(us): %ld\n", end - begin);
