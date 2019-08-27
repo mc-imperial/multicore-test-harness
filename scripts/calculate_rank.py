@@ -92,8 +92,10 @@ class CalculateRank(object):
 
             for i in range(len(paretto_optimal_tie_break)):
                 print(paretto_optimal_tie_break[i]['mapping'])
+            print("I had to break ties")
         else:
-            print(paretto_optimal)
+            print(paretto_optimal[0]['mapping'])
+            print("There was no tie breaking")
 
 
 if __name__ == "__main__":
