@@ -426,6 +426,16 @@ class ProcessManagement:
             time.sleep(self._sleep_shutdown)
 
         self._background_procs = []
+
+        # To make sure nothing is left, I suspect the previous step does not always work
+        p = subprocess.Popen(['ps', '-A'], stdout=subprocess.PIPE)
+        out, err = p.communicate()
+
+        for line in out.splitlines():
+            if b'_enemy' in line:
+                pid = int(line.split(None, 1)[0])
+                os.kill(pid, signal.SIGKILL)
+
         time.sleep(self._sleep_shutdown)
 
     def __del__(self):
