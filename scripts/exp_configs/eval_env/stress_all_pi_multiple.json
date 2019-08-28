@@ -40,7 +40,7 @@
       "1" : "../tuned_enemies/L2_small_enemy",
       "2" : "../tuned_enemies/L2_small_enemy",
       "3" : "../tuned_enemies/L2_large_enemy"
-    }
+    },
     "cores": 3,
     "quantile": 0.9,
     "measurement_iterations_step": 20,
