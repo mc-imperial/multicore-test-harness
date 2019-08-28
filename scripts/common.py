@@ -443,7 +443,8 @@ class ProcessManagement:
         Cleanup for whatever is running in the background
         :return:
         """
-        self.kill_stress()
+        pass
+        # self.kill_stress()
 
 
 class DataLog:

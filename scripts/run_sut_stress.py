@@ -285,6 +285,7 @@ class SutStress:
                                       conf_max=conf_max,
                                       success=True)
                     print("The q value is", result.q_value)
+                    self._processes.kill_stress()
                     return result
             elif experiment_info.stopping == "pessimistic":
                 for q in candidate_quantiles:
@@ -301,6 +302,7 @@ class SutStress:
                                           conf_max=conf_max,
                                           success=True)
                         print("The q value is", result.q_value)
+                        self._processes.kill_stress()
                         return result
 
         # At this point we know that we have hit max iterations
@@ -319,6 +321,7 @@ class SutStress:
                                       conf_max=conf_max,
                                       success=True)
                     print("The q value is", result.q_value)
+                    self._processes.kill_stress()
                     return result
 
         # If we hit this and we did not intend to (not using "fixed"), we failed
@@ -335,6 +338,7 @@ class SutStress:
                           conf_max=conf_max,
                           success=True if conf_var < experiment_info.max_confidence_variation else False)
         print("The q value is", result.q_value)
+        self._processes.kill_stress()
         return result
 
     def run_sut_stress(self, sut, stress, cores):
