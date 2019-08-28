@@ -34,7 +34,7 @@
   *  instructions: a value between 1-3
   *  1 - STORE
   *  2 - LOAD
-  *  3 - NOOP
+  *  3 - NOP
 
   */
 
