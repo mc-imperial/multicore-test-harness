@@ -473,7 +473,7 @@ class ObjectiveFunction:
                                iteration_name=str(enemy_config))
         if self.best_score is None or result.q_value > self.best_score:
             self.best_score = result.q_value
-            self.best_mapping = enemy_config
+            self.best_mapping = deepcopy(enemy_config)
 
         result.time = time() - self._t_start
         self._log.log_data_mapping(mapping_result=result, iteration=self.iteration)
