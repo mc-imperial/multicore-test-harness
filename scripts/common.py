@@ -434,7 +434,10 @@ class ProcessManagement:
         for line in out.splitlines():
             if b'_enemy' in line:
                 pid = int(line.split(None, 1)[0])
-                os.kill(pid, signal.SIGKILL)
+                try:
+                    os.kill(pid, signal.SIGKILL)
+                except OSError:
+                    pass
 
         time.sleep(self._sleep_shutdown)
 
