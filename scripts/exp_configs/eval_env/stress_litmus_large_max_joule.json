@@ -1,0 +1,36 @@
+{
+  "L2_large_q_value": {
+    "sut": "../bin/sut/L2_unified_test 10",
+    "mapping": {
+      "1" : "../tuned_enemies/L2_large_enemy",
+      "2" : "../tuned_enemies/L2_large_enemy",
+      "3" : "../tuned_enemies/L2_large_enemy"
+    },
+    "cores": 3,
+    "quantile": 0.9,
+    "measurement_iterations_step": 20,
+    "measurement_iterations_max": 200,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "fixed",
+    "governor" : "powersave",
+    "max_temperature": 80
+  },
+  "L2_large_max": {
+    "sut": "../bin/sut/L2_unified_test 10",
+    "mapping": {
+      "1" : "../tuned_enemies/L2_large_enemy_max",
+      "2" : "../tuned_enemies/L2_large_enemy_max",
+      "3" : "../tuned_enemies/L2_large_enemy_max"
+    },
+    "cores": 3,
+    "quantile": 0.9,
+    "measurement_iterations_step": 20,
+    "measurement_iterations_max": 200,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "fixed",
+    "governor" : "powersave",
+    "max_temperature": 80
+  }
+}
