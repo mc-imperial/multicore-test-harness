@@ -21,7 +21,7 @@
     "max_temperature": 80
   },
   "exp2": {
-    "sut": "../../IsolBench/bench/bandwidth -m 48 -a read -t 0",
+    "sut": "../../IsolBench/bench/bandwidth -m 48 -a read -t 4",
     "mapping": {
       "1" : "../../IsolBench/bench/bandwidth -m 4096 -a read -t 0",
       "2" : "../../IsolBench/bench/bandwidth -m 4096 -a read -t 0",
@@ -42,7 +42,7 @@
     "max_temperature": 80
   },
   "exp3": {
-    "sut": "../../IsolBench/bench/bandwidth -m 48 -a read -t 0",
+    "sut": "../../IsolBench/bench/bandwidth -m 48 -a read -t 4",
     "mapping": {
       "1" : "../../IsolBench/bench/bandwidth -m 48 -a read -t 0",
       "2" : "../../IsolBench/bench/bandwidth -m 48 -a read -t 0",
