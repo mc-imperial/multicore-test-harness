@@ -1,6 +1,6 @@
 {
   "exp1": {
-    "sut": "../../IsolBench/bench/latency -m 48 -t 4",
+    "sut": "../../IsolBench/bench/latency -m 48",
     "mapping": {
       "1" : "../../IsolBench/bench/bandwidth -m 4096 -a read -t 0",
       "2" : "../../IsolBench/bench/bandwidth -m 4096 -a read -t 0",
@@ -51,7 +51,7 @@
     "max_temperature": 80
   },
   "exp4": {
-    "sut": "../../IsolBench/bench/latency -m 48 -t 4",
+    "sut": "../../IsolBench/bench/latency -m 48",
     "mapping": {
       "1" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
       "2" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
