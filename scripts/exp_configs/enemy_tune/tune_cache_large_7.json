@@ -1,12 +1,12 @@
 {
-  "pointer_chasing_fuzz_tune1": {
-    "sut": "../bin/sut/pointer_chasing_test",
-    "enemy_range": "../templates/pointer_chasing/parameters.json",
-    "enemy_template": "../templates/pointer_chasing/template_pointer_chasing.c",
+  "cache_random_tune1": {
+    "sut": "../bin/sut/L2_unified_test 10",
+    "enemy_range": "../templates/cache/parameters.json",
+    "enemy_template": "../templates/cache/template_cache.c",
     "cores": 7,
     "method":"ran",
     "quantile": 0.9,
-    "max_file": "../results_litmus/pointer_chasing_fuzz_120_max_1.txt",
+    "max_file": "../results_litmus/cache_large_random_120_max_1.txt",
     "output_binary": "../results_litmus/",
     "tuning_max_time": 120,
     "tuning_max_iterations": 4000,
@@ -18,14 +18,14 @@
     "governor" : "powersave",
     "max_temperature": 80
   },
-  "pointer_chasing_fuzz_tune2": {
-    "sut": "../bin/sut/pointer_chasing_test",
-    "enemy_range": "../templates/pointer_chasing/parameters.json",
-    "enemy_template": "../templates/pointer_chasing/template_pointer_chasing.c",
+  "cache_random_tune2": {
+    "sut": "../bin/sut/L2_unified_test 10",
+    "enemy_range": "../templates/cache/parameters.json",
+    "enemy_template": "../templates/cache/template_cache.c",
     "cores": 7,
     "method":"ran",
     "quantile": 0.9,
-    "max_file": "../results_litmus/pointer_chasing_fuzz_120_max_2.txt",
+    "max_file": "../results_litmus/cache_large_random_120_max_2.txt",
     "output_binary": "../results_litmus/",
     "tuning_max_time": 120,
     "tuning_max_iterations": 4000,
@@ -37,14 +37,14 @@
     "governor" : "powersave",
     "max_temperature": 80
   },
-  "pointer_chasing_fuzz_tune3": {
-    "sut": "../bin/sut/pointer_chasing_test",
-    "enemy_range": "../templates/pointer_chasing/parameters.json",
-    "enemy_template": "../templates/pointer_chasing/template_pointer_chasing.c",
+  "cache_random_tune3": {
+    "sut": "../bin/sut/L2_unified_test 10",
+    "enemy_range": "../templates/cache/parameters.json",
+    "enemy_template": "../templates/cache/template_cache.c",
     "cores": 7,
     "method":"ran",
     "quantile": 0.9,
-    "max_file": "../results_litmus/pointer_chasing_fuzz_120_max_3.txt",
+    "max_file": "../results_litmus/cache_large_random_120_max_3.txt",
     "output_binary": "../results_litmus/",
     "tuning_max_time": 120,
     "tuning_max_iterations": 4000,
@@ -56,14 +56,14 @@
     "governor" : "powersave",
     "max_temperature": 80
   },
-  "pointer_chasing_sa_tune1": {
-    "sut": "../bin/sut/pointer_chasing_test",
-    "enemy_range": "../templates/pointer_chasing/parameters.json",
-    "enemy_template": "../templates/pointer_chasing/template_pointer_chasing.c",
+  "cache_sa_tune1": {
+    "sut": "../bin/sut/L2_unified_test 10",
+    "enemy_range": "../templates/cache/parameters.json",
+    "enemy_template": "../templates/cache/template_cache.c",
     "cores": 7,
     "method":"sa",
     "quantile": 0.9,
-    "max_file": "../results_litmus/pointer_chasing_sa_120_max_1.txt",
+    "max_file": "../results_litmus/cache_large_sa_120_max_1.txt",
     "output_binary": "../results_litmus/",
     "tuning_max_time": 120,
     "tuning_max_iterations": 4000,
@@ -75,14 +75,14 @@
     "governor" : "powersave",
     "max_temperature": 80
   },
-  "pointer_chasing_sa_tune2": {
-    "sut": "../bin/sut/pointer_chasing_test",
-    "enemy_range": "../templates/pointer_chasing/parameters.json",
-    "enemy_template": "../templates/pointer_chasing/template_pointer_chasing.c",
+  "cache_sa_tune2": {
+    "sut": "../bin/sut/L2_unified_test 10",
+    "enemy_range": "../templates/cache/parameters.json",
+    "enemy_template": "../templates/cache/template_cache.c",
     "cores": 7,
     "method":"sa",
     "quantile": 0.9,
-    "max_file": "../results_litmus/pointer_chasing_sa_120_max_2.txt",
+    "max_file": "../results_litmus/cache_large_sa_120_max_2.txt",
     "output_binary": "../results_litmus/",
     "tuning_max_time": 120,
     "tuning_max_iterations": 4000,
@@ -94,14 +94,14 @@
     "governor" : "powersave",
     "max_temperature": 80
   },
-  "pointer_chasing_sa_tune3": {
-    "sut": "../bin/sut/pointer_chasing_test",
-    "enemy_range": "../templates/pointer_chasing/parameters.json",
-    "enemy_template": "../templates/pointer_chasing/template_pointer_chasing.c",
+  "cache_sa_tune3": {
+    "sut": "../bin/sut/L2_unified_test 10",
+    "enemy_range": "../templates/cache/parameters.json",
+    "enemy_template": "../templates/cache/template_cache.c",
     "cores": 7,
     "method":"sa",
     "quantile": 0.9,
-    "max_file": "../results_litmus/pointer_chasing_sa_120_max_3.txt",
+    "max_file": "../results_litmus/cache_large_sa_120_max_3.txt",
     "output_binary": "../results_litmus/",
     "tuning_max_time": 120,
     "tuning_max_iterations": 4000,
@@ -113,14 +113,14 @@
     "governor" : "powersave",
     "max_temperature": 80
   },
-  "pointer_chasing_bo_tune1": {
-    "sut": "../bin/sut/pointer_chasing_test",
-    "enemy_range": "../templates/pointer_chasing/parameters.json",
-    "enemy_template": "../templates/pointer_chasing/template_pointer_chasing.c",
+  "cache_bo_tune1": {
+    "sut": "../bin/sut/L2_unified_test 10",
+    "enemy_range": "../templates/cache/parameters.json",
+    "enemy_template": "../templates/cache/template_cache.c",
     "cores": 7,
     "method":"bo",
     "quantile": 0.9,
-    "max_file": "../results_litmus/pointer_chasing_bo_120_max_1.txt",
+    "max_file": "../results_litmus/cache_large_bo_120_max_1.txt",
     "output_binary": "../results_litmus/",
     "tuning_max_time": 120,
     "tuning_max_iterations": 4000,
@@ -132,14 +132,14 @@
     "governor" : "powersave",
     "max_temperature": 80
   },
-  "pointer_chasing_bo_tune2": {
-    "sut": "../bin/sut/pointer_chasing_test",
-    "enemy_range": "../templates/pointer_chasing/parameters.json",
-    "enemy_template": "../templates/pointer_chasing/template_pointer_chasing.c",
+  "cache_bo_tune2": {
+    "sut": "../bin/sut/L2_unified_test 10",
+    "enemy_range": "../templates/cache/parameters.json",
+    "enemy_template": "../templates/cache/template_cache.c",
     "cores": 7,
     "method":"bo",
     "quantile": 0.9,
-    "max_file": "../results_litmus/pointer_chasing_bo_120_max_2.txt",
+    "max_file": "../results_litmus/cache_large_bo_120_max_2.txt",
     "output_binary": "../results_litmus/",
     "tuning_max_time": 120,
     "tuning_max_iterations": 4000,
@@ -151,14 +151,14 @@
     "governor" : "powersave",
     "max_temperature": 80
   },
-  "pointer_chasing_bo_tune3": {
-    "sut": "../bin/sut/pointer_chasing_test",
-    "enemy_range": "../templates/pointer_chasing/parameters.json",
-    "enemy_template": "../templates/pointer_chasing/template_pointer_chasing.c",
+  "cache_bo_tune3": {
+    "sut": "../bin/sut/L2_unified_test 10",
+    "enemy_range": "../templates/cache/parameters.json",
+    "enemy_template": "../templates/cache/template_cache.c",
     "cores": 7,
     "method":"bo",
     "quantile": 0.9,
-    "max_file": "../results_litmus/pointer_chasing_bo_120_max_3.txt",
+    "max_file": "../results_litmus/cache_large_bo_120_max_3.txt",
     "output_binary": "../results_litmus/",
     "tuning_max_time": 120,
     "tuning_max_iterations": 4000,
