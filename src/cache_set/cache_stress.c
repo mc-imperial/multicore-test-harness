@@ -34,6 +34,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/time.h>
+#include <sys/resource.h>
 
 #include "../common/common.h"
 
@@ -59,6 +61,8 @@ int main(int argc, char *argv[]) {
     float amplifier;
     long size = CACHE_SIZE;
 
+    struct rusage usage_start, usage_stop;
+
     if (argc==2) {
             amplifier = atof(argv[1]);
             size = (int) amplifier * CACHE_SIZE;
@@ -70,7 +74,9 @@ int main(int argc, char *argv[]) {
 
     for (int i = 0; i < size/sizeof(int); i++) my_array[i] = i;
 
+    getrusage(RUSAGE_SELF, &usage_start);
     begin = get_current_time_us();
+
 
 #ifdef INFINITE
     while(1) {
@@ -81,9 +87,13 @@ int main(int argc, char *argv[]) {
                 sum += my_array[i];
             }
     }
-    
+
 
     end = get_current_time_us();
+    getrusage(RUSAGE_SELF, &usage_stop);
+
+    printf("Voluntary_switches %ld\n", usage_stop.ru_nvcsw - usage_start.ru_nvcsw);
+    printf("Involuntary_switches %ld\n", usage_stop.ru_nivcsw - usage_start.ru_nivcsw);
 
     printf("Sum: %u\n", sum);
     printf("total time(us): %ld\n", end - begin);
