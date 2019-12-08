@@ -209,13 +209,13 @@ class SutStress:
             voluntary = int(get_event(s_out, "Voluntary_switches "))
         else:
             print("Unable find voluntary switches")
-            sys.exit(0)
+            return None
 
         if get_event(s_out, "Involuntary_switches ") is not None:
             involuntary = int(get_event(s_out, "Involuntary_switches "))
         else:
             print("Unable find involuntary switches")
-            sys.exit(0)
+            return None
 
         return voluntary, involuntary
 
@@ -277,9 +277,10 @@ class SutStress:
                 if self._instrument_cmd:
                     perf_results.append(get_perf_event(s_err))
 
-                (voluntary, involuntary) = self.get_switches(s_out)
-                voluntary_switches.append(voluntary)
-                involuntary_switches.append(involuntary)
+                if self.get_switches(s_out) is not None:
+                    (voluntary, involuntary) = self.get_switches(s_out)
+                    voluntary_switches.append(voluntary)
+                    involuntary_switches.append(involuntary)
 
                 final_temp = get_temp()
                 if final_temp < experiment_info.max_temperature:
