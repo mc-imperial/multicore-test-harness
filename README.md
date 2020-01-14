@@ -1,8 +1,7 @@
 # Multicore test harness #
 
-This software is a black-box testing technique with the capability of provoking interference behaviour in multi-core chips, enabling an assessment of the extent to which interference affects execution of a piece of Software Under Test (SUT).  Interference is analysed by having an “enemy” process run a configurable test harness that is designed, through a combination of manual and automated tuning, to maximize the degree of certain types of interference. The black-box nature of this technique makes it applicable to any multi-core microprocessor running any operating system, so long as compilation and execution of ANSI-C programs is supported.
+This software is a black-box testing technique with the capability of provoking interference behaviour in multi-core chips, enabling an assessment of the extent to which interference affects execution of a piece of a Program Under Test (PUT). Interference is analysed by having an “enemy” process run a configurable test harness that is designed, through a combination of manual and automated tuning, to maximize the degree of certain types of interference. The black-box nature of this technique makes it applicable to any multi-core microprocessor running any operating system, so long as compilation and execution of ANSI-C programs is supported.
 
-More information about the framework can be found [here](https://arxiv.org/abs/1809.05197)
 
 ## Benchmarks ##
 
@@ -30,7 +29,7 @@ A benchmark suite to test the latency of real-time threads. It is based on lunch
 ## Structure ##
 The enemy processes are written in C and the experiments are driven by scripts written in python 3.
 
-* **src** : C source folder for the enemy processes
+* **src** : C source folder for the enemy programs
 * **bin** : Default folder where the SUTs and enemy processes are built
 * **templates** : C sources for the configurable templates used for tuning
 * **scripts** : Python scripts used to drive the experiments
@@ -104,7 +103,7 @@ a) **Bus stress**. We have designed the enemy with the aim of hindering data tra
 
 b) **Cache stress**. This enemy process causes interference in the shared cache. It executes operations that cause as many evictions as possible.
 
-c) **Memory thrashing stress**. This enemy process causes interference in the shared bus and shared RAM controller. Memory thrashing enemy processes that make frequent RAM accesses and thus cause a lot of bus traffic and keep the RAM controller busy.
+c) **Thrashing stress**. This enemy process causes interference in the shared bus and shared RAM controller. Memory thrashing enemy processes that make frequent RAM accesses and thus cause a lot of bus traffic and keep the RAM controller busy.
 
 ### 2. Tuning the enemy processes ###
 
