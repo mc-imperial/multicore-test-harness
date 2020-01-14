@@ -473,7 +473,7 @@ class ObjectiveFunction:
                                iteration_name=str(enemy_config))
         if self.best_score is None or result.q_value > self.best_score:
             self.best_score = result.q_value
-            self.best_mapping = enemy_config
+            self.best_mapping = deepcopy(enemy_config)
 
         result.time = time() - self._t_start
         self._log.log_data_mapping(mapping_result=result, iteration=self.iteration)
@@ -960,8 +960,9 @@ class Tuning:
             self._experiment_info.read_json_object(tuning_object[experiment_name])
             self.read_json_object(tuning_object[experiment_name])
 
-            # To give each tuning a fair chance
-            seed(1000)
+            # To give each tuning a fair chance.
+            # We do not need this at this time
+            # seed(1000)
 
             if self._experiment_info.method == "sa_ran":
                 print("Tuning by simulated annealing on the "

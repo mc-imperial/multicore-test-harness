@@ -90,10 +90,16 @@ class CalculateRank(object):
                 if not (it in rank_list_bad):
                     paretto_optimal_tie_break.append(it)
 
+            print("With no tie breaking")
+            for i in range(len(paretto_optimal)):
+                print(paretto_optimal[i]['mapping'])
+            print("With tie breaking")
             for i in range(len(paretto_optimal_tie_break)):
                 print(paretto_optimal_tie_break[i]['mapping'])
+
         else:
             print(paretto_optimal[0]['mapping'])
+            print("There was no tie breaking")
 
 
 if __name__ == "__main__":

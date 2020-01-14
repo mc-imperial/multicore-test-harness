@@ -1,0 +1,19 @@
+{
+  "d_rank": {
+    "sut": "../bin/automotive/matrix-tblook-4K.exe -v0 -c1 -i1000",
+    "ranked_list": [
+      "../results_litmus/cache_bo_tune_d_1_enemy",
+      "../results_litmus/mem_bo_tune_d_1_enemy",
+      "../results_litmus/bus_bo_tune_d_1_enemy"
+    ],
+    "cores": 7,
+    "quantile": 0.95,
+    "measurement_iterations_step": 20,
+    "measurement_iterations_max": 200,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping": "fixed",
+    "governor": "powersave",
+    "max_temperature": 80
+  }
+}

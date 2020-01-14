@@ -1,0 +1,37 @@
+{
+  "sut_lost": {
+     "sut": "../bin/sut/automotive/ttsprk-a2time-pntrch-tblook-4M.exe -v0 -c1 -i2",
+     "mapping": {
+      "1" : "../log_tuning/sut_lost_ran_tune_600_1_enemy",
+      "2" : "../log_tuning/sut_lost_ran_tune_600_2_enemy",
+      "3" : "../log_tuning/sut_lost_ran_tune_600_3_enemy"
+    },
+    "cores": 3,
+    "quantile": 0.9,
+    "measurement_iterations_step": 20,
+    "measurement_iterations_max": 200,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "no_decrease",
+    "governor" : "powersave",
+    "max_temperature": 80
+  },
+  "sut_win": {
+    "sut": "../bin/sut/automotive/bitmnp-rspeed-puwmod-4M.exe -v0 -c1 -i2",
+    "mapping": {
+      "1" : "../log_tuning/sut_win_ran_tune_600_1_enemy",
+      "2" : "../log_tuning/sut_win_ran_tune_600_2_enemy",
+      "3" : "../log_tuning/sut_win_ran_tune_600_3_enemy"
+    },
+    "cores": 3,
+    "quantile": 0.9,
+    "measurement_iterations_step": 20,
+    "measurement_iterations_max": 200,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "no_decrease",
+    "governor" : "powersave",
+    "iterations": 20,
+    "max_temperature": 80
+  }
+}

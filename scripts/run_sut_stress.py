@@ -187,12 +187,37 @@ class SutStress:
             metric = get_event(s_out, "time(ns)=")
         elif get_event(s_out, "time(secs)= "):
             metric = get_event(s_out, "time(secs)= ")
+        elif get_event(s_out, "average = "):
+            metric = get_event(s_out, "average = ")
+        elif get_event(s_out, "average "):
+            metric = get_event(s_out, "average ")
 
         else:
             print("Unable find execution time or maximum latency")
             sys.exit(0)
 
         return metric
+
+    @staticmethod
+    def get_switches(s_out):
+        """
+        Get the time from the output string
+        :param s_out: The string to be processed
+        :return: The numerical metric
+        """
+        if get_event(s_out, "Voluntary_switches ") is not None:
+            voluntary = int(get_event(s_out, "Voluntary_switches "))
+        else:
+            print("Unable find voluntary switches")
+            return None
+
+        if get_event(s_out, "Involuntary_switches ") is not None:
+            involuntary = int(get_event(s_out, "Involuntary_switches "))
+        else:
+            print("Unable find involuntary switches")
+            return None
+
+        return voluntary, involuntary
 
     def run_mapping(self, experiment_info, mapping, iteration_name=None):
         """
@@ -214,6 +239,8 @@ class SutStress:
         total_times = []
         total_temps = []
         perf_results = dict()
+        voluntary_switches = []
+        involuntary_switches = []
 
         # start from 95 and decrease to 50 by 1
         candidate_quantiles = [x / 100.0 for x in range(95, 49, -1)]
@@ -250,6 +277,11 @@ class SutStress:
                 if self._instrument_cmd:
                     perf_results.append(get_perf_event(s_err))
 
+                if self.get_switches(s_out) is not None:
+                    (voluntary, involuntary) = self.get_switches(s_out)
+                    voluntary_switches.append(voluntary)
+                    involuntary_switches.append(involuntary)
+
                 final_temp = get_temp()
                 if final_temp < experiment_info.max_temperature:
                     total_times.append(self.get_metric(s_out))
@@ -281,7 +313,11 @@ class SutStress:
                                       quantile=experiment_info.quantile,
                                       conf_min=conf_min,
                                       conf_max=conf_max,
+                                      voluntary_switches=voluntary_switches,
+                                      involuntary_switches=involuntary_switches,
                                       success=True)
+                    print("The q value is", result.q_value)
+                    self._processes.kill_stress()
                     return result
             elif experiment_info.stopping == "pessimistic":
                 for q in candidate_quantiles:
@@ -296,7 +332,11 @@ class SutStress:
                                           quantile=q,
                                           conf_min=conf_min,
                                           conf_max=conf_max,
+                                          voluntary_switches=voluntary_switches,
+                                          involuntary_switches=involuntary_switches,
                                           success=True)
+                        print("The q value is", result.q_value)
+                        self._processes.kill_stress()
                         return result
 
         # At this point we know that we have hit max iterations
@@ -313,7 +353,11 @@ class SutStress:
                                       quantile=q,
                                       conf_min=conf_min,
                                       conf_max=conf_max,
+                                      voluntary_switches=voluntary_switches,
+                                      involuntary_switches=involuntary_switches,
                                       success=True)
+                    print("The q value is", result.q_value)
+                    self._processes.kill_stress()
                     return result
 
         # If we hit this and we did not intend to (not using "fixed"), we failed
@@ -328,7 +372,11 @@ class SutStress:
                           quantile=experiment_info.quantile,
                           conf_min=conf_min,
                           conf_max=conf_max,
+                          voluntary_switches=voluntary_switches,
+                          involuntary_switches=involuntary_switches,
                           success=True if conf_var < experiment_info.max_confidence_variation else False)
+        print("The q value is", result.q_value)
+        self._processes.kill_stress()
         return result
 
     def run_sut_stress(self, sut, stress, cores):
@@ -356,6 +404,8 @@ class SutStress:
             ex_time = get_event(s_out, "Total time (secs): ")
         elif get_event(s_out, "Max: "):
             ex_time = get_event(s_out, "Max: ")
+        elif get_event(s_out, "average = "):
+            ex_time = get_event(s_out, "average = ")
         else:
             print("Unable find execution time or maximum latency")
             sys.exit(0)

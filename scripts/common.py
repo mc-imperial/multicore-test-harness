@@ -227,8 +227,12 @@ class MappingResult:
         self.time = None                        # Time since the experiment started
         self.success = True                     # If the experiment was able to find a stable quantile
         self.mapping = mapping                  # The mapping of enemy processes
+        self.voluntary_switches = None          # Voluntary context switches
+        self.involuntary_switches = None        # Involuntary context switches
 
-    def log_result(self, perf_results, total_times, total_temps, quantile, conf_min, conf_max, success):
+    def log_result(self, perf_results, total_times, total_temps,
+                         quantile, conf_min, conf_max, success,
+                         voluntary_switches, involuntary_switches):
         """
         Log the parameters of the result
         :param perf_results: A dict of all the params gathered by perf
@@ -238,6 +242,8 @@ class MappingResult:
         :param conf_min: The minimum value of the confidence interval
         :param conf_max: The maximum value of the confidence interval
         :param success: If we were are able successfully get a stable quantile
+        :param voluntary_switches: Voluntary switches
+        :param involuntary_switches: Involuntary switches
         :return:
         """
         sums = dict()
@@ -253,6 +259,8 @@ class MappingResult:
         self.q_min = conf_min
         self.q_max = conf_max
         self.success = success
+        self.voluntary_switches = voluntary_switches
+        self.involuntary_switches = involuntary_switches
 
     def get_dict(self):
         """
@@ -270,6 +278,8 @@ class MappingResult:
         result["time"] = self.time
         result["success"] = self.success
         result["mapping"] = str(self.mapping)
+        result["voluntary_switches"] = self.voluntary_switches
+        result["invluntary_switches"] = self.involuntary_switches
 
         return result
 
@@ -299,6 +309,8 @@ def get_event(data,field):
             value = None
 
     return value
+
+
 
 
 def remove_outliers(times, scale=3):
@@ -426,6 +438,19 @@ class ProcessManagement:
             time.sleep(self._sleep_shutdown)
 
         self._background_procs = []
+
+        # To make sure nothing is left, I suspect the previous step does not always work
+        p = subprocess.Popen(['ps', '-A'], stdout=subprocess.PIPE)
+        out, err = p.communicate()
+
+        for line in out.splitlines():
+            if b'_enemy' in line:
+                pid = int(line.split(None, 1)[0])
+                try:
+                    os.kill(pid, signal.SIGKILL)
+                except OSError:
+                    pass
+
         time.sleep(self._sleep_shutdown)
 
     def __del__(self):
@@ -433,7 +458,8 @@ class ProcessManagement:
         Cleanup for whatever is running in the background
         :return:
         """
-        self.kill_stress()
+        pass
+        # self.kill_stress()
 
 
 class DataLog:

@@ -1,0 +1,40 @@
+{
+  "cache_bo_tune_fixed": {
+    "sut": "../bin/sut/L2_unified_test",
+    "enemy_range": "../templates/cache/parameters.json",
+    "enemy_template": "../templates/cache/template_cache.c",
+    "cores": 3,
+    "method":"bo",
+    "quantile": 0.9,
+    "max_file": "../results_litmus/cache_bo_480_max.txt",
+    "output_binary": "../results_litmus/",
+    "tuning_max_time": 720,
+    "tuning_max_iterations": 4000,
+    "measurement_iterations_step": 20,
+    "measurement_iterations_max": 200,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "fixed",
+    "governor" : "powersave",
+    "max_temperature": 80
+  },
+  "cache_bo_tune_no_decrease": {
+    "sut": "../bin/sut/L2_unified_test",
+    "enemy_range": "../templates/cache/parameters.json",
+    "enemy_template": "../templates/cache/template_cache.c",
+    "cores": 3,
+    "method":"bo",
+    "quantile": 0.9,
+    "max_file": "../results_litmus/cache_bo_480_max.txt",
+    "output_binary": "../results_litmus/",
+    "tuning_max_time": 720,
+    "tuning_max_iterations": 4000,
+    "measurement_iterations_step": 20,
+    "measurement_iterations_max": 200,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "no_decrease",
+    "governor" : "powersave",
+    "max_temperature": 80
+  }
+}

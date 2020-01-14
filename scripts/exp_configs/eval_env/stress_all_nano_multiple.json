@@ -2,13 +2,13 @@
   "coremark": {
     "sut": "../bin/sut/coremark.exe 0x0 0x0 0x66 1000",
     "mapping": {
-      "1" : "../tuned_enemies/tuned_bus",
-      "2" : "../tuned_enemies/tuned_bus",
-      "3" : "../tuned_enemies/tuned_bus",
-      "4" : "../tuned_enemies/tuned_cache",
-      "5" : "../tuned_enemies/tuned_cache",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "1" : "../tuned_enemies/L2_large_enemy",
+      "2" : "../tuned_enemies/L2_small_enemy",
+      "3" : "../tuned_enemies/L2_large_enemy",
+      "4" : "../tuned_enemies/L2_large_enemy",
+      "5" : "../tuned_enemies/L2_small_enemy",
+      "6" : "../tuned_enemies/L2_large_enemy",
+      "7" : "../tuned_enemies/L2_large_enemy"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -19,19 +19,17 @@
     "stopping" : "no_decrease",
     "governor" : "powersave",
     "max_temperature": 80
-<<<<<<< HEAD
-=======
   },
   "bitmnp-rspeed-puwmod-4K": {
     "sut": "../bin/automotive/bitmnp-rspeed-puwmod-4K.exe -v0 -c1 -i1000",
     "mapping": {
-      "1" : "../tuned_enemies/tuned_bus",
-      "2" : "../tuned_enemies/tuned_bus",
-      "3" : "../tuned_enemies/tuned_bus",
-      "4" : "../tuned_enemies/tuned_cache",
-      "5" : "../tuned_enemies/tuned_cache",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "1" : "../tuned_enemies/L2_large_enemy",
+      "2" : "../tuned_enemies/L2_small_enemy",
+      "3" : "../tuned_enemies/L2_large_enemy",
+      "4" : "../tuned_enemies/L2_large_enemy",
+      "5" : "../tuned_enemies/L2_small_enemy",
+      "6" : "../tuned_enemies/L2_large_enemy",
+      "7" : "../tuned_enemies/L2_large_enemy"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -46,13 +44,13 @@
   "bitmnp-rspeed-puwmod-4M": {
     "sut": "../bin/automotive/bitmnp-rspeed-puwmod-4M.exe -v0 -c1 -i2",
     "mapping": {
-      "1" : "../tuned_enemies/tuned_bus",
-      "2" : "../tuned_enemies/tuned_bus",
-      "3" : "../tuned_enemies/tuned_bus",
-      "4" : "../tuned_enemies/tuned_cache",
-      "5" : "../tuned_enemies/tuned_cache",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "1" : "../tuned_enemies/L2_large_enemy",
+      "2" : "../tuned_enemies/L2_small_enemy",
+      "3" : "../tuned_enemies/L2_large_enemy",
+      "4" : "../tuned_enemies/L2_large_enemy",
+      "5" : "../tuned_enemies/L2_small_enemy",
+      "6" : "../tuned_enemies/L2_large_enemy",
+      "7" : "../tuned_enemies/L2_large_enemy"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -67,13 +65,13 @@
   "matrix-tblook-4K": {
     "sut": "../bin/automotive/matrix-tblook-4K.exe -v0 -c1 -i1000",
     "mapping": {
-      "1" : "../tuned_enemies/tuned_bus",
-      "2" : "../tuned_enemies/tuned_bus",
-      "3" : "../tuned_enemies/tuned_bus",
-      "4" : "../tuned_enemies/tuned_cache",
-      "5" : "../tuned_enemies/tuned_cache",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "1" : "../tuned_enemies/L2_large_enemy",
+      "2" : "../tuned_enemies/L2_small_enemy",
+      "3" : "../tuned_enemies/L2_large_enemy",
+      "4" : "../tuned_enemies/L2_large_enemy",
+      "5" : "../tuned_enemies/L2_small_enemy",
+      "6" : "../tuned_enemies/L2_large_enemy",
+      "7" : "../tuned_enemies/L2_large_enemy"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -88,13 +86,13 @@
   "matrix-tblook-4M": {
     "sut": "../bin/automotive/matrix-tblook-4M.exe -v0 -c1 -i2",
     "mapping": {
-      "1" : "../tuned_enemies/tuned_bus",
-      "2" : "../tuned_enemies/tuned_bus",
-      "3" : "../tuned_enemies/tuned_bus",
-      "4" : "../tuned_enemies/tuned_cache",
-      "5" : "../tuned_enemies/tuned_cache",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "1" : "../tuned_enemies/L2_large_enemy",
+      "2" : "../tuned_enemies/L2_small_enemy",
+      "3" : "../tuned_enemies/L2_large_enemy",
+      "4" : "../tuned_enemies/L2_large_enemy",
+      "5" : "../tuned_enemies/L2_small_enemy",
+      "6" : "../tuned_enemies/L2_large_enemy",
+      "7" : "../tuned_enemies/L2_large_enemy"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -109,13 +107,13 @@
   "puwmod-rspeed-4K": {
     "sut": "../bin/automotive/puwmod-rspeed-4K.exe -v0 -c1 -i1000",
     "mapping": {
-      "1" : "../tuned_enemies/tuned_bus",
-      "2" : "../tuned_enemies/tuned_bus",
-      "3" : "../tuned_enemies/tuned_bus",
-      "4" : "../tuned_enemies/tuned_cache",
-      "5" : "../tuned_enemies/tuned_cache",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "1" : "../tuned_enemies/L2_large_enemy",
+      "2" : "../tuned_enemies/L2_small_enemy",
+      "3" : "../tuned_enemies/L2_large_enemy",
+      "4" : "../tuned_enemies/L2_large_enemy",
+      "5" : "../tuned_enemies/L2_small_enemy",
+      "6" : "../tuned_enemies/L2_large_enemy",
+      "7" : "../tuned_enemies/L2_large_enemy"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -130,13 +128,13 @@
   "puwmod-rspeed-4M": {
     "sut": "../bin/automotive/puwmod-rspeed-4M.exe -v0 -c1 -i2",
     "mapping": {
-      "1" : "../tuned_enemies/tuned_bus",
-      "2" : "../tuned_enemies/tuned_bus",
-      "3" : "../tuned_enemies/tuned_bus",
-      "4" : "../tuned_enemies/tuned_cache",
-      "5" : "../tuned_enemies/tuned_cache",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "1" : "../tuned_enemies/L2_large_enemy",
+      "2" : "../tuned_enemies/L2_small_enemy",
+      "3" : "../tuned_enemies/L2_large_enemy",
+      "4" : "../tuned_enemies/L2_large_enemy",
+      "5" : "../tuned_enemies/L2_small_enemy",
+      "6" : "../tuned_enemies/L2_large_enemy",
+      "7" : "../tuned_enemies/L2_large_enemy"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -151,13 +149,13 @@
   "rspeed-idctrn-canrdr-4K": {
     "sut": "../bin/automotive/rspeed-idctrn-canrdr-4K.exe -v0 -c1 -i1000",
     "mapping": {
-      "1" : "../tuned_enemies/tuned_bus",
-      "2" : "../tuned_enemies/tuned_bus",
-      "3" : "../tuned_enemies/tuned_bus",
-      "4" : "../tuned_enemies/tuned_cache",
-      "5" : "../tuned_enemies/tuned_cache",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "1" : "../tuned_enemies/L2_large_enemy",
+      "2" : "../tuned_enemies/L2_small_enemy",
+      "3" : "../tuned_enemies/L2_large_enemy",
+      "4" : "../tuned_enemies/L2_large_enemy",
+      "5" : "../tuned_enemies/L2_small_enemy",
+      "6" : "../tuned_enemies/L2_large_enemy",
+      "7" : "../tuned_enemies/L2_large_enemy"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -172,13 +170,13 @@
   "rspeed-idctrn-canrdr-4M": {
     "sut": "../bin/automotive/rspeed-idctrn-canrdr-4M.exe -v0 -c1 -i2",
     "mapping": {
-      "1" : "../tuned_enemies/tuned_bus",
-      "2" : "../tuned_enemies/tuned_bus",
-      "3" : "../tuned_enemies/tuned_bus",
-      "4" : "../tuned_enemies/tuned_cache",
-      "5" : "../tuned_enemies/tuned_cache",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "1" : "../tuned_enemies/L2_large_enemy",
+      "2" : "../tuned_enemies/L2_small_enemy",
+      "3" : "../tuned_enemies/L2_large_enemy",
+      "4" : "../tuned_enemies/L2_large_enemy",
+      "5" : "../tuned_enemies/L2_small_enemy",
+      "6" : "../tuned_enemies/L2_large_enemy",
+      "7" : "../tuned_enemies/L2_large_enemy"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -193,13 +191,13 @@
   "rspeed-idctrn-iirflt-4K": {
     "sut": "../bin/automotive/rspeed-idctrn-iirflt-4K.exe -v0 -c1 -i1000",
     "mapping": {
-      "1" : "../tuned_enemies/tuned_bus",
-      "2" : "../tuned_enemies/tuned_bus",
-      "3" : "../tuned_enemies/tuned_bus",
-      "4" : "../tuned_enemies/tuned_cache",
-      "5" : "../tuned_enemies/tuned_cache",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "1" : "../tuned_enemies/L2_large_enemy",
+      "2" : "../tuned_enemies/L2_small_enemy",
+      "3" : "../tuned_enemies/L2_large_enemy",
+      "4" : "../tuned_enemies/L2_large_enemy",
+      "5" : "../tuned_enemies/L2_small_enemy",
+      "6" : "../tuned_enemies/L2_large_enemy",
+      "7" : "../tuned_enemies/L2_large_enemy"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -214,13 +212,13 @@
   "rspeed-idctrn-iirflt-4M": {
     "sut": "../bin/automotive/rspeed-idctrn-iirflt-4M.exe -v0 -c1 -i2",
     "mapping": {
-      "1" : "../tuned_enemies/tuned_bus",
-      "2" : "../tuned_enemies/tuned_bus",
-      "3" : "../tuned_enemies/tuned_bus",
-      "4" : "../tuned_enemies/tuned_cache",
-      "5" : "../tuned_enemies/tuned_cache",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "1" : "../tuned_enemies/L2_large_enemy",
+      "2" : "../tuned_enemies/L2_small_enemy",
+      "3" : "../tuned_enemies/L2_large_enemy",
+      "4" : "../tuned_enemies/L2_large_enemy",
+      "5" : "../tuned_enemies/L2_small_enemy",
+      "6" : "../tuned_enemies/L2_large_enemy",
+      "7" : "../tuned_enemies/L2_large_enemy"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -235,13 +233,13 @@
   "ttsprk-a2time-matrix-4K": {
     "sut": "../bin/automotive/ttsprk-a2time-matrix-4K.exe -v0 -c1 -i1000",
     "mapping": {
-      "1" : "../tuned_enemies/tuned_bus",
-      "2" : "../tuned_enemies/tuned_bus",
-      "3" : "../tuned_enemies/tuned_bus",
-      "4" : "../tuned_enemies/tuned_cache",
-      "5" : "../tuned_enemies/tuned_cache",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "1" : "../tuned_enemies/L2_large_enemy",
+      "2" : "../tuned_enemies/L2_small_enemy",
+      "3" : "../tuned_enemies/L2_large_enemy",
+      "4" : "../tuned_enemies/L2_large_enemy",
+      "5" : "../tuned_enemies/L2_small_enemy",
+      "6" : "../tuned_enemies/L2_large_enemy",
+      "7" : "../tuned_enemies/L2_large_enemy"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -256,13 +254,13 @@
   "ttsprk-a2time-matrix-4M": {
     "sut": "../bin/automotive/ttsprk-a2time-matrix-4M.exe -v0 -c1 -i2",
     "mapping": {
-      "1" : "../tuned_enemies/tuned_bus",
-      "2" : "../tuned_enemies/tuned_bus",
-      "3" : "../tuned_enemies/tuned_bus",
-      "4" : "../tuned_enemies/tuned_cache",
-      "5" : "../tuned_enemies/tuned_cache",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "1" : "../tuned_enemies/L2_large_enemy",
+      "2" : "../tuned_enemies/L2_small_enemy",
+      "3" : "../tuned_enemies/L2_large_enemy",
+      "4" : "../tuned_enemies/L2_large_enemy",
+      "5" : "../tuned_enemies/L2_small_enemy",
+      "6" : "../tuned_enemies/L2_large_enemy",
+      "7" : "../tuned_enemies/L2_large_enemy"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -277,13 +275,13 @@
   "ttsprk-a2time-pntrch-4K": {
     "sut": "../bin/automotive/ttsprk-a2time-pntrch-4K.exe -v0 -c1 -i1000",
     "mapping": {
-      "1" : "../tuned_enemies/tuned_bus",
-      "2" : "../tuned_enemies/tuned_bus",
-      "3" : "../tuned_enemies/tuned_bus",
-      "4" : "../tuned_enemies/tuned_cache",
-      "5" : "../tuned_enemies/tuned_cache",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "1" : "../tuned_enemies/L2_large_enemy",
+      "2" : "../tuned_enemies/L2_small_enemy",
+      "3" : "../tuned_enemies/L2_large_enemy",
+      "4" : "../tuned_enemies/L2_large_enemy",
+      "5" : "../tuned_enemies/L2_small_enemy",
+      "6" : "../tuned_enemies/L2_large_enemy",
+      "7" : "../tuned_enemies/L2_large_enemy"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -298,13 +296,13 @@
   "ttsprk-a2time-pntrch-4M": {
     "sut": "../bin/automotive/ttsprk-a2time-pntrch-4M.exe -v0 -c1 -i2",
     "mapping": {
-      "1" : "../tuned_enemies/tuned_bus",
-      "2" : "../tuned_enemies/tuned_bus",
-      "3" : "../tuned_enemies/tuned_bus",
-      "4" : "../tuned_enemies/tuned_cache",
-      "5" : "../tuned_enemies/tuned_cache",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "1" : "../tuned_enemies/L2_large_enemy",
+      "2" : "../tuned_enemies/L2_small_enemy",
+      "3" : "../tuned_enemies/L2_large_enemy",
+      "4" : "../tuned_enemies/L2_large_enemy",
+      "5" : "../tuned_enemies/L2_small_enemy",
+      "6" : "../tuned_enemies/L2_large_enemy",
+      "7" : "../tuned_enemies/L2_large_enemy"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -319,13 +317,13 @@
   "ttsprk-a2time-pntrch-aifirf-4K": {
     "sut": "../bin/automotive/ttsprk-a2time-pntrch-aifirf-4K.exe -v0 -c1 -i1000",
     "mapping": {
-      "1" : "../tuned_enemies/tuned_bus",
-      "2" : "../tuned_enemies/tuned_bus",
-      "3" : "../tuned_enemies/tuned_bus",
-      "4" : "../tuned_enemies/tuned_cache",
-      "5" : "../tuned_enemies/tuned_cache",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "1" : "../tuned_enemies/L2_large_enemy",
+      "2" : "../tuned_enemies/L2_small_enemy",
+      "3" : "../tuned_enemies/L2_large_enemy",
+      "4" : "../tuned_enemies/L2_large_enemy",
+      "5" : "../tuned_enemies/L2_small_enemy",
+      "6" : "../tuned_enemies/L2_large_enemy",
+      "7" : "../tuned_enemies/L2_large_enemy"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -340,13 +338,13 @@
   "ttsprk-a2time-pntrch-aifirf-4M": {
     "sut": "../bin/automotive/ttsprk-a2time-pntrch-aifirf-4M.exe -v0 -c1 -i2",
     "mapping": {
-      "1" : "../tuned_enemies/tuned_bus",
-      "2" : "../tuned_enemies/tuned_bus",
-      "3" : "../tuned_enemies/tuned_bus",
-      "4" : "../tuned_enemies/tuned_cache",
-      "5" : "../tuned_enemies/tuned_cache",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "1" : "../tuned_enemies/L2_large_enemy",
+      "2" : "../tuned_enemies/L2_small_enemy",
+      "3" : "../tuned_enemies/L2_large_enemy",
+      "4" : "../tuned_enemies/L2_large_enemy",
+      "5" : "../tuned_enemies/L2_small_enemy",
+      "6" : "../tuned_enemies/L2_large_enemy",
+      "7" : "../tuned_enemies/L2_large_enemy"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -361,13 +359,13 @@
   "ttsprk-a2time-pntrch-idctrn-4K": {
     "sut": "../bin/automotive/ttsprk-a2time-pntrch-idctrn-4K.exe -v0 -c1 -i1000",
     "mapping": {
-      "1" : "../tuned_enemies/tuned_bus",
-      "2" : "../tuned_enemies/tuned_bus",
-      "3" : "../tuned_enemies/tuned_bus",
-      "4" : "../tuned_enemies/tuned_cache",
-      "5" : "../tuned_enemies/tuned_cache",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "1" : "../tuned_enemies/L2_large_enemy",
+      "2" : "../tuned_enemies/L2_small_enemy",
+      "3" : "../tuned_enemies/L2_large_enemy",
+      "4" : "../tuned_enemies/L2_large_enemy",
+      "5" : "../tuned_enemies/L2_small_enemy",
+      "6" : "../tuned_enemies/L2_large_enemy",
+      "7" : "../tuned_enemies/L2_large_enemy"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -382,13 +380,13 @@
   "ttsprk-a2time-pntrch-idctrn-4M": {
     "sut": "../bin/automotive/ttsprk-a2time-pntrch-idctrn-4M.exe -v0 -c1 -i2",
     "mapping": {
-      "1" : "../tuned_enemies/tuned_bus",
-      "2" : "../tuned_enemies/tuned_bus",
-      "3" : "../tuned_enemies/tuned_bus",
-      "4" : "../tuned_enemies/tuned_cache",
-      "5" : "../tuned_enemies/tuned_cache",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "1" : "../tuned_enemies/L2_large_enemy",
+      "2" : "../tuned_enemies/L2_small_enemy",
+      "3" : "../tuned_enemies/L2_large_enemy",
+      "4" : "../tuned_enemies/L2_large_enemy",
+      "5" : "../tuned_enemies/L2_small_enemy",
+      "6" : "../tuned_enemies/L2_large_enemy",
+      "7" : "../tuned_enemies/L2_large_enemy"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -403,13 +401,13 @@
   "ttsprk-a2time-pntrch-tblook-4K": {
     "sut": "../bin/automotive/ttsprk-a2time-pntrch-tblook-4K.exe -v0 -c1 -i1000",
     "mapping": {
-      "1" : "../tuned_enemies/tuned_bus",
-      "2" : "../tuned_enemies/tuned_bus",
-      "3" : "../tuned_enemies/tuned_bus",
-      "4" : "../tuned_enemies/tuned_cache",
-      "5" : "../tuned_enemies/tuned_cache",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "1" : "../tuned_enemies/L2_large_enemy",
+      "2" : "../tuned_enemies/L2_small_enemy",
+      "3" : "../tuned_enemies/L2_large_enemy",
+      "4" : "../tuned_enemies/L2_large_enemy",
+      "5" : "../tuned_enemies/L2_small_enemy",
+      "6" : "../tuned_enemies/L2_large_enemy",
+      "7" : "../tuned_enemies/L2_large_enemy"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -424,13 +422,13 @@
   "ttsprk-a2time-pntrch-tblook-4M": {
     "sut": "../bin/automotive/ttsprk-a2time-pntrch-tblook-4M.exe -v0 -c1 -i2",
     "mapping": {
-      "1" : "../tuned_enemies/tuned_bus",
-      "2" : "../tuned_enemies/tuned_bus",
-      "3" : "../tuned_enemies/tuned_bus",
-      "4" : "../tuned_enemies/tuned_cache",
-      "5" : "../tuned_enemies/tuned_cache",
-      "6" : "../tuned_enemies/tuned_memory",
-      "7" : "../tuned_enemies/tuned_memory"
+      "1" : "../tuned_enemies/L2_large_enemy",
+      "2" : "../tuned_enemies/L2_small_enemy",
+      "3" : "../tuned_enemies/L2_large_enemy",
+      "4" : "../tuned_enemies/L2_large_enemy",
+      "5" : "../tuned_enemies/L2_small_enemy",
+      "6" : "../tuned_enemies/L2_large_enemy",
+      "7" : "../tuned_enemies/L2_large_enemy"
     },
     "cores": 7,
     "quantile": 0.9,
@@ -441,6 +439,5 @@
     "stopping" : "no_decrease",
     "governor" : "powersave",
     "max_temperature": 80
->>>>>>> development
   }
 }

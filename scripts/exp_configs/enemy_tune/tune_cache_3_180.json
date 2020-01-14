@@ -1,0 +1,21 @@
+{
+  "cache_bo_tune_180": {
+    "sut": "../bin/sut/L2_unified_test",
+    "enemy_range": "../templates/cache/parameters.json",
+    "enemy_template": "../templates/cache/template_cache.c",
+    "cores": 3,
+    "method":"bo",
+    "quantile": 0.9,
+    "max_file": "../log_tuning/cache_bo_180_max.txt",
+    "output_binary": "../log_tuning/",
+    "tuning_max_time": 180,
+    "tuning_max_iterations": 4000,
+    "measurement_iterations_step": 20,
+    "measurement_iterations_max": 200,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "no_decrease",
+    "governor" : "powersave",
+    "max_temperature": 80
+  }
+}

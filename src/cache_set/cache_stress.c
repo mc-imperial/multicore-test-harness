@@ -34,6 +34,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/time.h>
+#include <sys/resource.h>
 
 #include "../common/common.h"
 
@@ -44,58 +46,58 @@
 #define CACHE_SIZE      SIZE * KB
 
 /** Wrap the code in a loop consisting of ITERATIONS iterations */
-#define ITERATIONS      100
+#define ITERATIONS      500
 
 /**
  @brief this main func
  @ return 0 on success
  */
-int main() {
+int main(int argc, char *argv[]) {
 
-    register volatile char * my_array_1;
+    register volatile int * my_array;
+    register unsigned int sum = 0;
+    long begin = 0;
+    long end = 0;
+    float amplifier;
+    long size = CACHE_SIZE;
+
+    struct rusage usage_start, usage_stop;
+
+    if (argc==2) {
+            amplifier = atof(argv[1]);
+            size = (int) amplifier * CACHE_SIZE;
+    }
 
 
-    register unsigned long total = 0;
-    register unsigned long total_stores = 0;
-    register unsigned long total_loads = 0;
+    my_array = (int *) malloc(size);
+    DIE(my_array == NULL, "Unable to allocate memory");
 
-    register int stride = CACHE_SIZE/ASSOCIATIVITY;
+    for (int i = 0; i < size/sizeof(int); i++) my_array[i] = i;
 
-    long begin = 0, end = 0;
-
-    my_array_1 = (char *) aligned_alloc(64, sizeof(char) * CACHE_SIZE);
-    DIE(my_array_1 == NULL, "Unable to allocate memory");
-
+    getrusage(RUSAGE_SELF, &usage_start);
     begin = get_current_time_us();
+
 
 #ifdef INFINITE
     while(1) {
 #else
     for (int it = 0; it < ITERATIONS; it++) {
 #endif
-        for (int i = 0; i < stride; i+=CACHE_LINE) {
-            for (int j = 0; j < ASSOCIATIVITY; j++) {
-                my_array_1[i + (j * stride)] = i;
+        for (int i = 0; i < size/sizeof(int); i+=CACHE_LINE/4) {
+                sum += my_array[i];
             }
-        total_stores += ASSOCIATIVITY;
-        }
-
-        for (int i = 0; i < stride; i+=CACHE_LINE) {
-            for (int j = 0; j < ASSOCIATIVITY; j++) {
-                total += my_array_1[i + (j * stride)];
-            }
-        total_loads += ASSOCIATIVITY;
-        }
     }
 
+
     end = get_current_time_us();
+    getrusage(RUSAGE_SELF, &usage_stop);
 
-    printf("total stores: %lu\n", total_stores);
-    printf("total loads: %lu\n", total_loads);
-    printf("total: %lu\n", total);
+    printf("Voluntary_switches %ld\n", usage_stop.ru_nvcsw - usage_start.ru_nvcsw);
+    printf("Involuntary_switches %ld\n", usage_stop.ru_nivcsw - usage_start.ru_nivcsw);
 
+    printf("Sum: %u\n", sum);
     printf("total time(us): %ld\n", end - begin);
 
-    free( (void *) my_array_1);
+    free( (void *) my_array);
     return 0;
 }

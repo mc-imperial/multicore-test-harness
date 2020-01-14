@@ -54,8 +54,8 @@
 int main ()
 {
     long begin = 0, end = 0;
-    int32_t *mem1;
-    int32_t *mem2;
+    volatile int32_t *mem1;
+    volatile int32_t *mem2;
 
     srand(time(NULL));
     mem1 = (int32_t*) malloc(MEM_SIZE);
@@ -77,8 +77,8 @@ int main ()
         for (int32_t i; i < MEM_SIZE/sizeof(int32_t); i++) mem2[i] = mem1[i] + rand();
 
     }
-    free(mem1);
-    free(mem2);
+    free((void *) mem1);
+    free((void *) mem2);
 
     end = get_current_time_us();
     printf("total time(us): %ld\n", end - begin);

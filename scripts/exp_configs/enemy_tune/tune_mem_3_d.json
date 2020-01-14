@@ -1,0 +1,21 @@
+{
+  "mem_bo_tune_d": {
+    "sut": "../bin/automotive/matrix-tblook-4K.exe -v0 -c1 -i1000",
+    "enemy_range": "../templates/mem/parameters.json",
+    "enemy_template": "../templates/mem/template_mem.c",
+    "cores": 3,
+    "method":"bo",
+    "quantile": 0.9,
+    "max_file": "../results_tuning/mem_bo_480_max.txt",
+    "output_binary": "../results_tuning/",
+    "tuning_max_time": 480,
+    "tuning_max_iterations": 4000,
+    "measurement_iterations_step": 20,
+    "measurement_iterations_max": 200,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "no_decrease",
+    "governor" : "powersave",
+    "max_temperature": 80
+  }
+}

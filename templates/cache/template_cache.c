@@ -34,7 +34,7 @@
   *  instructions: a value between 1-3
   *  1 - STORE
   *  2 - LOAD
-  *  3 - NOOP
+  *  3 - NOP
 
   */
 
@@ -106,23 +106,24 @@
 int main() {
 
 
-  volatile char * my_array_1 = (char *) malloc(sizeof(char) * CACHE_SIZE);
+  volatile int * my_array_1 = (int *) malloc(CACHE_SIZE);
   register unsigned long total = 0;
-  register int stride = CACHE_SIZE/ASSOCIATIVITY;
-
+  int max_elements = CACHE_SIZE/sizeof(int);
 
   while(1) {
 
-    for (int i = 0; i < stride; i+=CACHE_LINE) {
-      for (int j = 0; j < ASSOCIATIVITY; j++) {
-        INSTR1_V(my_array_1, i + (j * stride), i, total);
-        INSTR2_V(my_array_1, i + (j * stride), i, total);
-        INSTR3_V(my_array_1, i + (j * stride), i, total);
-        INSTR4_V(my_array_1, i + (j * stride), i, total);
-        INSTR5_V(my_array_1, i + (j * stride), i, total);
+    for (int i = 0; i < max_elements; i+=STRIDE) {
+        INSTR1_V(my_array_1, i, i, total);
+        INSTR2_V(my_array_1, i, i, total);
+        INSTR3_V(my_array_1, i, i, total);
+        INSTR4_V(my_array_1, i, i, total);
+        INSTR5_V(my_array_1, i, i, total);
       }
     }
-  }
+
+    // Just to make sure that no optimisation takes place
+    if (total) my_array_1[0] = total;
+    printf("Total is %ld", total);
 
 
 

@@ -1,12 +1,12 @@
 {
-  "mem_bo_tune_480": {
-    "sut": "../bin/sut/mem_thrashing_test",
-    "enemy_range": "../templates/mem/parameters.json",
-    "enemy_template": "../templates/mem/template_mem.c",
+  "bus_bo_tune_d": {
+    "sut": "../bin/automotive/matrix-tblook-4K.exe -v0 -c1 -i1000",
+    "enemy_range": "../templates/bus/parameters.json",
+    "enemy_template": "../templates/bus/template_bus.c",
     "cores": 3,
-    "method":"bo",
+    "method":"ran",
     "quantile": 0.9,
-    "max_file": "../results_tuning/mem_bo_480_max.txt",
+    "max_file": "../results_tuning/bus_bo_480_max.txt",
     "output_binary": "../results_tuning/",
     "tuning_max_time": 480,
     "tuning_max_iterations": 4000,
