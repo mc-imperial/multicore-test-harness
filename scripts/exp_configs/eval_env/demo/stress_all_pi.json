@@ -1,10 +1,27 @@
 {
-  "coremark": {
+  "coremark_HE": {
     "sut": "../bin/sut/coremark.exe 0x0 0x0 0x66 1000",
     "mapping": {
-      "1" : "../results_tuning/cache_ran_tune_1_enemy",
-      "2" : "../results_tuning/cache_ran_tune_1_enemy",
-      "3" : "../results_tuning/cache_ran_tune_1_enemy"
+      "1" : "../results_tuning/L2_large_enemy",
+      "2" : "../results_tuning/L2_large_enemy",
+      "3" : "../results_tuning/L2_large_enemy"
+    },
+    "cores": 3,
+    "quantile": 0.9,
+    "measurement_iterations_step": 20,
+    "measurement_iterations_max": 200,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "no_decrease",
+    "governor" : "powersave",
+    "max_temperature": 80
+  },
+  "coremark_BYE": {
+    "sut": "../bin/sut/coremark.exe 0x0 0x0 0x66 1000",
+    "mapping": {
+      "1" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
+      "2" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0",
+      "3" : "../../IsolBench/bench/bandwidth -m 4096 -a write -t 0"
     },
     "cores": 3,
     "quantile": 0.9,
