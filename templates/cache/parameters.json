@@ -1,11 +1,7 @@
 {
   "DEFINES": {
     "SIZE": {
-<<<<<<< HEAD
-      "range" :[1,10240],
-=======
       "range" :[16, 65536],
->>>>>>> development
       "type": "int"
     },
     "STRIDE": {
