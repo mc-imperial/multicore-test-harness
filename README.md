@@ -260,6 +260,8 @@ The next step involves running the script to determine the Paretto Optimal hosti
 ```
 6. Investigate the log file for the effect of the enemy on the bechmark
 
-* **coremark->it->baseline->q_value**: The quantile of the baseline execution time.
-* **coremark->it->enemy->q_value**: The quantile of the execution time with the enemy process
+* **coremark_HE->it->baseline->q_value**: The quantile of the baseline execution time, for out hostile environment
+* **coremark_HE->it->enemy->q_value**: The quantile of the execution time with the enemy process, for our hostile environment
 
+* **coremark_BYE->it->baseline->q_value**: The quantile of the baseline execution time, for previous work
+* **coremark_BYE->it->enemy->q_value**: The quantile of the execution time with the enemy process, for previous work

@@ -2,9 +2,9 @@
   "coremark_HE": {
     "sut": "../bin/sut/coremark.exe 0x0 0x0 0x66 1000",
     "mapping": {
-      "1" : "../results_tuning/L2_large_enemy",
-      "2" : "../results_tuning/L2_large_enemy",
-      "3" : "../results_tuning/L2_large_enemy"
+      "1" : "../tuned_enemies/L2_large_enemy",
+      "2" : "../tuned_enemies/L2_large_enemy",
+      "3" : "../tuned_enemies/L2_large_enemy"
     },
     "cores": 3,
     "quantile": 0.9,
