@@ -5,7 +5,7 @@
       "1" : "../log_tuning/sut_lost_ran_tune_600_1_enemy",
       "2" : "../log_tuning/sut_lost_ran_tune_600_2_enemy",
       "3" : "../log_tuning/sut_lost_ran_tune_600_3_enemy"
-    },,
+    },
     "cores": 3,
     "quantile": 0.9,
     "measurement_iterations_step": 20,
