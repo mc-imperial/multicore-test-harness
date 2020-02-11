@@ -128,8 +128,9 @@ class SutStress:
         :param core: Core to start on
         :return: Output and error
         """
-        cmd = self._get_taskset_cmd(core) + " " + "nice -20 " + \
+        cmd = self._get_taskset_cmd(core) + " " + "nice -n -20 " + \
               self._instrument_cmd + " " + "./" + sut
+        #cmd = self._get_taskset_cmd(core) +  self._instrument_cmd + " " + "./" + sut
         s_out,s_err = self._processes.system_call(cmd)
         return s_out, s_err
 
