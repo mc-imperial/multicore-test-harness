@@ -1,0 +1,19 @@
+{
+  "exp2": {
+    "sut": "../bin/sut/L2_unified_test",
+    "mapping": {
+      "1" : "../../IsolBench/bench/bandwidth -m 4096 -a read -t 0",
+      "2" : "../../IsolBench/bench/bandwidth -m 4096 -a read -t 0",
+      "3" : "../../IsolBench/bench/bandwidth -m 4096 -a read -t 0"
+    },
+    "cores": 3,
+    "quantile": 0.9,
+    "measurement_iterations_step": 1000,
+    "measurement_iterations_max": 1000,
+    "max_confidence_variation": 5,
+    "confidence_interval": 0.95,
+    "stopping" : "fixed",
+    "governor" : "powersave",
+    "max_temperature": 80
+  }
+}
