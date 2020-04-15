@@ -19,6 +19,8 @@
     "stopping" : "no_decrease",
     "governor" : "powersave",
     "max_temperature": 80
+<<<<<<< HEAD
+=======
   },
   "bitmnp-rspeed-puwmod-4K": {
     "sut": "../bin/automotive/bitmnp-rspeed-puwmod-4K.exe -v0 -c1 -i1000",
@@ -439,5 +441,6 @@
     "stopping" : "no_decrease",
     "governor" : "powersave",
     "max_temperature": 80
+>>>>>>> development
   }
 }
