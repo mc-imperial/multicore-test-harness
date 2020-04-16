@@ -5,6 +5,7 @@ COREMARK_PORT_DIR = linux64
 BUS_DIR = ./src/bus_set
 CACHE_DIR = ./src/cache_set
 MEM_DIR = ./src/mem_thrashing_set
+VEC_ADD_DIR = ./src/vector_add
 SYS_DIR = ./src/system_calls_set
 PIPE_DIR = ./src/pipeline_set
 POINTER_DIR = ./src/pointer_chasing
@@ -13,7 +14,7 @@ RT_TESTS_DIR = ./src/rt-tests
 
 WCET_DIR = ./src/wcet
 
-all: bus_set cache_set mem_set sys_set pipeline_set pointer_chasing wcet_sut coremark_sut cyclictest
+all: bus_set cache_set mem_set sys_set pipeline_set pointer_chasing wcet_sut coremark_sut cyclictest vector_add
 
 bus_set:
 	(cd $(BUS_DIR); make all)
@@ -27,6 +28,8 @@ pipeline_set:
 	(cd $(PIPE_DIR); make all)
 pointer_chasing:
 	(cd $(POINTER_DIR); make all)
+vector_add:
+	(cd $(VEC_ADD_DIR); make all)
 
 wcet_sut:
 	(cd $(WCET_DIR); make all)

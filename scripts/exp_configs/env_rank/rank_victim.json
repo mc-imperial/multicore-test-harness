@@ -1,9 +1,8 @@
 {
-  "cache_L2_small": {
+  "cache_small": {
     "sut": "../bin/sut/L2_unified_test",
     "ranked_list": ["../tuned_enemies/L2_small_enemy",
-                    "../tuned_enemies/L2_large_enemy",
-                    "../tuned_enemies/tuned_bus"],
+                    "../tuned_enemies/L2_large_enemy"],
     "cores": 3,
     "quantile": 0.95,
     "measurement_iterations_step": 20,
@@ -14,26 +13,10 @@
     "governor" : "powersave",
     "max_temperature": 80
   },
-  "cache_L2_large": {
+  "cache_large": {
     "sut": "../bin/sut/L2_unified_test 10",
     "ranked_list": ["../tuned_enemies/L2_small_enemy",
-                    "../tuned_enemies/L2_large_enemy",
-                    "../tuned_enemies/tuned_bus"],
-    "cores": 3,
-    "quantile": 0.95,
-    "measurement_iterations_step": 20,
-    "measurement_iterations_max": 500,
-    "max_confidence_variation": 5,
-    "confidence_interval": 0.95,
-    "stopping" : "no_decrease",
-    "governor" : "powersave",
-    "max_temperature": 80
-  },
-  "bus": {
-    "sut": "../bin/sut/bus_test",
-    "ranked_list": ["../tuned_enemies/L2_small_enemy",
-                    "../tuned_enemies/L2_large_enemy",
-                    "../tuned_enemies/tuned_bus"],
+                    "../tuned_enemies/L2_large_enemy"],
     "cores": 3,
     "quantile": 0.95,
     "measurement_iterations_step": 20,
